@@ -19,21 +19,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Get list of changed files
-        id: changed-files
-        run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1 || true
-          git diff --name-only HEAD $(git merge-base HEAD FETCH_HEAD) > changed_files.txt
-          cat changed_files.txt
-
       - name: Lint Code Base
-        if: success() && steps.changed-files.outputs.changed_files != ''
         uses: github/super-linter@v5
         env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: false
-          VALIDATE_PYTHON: true
-          VALIDATE_JAVASCRIPT_ES: true
-        with:
-          files: $(cat changed_files.txt)
+            DEFAULT_BRANCH: master
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            VALIDATE_ALL_CODEBASE: false
+            ERROR_ON_MISSING_EXEC_BIT: true
+            VALIDATE_ANSIBLE: false
+            # disable all python linters
+            # ruff is taking care of this
+            VALIDATE_PYTHON: false
+            VALIDATE_PYTHON_BLACK: false
+            VALIDATE_PYTHON_FLAKE8: false
+            VALIDATE_PYTHON_ISORT: false
+            VALIDATE_PYTHON_MYPY: false
+            VALIDATE_PYTHON_PYLINT: false
+            # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
+            # specify one on the command line". Since there is no environment variable to set one on
+            # the command line, that means you need a configuration file (pyproject.toml by default)
+            # just to be able to use it.
+            VALIDATE_SQLFLUFF: false
