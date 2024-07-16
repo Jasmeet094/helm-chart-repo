@@ -1,0 +1,39 @@
+name: Lint Code Base
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  super-linter:
+    name: Super Linter
+    runs-on: ubuntu-latest
+    permissions:
+          contents: read
+          packages: read
+          statuses: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get list of changed files
+        id: changed-files
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }} --depth=1 || true
+          git diff --name-only HEAD $(git merge-base HEAD FETCH_HEAD) > changed_files.txt
+          cat changed_files.txt
+
+      - name: Lint Code Base
+        if: success() && steps.changed-files.outputs.changed_files != ''
+        uses: github/super-linter@v5
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_PYTHON: true
+          VALIDATE_JAVASCRIPT_ES: true
+        with:
+          files: $(cat changed_files.txt)

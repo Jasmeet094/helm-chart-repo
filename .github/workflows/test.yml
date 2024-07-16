@@ -1,0 +1,79 @@
+---
+    name: Lint Code Base
+    
+    on:
+      push:
+      pull_request:
+        branches: [master]
+    
+    jobs:
+      super-linter:
+        name: Super Linter
+        runs-on: ubuntu-latest
+    
+        permissions:
+          contents: read
+          packages: read
+          statuses: write
+    
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+            with:
+              # Full git history is needed to get a proper
+              # list of changed files within `super-linter`
+              fetch-depth: 0
+    
+          - name: Lint Code Base
+            uses: github/super-linter@v5
+            env:
+              DEFAULT_BRANCH: master
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              VALIDATE_ALL_CODEBASE: false
+              ERROR_ON_MISSING_EXEC_BIT: true
+              VALIDATE_ANSIBLE: false
+              # disable all python linters
+              # ruff is taking care of this
+              VALIDATE_PYTHON: false
+              VALIDATE_PYTHON_BLACK: false
+              VALIDATE_PYTHON_FLAKE8: false
+              VALIDATE_PYTHON_ISORT: false
+              VALIDATE_PYTHON_MYPY: false
+              VALIDATE_PYTHON_PYLINT: false
+              # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
+              # specify one on the command line". Since there is no environment variable to set one on
+              # the command line, that means you need a configuration file (pyproject.toml by default)
+              # just to be able to use it.
+              VALIDATE_SQLFLUFF: false
+    
+      ansible-lint:
+        name: Ansible Lint
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 1
+    
+          - name: Set up Python
+            uses: actions/setup-python@v5
+            with:
+              python-version: 3.x
+    
+          - name: Install ansible-lint
+            run: pip install ansible ansible-lint
+    
+          - name: Run ansible-lint on changed files
+            run: cd ansible && ansible-lint --nocolor
+    
+      ruff:
+        name: Ruff Lint
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout Code
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 1
+    
+          - name: Ruff check
+            uses: chartboost/ruff-action@v1
