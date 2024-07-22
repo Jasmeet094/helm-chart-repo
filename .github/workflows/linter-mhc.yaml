@@ -7,7 +7,7 @@
         branches: [main]
     
     jobs:
-      super-linter:
+      super-linter-mhc:
         name: Super Linter
         runs-on: ubuntu-latest
     
@@ -44,7 +44,7 @@
               DEFAULT_BRANCH: main
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               VALIDATE_ALL_CODEBASE: false
-              ERROR_ON_MISSING_EXEC_BIT: true
+              VALIDATE_BASH_EXEC: true
               VALIDATE_ANSIBLE: false
               # disable all python linters
               # ruff is taking care of this
