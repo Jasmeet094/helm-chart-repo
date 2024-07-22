@@ -1,5 +1,5 @@
 ---
-    name: Lint Code Base - mhc
+    name: Lint Code Base - mhc 
     
     on:
       push:
