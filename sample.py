@@ -1,55 +1,62 @@
-# This function adds two numbers
-def add(x, y):
-    return x + y
+def give_options(x,y,z):
+    print("a):", x)
+    print("b):", y)
+    print("c):", z)
+    
+print("Hello! Welcome to my Quiz" "\n" "All Questions carries 10 marks each")
+ans = input("Are you ready to play (yes/no): ")
+a ="Note: wrtie answers! do not write option."
+score = 0
+total_questions = 4
 
-# This function subtracts two numbers
-def subtract(x, y):
-    return x - y
+correct_ans =["python", "steve jobs", "artificial intelligence", "bitcoin"]
 
-# This function multiplies two numbers
-def multiply(x, y):
-    return x * y
-
-# This function divides two numbers
-def divide(x, y):
-    return x / y
-
-
-print("Select operation.")
-print("1.Add")
-print("2.Subtract")
-print("3.Multiply")
-print("4.Divide")
-
-while True:
-    # take input from the user
-    choice = input("Enter choice(1/2/3/4): ")
-
-    # check if choice is one of the four options
-    if choice in ('1', '2', '3', '4'):
-        try:
-            num1 = float(input("Enter first number: "))
-            num2 = float(input("Enter second number: "))
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-            continue
-
-        if choice == '1':
-            print(num1, "+", num2, "=", add(num1, num2))
-
-        elif choice == '2':
-            print(num1, "-", num2, "=", subtract(num1, num2))
-
-        elif choice == '3':
-            print(num1, "*", num2, "=", multiply(num1, num2))
-
-        elif choice == '4':
-            print(num1, "/", num2, "=", divide(num1, num2))
-        
-        # check if user wants another calculation
-        # break the while loop if answer is no
-        next_calculation = input("Let's do next calculation? (yes/no): ")
-        if next_calculation == "no":
-          break
+if ans.lower() == "yes":
+    print(a)
+    print("Question- What is the best Programming Language? ")
+    give_options("Python", "C", "Java" )
+    ans=input("&gt;&gt;&gt;")
+    if ans.lower() == correct_ans[0]:
+        score=score+1
+        print("Correct")
     else:
-        print("Invalid Input")
+        print("Incorrect")
+    print(a)
+    print("Question- Who is the Founder of Apple Inc? ")
+    give_options("Mark Zuckerberg", "Warren Buffet", "Steve jobs")
+    ans = input("&gt;&gt;&gt;")
+    if ans.lower() == correct_ans[1]:
+        score=score+1
+        print("Correct")
+    else:
+        print("Incorrect")
+    print(a)
+    print("Question- What is more better among these? ")
+    give_options("Data Science", "Artificial Intelligence", "Digital Marketing")
+    ans = input("&gt;&gt;&gt;")
+    if ans.lower() == correct_ans[2]:
+        score=score+1
+        print("Correct")
+    else:
+        print("Incorrect")
+    print(a)
+    print("Question- What is the best Investment? ")
+    give_options("Share Capital", "Mutual Funds", "Bitcoin")
+    ans = input("&gt;&gt;&gt;")
+    if ans.lower() == correct_ans[3]:
+        score=score+1
+        print("Correct")
+    else:
+        print("Incorrect")
+Code language: PHP (php)
+Now as we are done with the questions it’s time to show the scores to the user. I will multiply the score with 10 and then I will pass the if-else conditionals to print the status of the result of this Quiz game:
+
+i = score*10
+if i &lt; 30:
+    print("Ouch, your score is ",i,"/ 40 better luck next time.")
+elif i ==30:
+    print("Nice! you scored ",i,"/ 40 you are quiet smart.")
+else:
+    print("Congratulations! it's a perfect ",i,"/ 40 you are Intelligent.")
+    
+# Coded with 💙 by Mr. Unity Buddy
