@@ -59,6 +59,7 @@
               # the command line, that means you need a configuration file (pyproject.toml by default)
               # just to be able to use it.
               VALIDATE_SQLFLUFF: false
+              LOG_LEVEL: ERROR
               #FILTER_REGEX_INCLUDE: ${{ steps.changed-files.outputs.all_changed_files }} 
     
       ansible-lint:
