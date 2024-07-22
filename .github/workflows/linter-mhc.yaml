@@ -8,7 +8,7 @@
     
     jobs:
       super-linter-mhc:
-        name: Super Linter
+        name: Super Linter MHC
         runs-on: ubuntu-latest
     
         permissions:
