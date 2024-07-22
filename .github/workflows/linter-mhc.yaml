@@ -1,5 +1,5 @@
 ---
-    name: Lint Code Base
+    name: Lint Code Base - mhc
     
     on:
       push:
@@ -59,8 +59,7 @@
               # the command line, that means you need a configuration file (pyproject.toml by default)
               # just to be able to use it.
               VALIDATE_SQLFLUFF: false
-            with: 
-              files: ${{ steps.changed-files.outputs.all_changed_files }}  
+              FILTER_REGEX_INCLUDE: ${{ steps.changed-files.outputs.all_changed_files }} 
     
       ansible-lint:
         name: Ansible Lint
