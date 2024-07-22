@@ -1,4 +1,4 @@
-name: Lint Code Base - new
+name: Lint Code Base - newmhc
 
 on:
   push:
@@ -18,18 +18,25 @@ jobs:
 
       - name: Get list of changed files
         id: filter
-        uses: dorny/paths-filter@v3
+        uses: dorny/paths-filter@v2
         with:
           filters: |
             src:
               - 'src/**'
 
+      - name: Output changed files
+        run: echo "Changed files: ${{ steps.filter.outputs.src }}"
+    
+      - name: Set changed output
+        id: set-output
+        run: echo "::set-output name=changed::${{ steps.filter.outputs.src }}"
+        
   super-linter:
     name: Super Linter
     runs-on: ubuntu-latest
     needs: filter
 
-    if: ${{ needs.filter.outputs.changed == 'true' }}
+    if: ${{ needs.filter.outputs.changed != '' }}
 
     permissions:
       contents: read
@@ -63,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: filter
 
-    if: ${{ needs.filter.outputs.changed == 'true' }}
+    if: ${{ needs.filter.outputs.changed != '' }}
 
     steps:
       - name: Checkout Code
@@ -87,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: filter
 
-    if: ${{ needs.filter.outputs.changed == 'true' }}
+    if: ${{ needs.filter.outputs.changed != '' }}
 
     steps:
       - name: Checkout Code
