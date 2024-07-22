@@ -18,7 +18,7 @@ jobs:
 
       - name: Get list of changed files
         id: filter
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         with:
           filters: |
             src:
