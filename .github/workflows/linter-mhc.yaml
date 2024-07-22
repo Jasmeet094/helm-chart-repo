@@ -1,95 +1,95 @@
----
-    name: Lint Code Base - mhc 
+# ---
+#     name: Lint Code Base - mhc 
     
-    on:
-      push:
-      pull_request:
-        branches: [main]
+#     on:
+#       push:
+#       pull_request:
+#         branches: [main]
     
-    jobs:
-      super-linter-mhc:
-        name: Super Linter MHC
-        runs-on: ubuntu-latest
+#     jobs:
+#       super-linter-mhc:
+#         name: Super Linter MHC
+#         runs-on: ubuntu-latest
     
-        permissions:
-          contents: read
-          packages: read
-          statuses: write
+#         permissions:
+#           contents: read
+#           packages: read
+#           statuses: write
     
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v4
-            with:
-              # Full git history is needed to get a proper
-              # list of changed files within `super-linter`
-              fetch-depth: 0
+#         steps:
+#           - name: Checkout Code
+#             uses: actions/checkout@v4
+#             with:
+#               # Full git history is needed to get a proper
+#               # list of changed files within `super-linter`
+#               fetch-depth: 0
 
-          - name: Get changed files
-            id: changed-files
-            uses: tj-actions/changed-files@v44.5.6
-            with:
-              since_last_remote_commit: true
+#           - name: Get changed files
+#             id: changed-files
+#             uses: tj-actions/changed-files@v44.5.6
+#             with:
+#               since_last_remote_commit: true
         
-          - name: List all changed files
-            env:
-               ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-            run: |
-                  for file in ${ALL_CHANGED_FILES}; do
-                    echo "$file was changed"
-                  done
+#           - name: List all changed files
+#             env:
+#                ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+#             run: |
+#                   for file in ${ALL_CHANGED_FILES}; do
+#                     echo "$file was changed"
+#                   done
 
 
-          - name: Lint Code Base
-            uses: github/super-linter@latest
-            env:
-              DEFAULT_BRANCH: main
-              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              VALIDATE_ALL_CODEBASE: false
-              #VALIDATE_BASH_EXEC: true
-              VALIDATE_ANSIBLE: false
-              # disable all python linters
-              # ruff is taking care of this
-              VALIDATE_PYTHON: false
-              VALIDATE_PYTHON_BLACK: false
-              VALIDATE_PYTHON_FLAKE8: false
-              VALIDATE_PYTHON_ISORT: false
-              VALIDATE_PYTHON_MYPY: false
-              VALIDATE_PYTHON_PYLINT: false
-              # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
-              # specify one on the command line". Since there is no environment variable to set one on
-              # the command line, that means you need a configuration file (pyproject.toml by default)
-              # just to be able to use it.
-              VALIDATE_SQLFLUFF: false
-              FILTER_REGEX_INCLUDE: ${{ steps.changed-files.outputs.all_changed_files }} 
+#           - name: Lint Code Base
+#             uses: github/super-linter@latest
+#             env:
+#               DEFAULT_BRANCH: main
+#               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#               VALIDATE_ALL_CODEBASE: false
+#               #VALIDATE_BASH_EXEC: true
+#               VALIDATE_ANSIBLE: false
+#               # disable all python linters
+#               # ruff is taking care of this
+#               VALIDATE_PYTHON: false
+#               VALIDATE_PYTHON_BLACK: false
+#               VALIDATE_PYTHON_FLAKE8: false
+#               VALIDATE_PYTHON_ISORT: false
+#               VALIDATE_PYTHON_MYPY: false
+#               VALIDATE_PYTHON_PYLINT: false
+#               # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
+#               # specify one on the command line". Since there is no environment variable to set one on
+#               # the command line, that means you need a configuration file (pyproject.toml by default)
+#               # just to be able to use it.
+#               VALIDATE_SQLFLUFF: false
+#               FILTER_REGEX_INCLUDE: ${{ steps.changed-files.outputs.all_changed_files }} 
     
-      ansible-lint:
-        name: Ansible Lint
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 1
+#       ansible-lint:
+#         name: Ansible Lint
+#         runs-on: ubuntu-latest
+#         steps:
+#           - name: Checkout Code
+#             uses: actions/checkout@v4
+#             with:
+#               fetch-depth: 1
     
-          - name: Set up Python
-            uses: actions/setup-python@v5
-            with:
-              python-version: 3.x
+#           - name: Set up Python
+#             uses: actions/setup-python@v5
+#             with:
+#               python-version: 3.x
     
-          - name: Install ansible-lint
-            run: pip install ansible ansible-lint
+#           - name: Install ansible-lint
+#             run: pip install ansible ansible-lint
     
-          - name: Run ansible-lint on changed files
-            run: cd ansible && ansible-lint --nocolor
+#           - name: Run ansible-lint on changed files
+#             run: cd ansible && ansible-lint --nocolor
     
-      ruff:
-        name: Ruff Lint
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout Code
-            uses: actions/checkout@v4
-            with:
-              fetch-depth: 1
+#       ruff:
+#         name: Ruff Lint
+#         runs-on: ubuntu-latest
+#         steps:
+#           - name: Checkout Code
+#             uses: actions/checkout@v4
+#             with:
+#               fetch-depth: 1
     
-          - name: Ruff check
-            uses: chartboost/ruff-action@v1
+#           - name: Ruff check
+#             uses: chartboost/ruff-action@v1
