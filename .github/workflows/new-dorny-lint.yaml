@@ -1,9 +1,10 @@
-name: Lint Code Base
+
+name: Lint Code Base -new
 
 on:
   push:
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   filter:
@@ -49,7 +50,7 @@ jobs:
       - name: Lint Code Base
         uses: github/super-linter@v6
         env:
-          DEFAULT_BRANCH: main
+          DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_ALL_CODEBASE: false
           ERROR_ON_MISSING_EXEC_BIT: true
