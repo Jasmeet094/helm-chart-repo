@@ -37,6 +37,7 @@
                   for file in ${ALL_CHANGED_FILES}; do
                     echo "$file was changed"
                   done
+                  
 
           - name: Lint Code Base
             uses: github/super-linter@v5
