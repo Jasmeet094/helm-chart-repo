@@ -1,0 +1,26 @@
+---
+
+  - name: install pip and friends
+    apt: name={{ item }} state=present
+    register: result
+    retries: 2
+    delay: 10
+    with_items:
+      -  python-pip
+      -  python3-pip
+    become: True
+
+  - name: install awscli from pip3
+    pip: name=awscli version={{ u18_awscli_version }} executable=pip3
+    become: True
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+  
+  - name: install boto3 from pip3
+    pip: name=boto3 version={{ u18_boto3_version }} executable=pip3
+    become: True
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+  
+  - name: install boto3 from pip
+    pip: name=boto3 version={{ u18_boto3_version }} executable=pip
+    become: True
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'

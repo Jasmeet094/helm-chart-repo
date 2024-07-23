@@ -1,0 +1,5 @@
+---
+- include: clamav_install.yml
+  become: True
+
+- include: logrotate.yml

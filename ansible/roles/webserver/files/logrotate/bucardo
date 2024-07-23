@@ -1,0 +1,11 @@
+"/var/log/bucardo/log.bucardo" /var/log/bucardo/*.log {
+        daily
+        missingok
+        rotate 366
+        compress
+        delaycompress
+        notifempty
+        create 664 bucardo bucardo
+        copytruncate
+        sharedscripts
+}

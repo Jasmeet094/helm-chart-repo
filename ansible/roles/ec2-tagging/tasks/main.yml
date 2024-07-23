@@ -1,0 +1,31 @@
+- name: Determine server type
+  set_fact:
+    server_type: "{% if inventory_hostname_short |regex_search('(^.*)db[0-9]{1}$') %}db{% elif inventory_hostname_short |regex_search('(^.*)w[0-9]{1}$') %}web{% else %}other{% endif %}"
+
+- name: Set tags
+  set_fact:
+    role_tag: "{% if server_type=='web' and inventory_hostname_short |regex_search('(^.*)w1$') %}Admin{% elif server_type=='db' %}Database{% elif server_type=='web' %}Web{% else %}Other{% endif %}"
+    shard_tag: "{% if env in nonsharded_envs %}nonsharded{% else %}{{ shard }}{% endif %}"
+    env_tag: "{{ env }}"
+    backup_tag: "{% if env in 'p' %}Prod{% else %}NonProd{% endif %}"
+   
+- name: debug tag vars
+  debug:
+    var: "{{ item }}"
+  with_items:
+    - role_tag
+    - shard_tag
+    - env_tag
+
+- name: Ensure tags are present on a resource
+  amazon.aws.ec2_tag:
+    region: us-west-2 # This will break if not in the us-west-2 region
+    resource: "{{ instance_id }}"
+    state: present
+    purge_tags: no
+    tags:
+      Role: "{{ role_tag }}"
+      Shard: "{{ shard_tag }}"
+      Environment: "{{ env_tag }}"
+      Backup: "{{ backup_tag }}"
+  delegate_to: localhost

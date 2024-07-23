@@ -1,0 +1,539 @@
+Binary files www1/etc/aliases.db and www2/etc/aliases.db differ
+diff -ru www1/etc/apt/sources.list www2/etc/apt/sources.list
+--- www1/etc/apt/sources.list	2016-03-13 10:40:40.000000000 -0700
++++ www2/etc/apt/sources.list	2015-07-05 10:30:44.000000000 -0700
+@@ -9,13 +9,13 @@
+ 
+ # See http://help.ubuntu.com/community/UpgradeNotes for how to upgrade to
+ # newer versions of the distribution.
+-deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise main restricted
+-deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise main restricted
++deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise main
++deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise main
+ 
+ ## Major bug fix updates produced after the final release of the
+ ## distribution.
+-deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates main restricted
+-deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates main restricted
++deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates main
++deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates main
+ 
+ ## N.B. software from this repository is ENTIRELY UNSUPPORTED by the Ubuntu
+ ## team. Also, please note that software in universe WILL NOT receive any
+@@ -30,10 +30,10 @@
+ ## your rights to use the software. Also, please note that software in 
+ ## multiverse WILL NOT receive any review or updates from the Ubuntu
+ ## security team.
+-deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
+-deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
+-deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
+-deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
++# deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
++# deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise multiverse
++# deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
++# deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-updates multiverse
+ 
+ ## Uncomment the following two lines to add software from the 'backports'
+ ## repository.
+@@ -42,8 +42,8 @@
+ ## newer versions of some applications which may provide useful features.
+ ## Also, please note that software in backports WILL NOT receive any review
+ ## or updates from the Ubuntu security team.
+-deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
+-deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
++# deb http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
++# deb-src http://us-west-1.ec2.archive.ubuntu.com/ubuntu/ precise-backports main restricted universe multiverse
+ 
+ ## Uncomment the following two lines to add software from Canonical's
+ ## 'partner' repository.
+diff -ru www1/etc/ca-certificates.conf www2/etc/ca-certificates.conf
+--- www1/etc/ca-certificates.conf	2016-02-28 09:42:48.000000000 -0800
++++ www2/etc/ca-certificates.conf	2016-11-13 12:47:35.000000000 -0800
+@@ -218,3 +218,4 @@
+ mozilla/TÜRKTRUST_Elektronik_Sertifika_Hizmet_Sağlayıcısı_H6.crt
+ mozilla/USERTrust_ECC_Certification_Authority.crt
+ mozilla/USERTrust_RSA_Certification_Authority.crt
++entrust.crt
+diff -ru www1/etc/ca-certificates.conf.dpkg-old www2/etc/ca-certificates.conf.dpkg-old
+--- www1/etc/ca-certificates.conf.dpkg-old	2015-08-16 10:25:17.000000000 -0700
++++ www2/etc/ca-certificates.conf.dpkg-old	2016-02-28 09:41:55.000000000 -0800
+@@ -11,7 +11,7 @@
+ #
+ !cacert.org/cacert.org.crt
+ !debconf.org/ca.crt
+-mozilla/A-Trust-nQual-03.crt
++!mozilla/A-Trust-nQual-03.crt
+ mozilla/ACEDICOM_Root.crt
+ mozilla/AC_Raíz_Certicámara_S.A..crt
+ mozilla/AddTrust_External_Root.crt
+@@ -22,13 +22,13 @@
+ mozilla/AffirmTrust_Networking.crt
+ mozilla/AffirmTrust_Premium.crt
+ mozilla/AffirmTrust_Premium_ECC.crt
+-mozilla/America_Online_Root_Certification_Authority_1.crt
+-mozilla/America_Online_Root_Certification_Authority_2.crt
++!mozilla/America_Online_Root_Certification_Authority_1.crt
++!mozilla/America_Online_Root_Certification_Authority_2.crt
+ mozilla/ApplicationCA_-_Japanese_Government.crt
+ mozilla/Autoridad_de_Certificacion_Firmaprofesional_CIF_A62634068.crt
+ mozilla/Baltimore_CyberTrust_Root.crt
+ mozilla/Buypass_Class_2_CA_1.crt
+-mozilla/Buypass_Class_3_CA_1.crt
++!mozilla/Buypass_Class_3_CA_1.crt
+ mozilla/CA_Disig.crt
+ mozilla/CNNIC_ROOT.crt
+ mozilla/COMODO_Certification_Authority.crt
+@@ -42,7 +42,7 @@
+ mozilla/Certum_Trusted_Network_CA.crt
+ mozilla/Chambers_of_Commerce_Root_-_2008.crt
+ mozilla/ComSign_CA.crt
+-mozilla/ComSign_Secured_CA.crt
++!mozilla/ComSign_Secured_CA.crt
+ mozilla/Comodo_AAA_Services_root.crt
+ mozilla/Comodo_Secure_Services_root.crt
+ mozilla/Comodo_Trusted_Services_root.crt
+@@ -53,9 +53,9 @@
+ mozilla/DigiCert_Assured_ID_Root_CA.crt
+ mozilla/DigiCert_Global_Root_CA.crt
+ mozilla/DigiCert_High_Assurance_EV_Root_CA.crt
+-mozilla/Digital_Signature_Trust_Co._Global_CA_1.crt
+-mozilla/Digital_Signature_Trust_Co._Global_CA_3.crt
+-mozilla/E-Guven_Kok_Elektronik_Sertifika_Hizmet_Saglayicisi.crt
++!mozilla/Digital_Signature_Trust_Co._Global_CA_1.crt
++!mozilla/Digital_Signature_Trust_Co._Global_CA_3.crt
++!mozilla/E-Guven_Kok_Elektronik_Sertifika_Hizmet_Saglayicisi.crt
+ mozilla/EBG_Elektronik_Sertifika_Hizmet_Sağlayıcısı.crt
+ mozilla/Entrust.net_Premium_2048_Secure_Server_CA.crt
+ !mozilla/Entrust.net_Secure_Server_CA.crt
+@@ -65,7 +65,7 @@
+ mozilla/Equifax_Secure_eBusiness_CA_1.crt
+ !mozilla/Equifax_Secure_eBusiness_CA_2.crt
+ !mozilla/Firmaprofesional_Root_CA.crt
+-mozilla/GTE_CyberTrust_Global_Root.crt
++!mozilla/GTE_CyberTrust_Global_Root.crt
+ mozilla/GeoTrust_Global_CA.crt
+ mozilla/GeoTrust_Global_CA_2.crt
+ mozilla/GeoTrust_Primary_Certification_Authority.crt
+@@ -116,22 +116,22 @@
+ mozilla/SwissSign_Platinum_CA_-_G2.crt
+ mozilla/SwissSign_Silver_CA_-_G2.crt
+ mozilla/Swisscom_Root_CA_1.crt
+-mozilla/TC_TrustCenter_Class_2_CA_II.crt
++!mozilla/TC_TrustCenter_Class_2_CA_II.crt
+ mozilla/TC_TrustCenter_Class_3_CA_II.crt
+-mozilla/TC_TrustCenter_Universal_CA_I.crt
++!mozilla/TC_TrustCenter_Universal_CA_I.crt
+ !mozilla/TC_TrustCenter_Universal_CA_III.crt
+ !mozilla/TC_TrustCenter__Germany__Class_2_CA.crt
+ !mozilla/TC_TrustCenter__Germany__Class_3_CA.crt
+ !mozilla/TDC_Internet_Root_CA.crt
+ !mozilla/TDC_OCES_Root_CA.crt
+-mozilla/TURKTRUST_Certificate_Services_Provider_Root_1.crt
+-mozilla/TURKTRUST_Certificate_Services_Provider_Root_2.crt
++!mozilla/TURKTRUST_Certificate_Services_Provider_Root_1.crt
++!mozilla/TURKTRUST_Certificate_Services_Provider_Root_2.crt
+ mozilla/TWCA_Root_Certification_Authority.crt
+ mozilla/Taiwan_GRCA.crt
+-mozilla/Thawte_Premium_Server_CA.crt
+-mozilla/Thawte_Server_CA.crt
++!mozilla/Thawte_Premium_Server_CA.crt
++!mozilla/Thawte_Server_CA.crt
+ mozilla/TÜBİTAK_UEKAE_Kök_Sertifika_Hizmet_Sağlayıcısı_-_Sürüm_3.crt
+-mozilla/UTN_DATACorp_SGC_Root_CA.crt
++!mozilla/UTN_DATACorp_SGC_Root_CA.crt
+ mozilla/UTN_USERFirst_Email_Root_CA.crt
+ mozilla/UTN_USERFirst_Hardware_Root_CA.crt
+ !mozilla/ValiCert_Class_1_VA.crt
+@@ -149,7 +149,7 @@
+ mozilla/Verisign_Class_3_Public_Primary_Certification_Authority_-_G2.crt
+ mozilla/Verisign_Class_3_Public_Primary_Certification_Authority_-_G3.crt
+ !mozilla/Verisign_Class_4_Public_Primary_Certification_Authority_-_G2.crt
+-mozilla/Verisign_Class_4_Public_Primary_Certification_Authority_-_G3.crt
++!mozilla/Verisign_Class_4_Public_Primary_Certification_Authority_-_G3.crt
+ mozilla/Visa_eCommerce_Root.crt
+ mozilla/WellsSecure_Public_Root_Certificate_Authority.crt
+ !mozilla/Wells_Fargo_Root_CA.crt
+@@ -160,7 +160,7 @@
+ mozilla/thawte_Primary_Root_CA_-_G2.crt
+ mozilla/thawte_Primary_Root_CA_-_G3.crt
+ !spi-inc.org/spi-ca-2003.crt
+-spi-inc.org/spi-cacert-2008.crt
++!spi-inc.org/spi-cacert-2008.crt
+ mozilla/Actalis_Authentication_Root_CA.crt
+ mozilla/Buypass_Class_2_Root_CA.crt
+ mozilla/Buypass_Class_3_Root_CA.crt
+@@ -193,9 +193,28 @@
+ mozilla/QuoVadis_Root_CA_1_G3.crt
+ mozilla/QuoVadis_Root_CA_2_G3.crt
+ mozilla/QuoVadis_Root_CA_3_G3.crt
+-mozilla/SG_TRUST_SERVICES_RACINE.crt
++!mozilla/SG_TRUST_SERVICES_RACINE.crt
+ mozilla/TeliaSonera_Root_CA_v1.crt
+ mozilla/T-TeleSec_GlobalRoot_Class_2.crt
+ mozilla/TWCA_Global_Root_CA.crt
+ mozilla/WoSign_China.crt
+ mozilla/WoSign.crt
++mozilla/CA_WoSign_ECC_Root.crt
++mozilla/Certification_Authority_of_WoSign_G2.crt
++mozilla/Certinomis_-_Root_CA.crt
++mozilla/CFCA_EV_ROOT.crt
++mozilla/COMODO_RSA_Certification_Authority.crt
++mozilla/Entrust_Root_Certification_Authority_-_EC1.crt
++mozilla/Entrust_Root_Certification_Authority_-_G2.crt
++mozilla/GlobalSign_ECC_Root_CA_-_R4.crt
++mozilla/GlobalSign_ECC_Root_CA_-_R5.crt
++mozilla/IdenTrust_Commercial_Root_CA_1.crt
++mozilla/IdenTrust_Public_Sector_Root_CA_1.crt
++mozilla/OISTE_WISeKey_Global_Root_GB_CA.crt
++mozilla/Staat_der_Nederlanden_EV_Root_CA.crt
++mozilla/Staat_der_Nederlanden_Root_CA_-_G3.crt
++mozilla/S-TRUST_Universal_Root_CA.crt
++mozilla/TÜRKTRUST_Elektronik_Sertifika_Hizmet_Sağlayıcısı_H5.crt
++mozilla/TÜRKTRUST_Elektronik_Sertifika_Hizmet_Sağlayıcısı_H6.crt
++mozilla/USERTrust_ECC_Certification_Authority.crt
++mozilla/USERTrust_RSA_Certification_Authority.crt
+diff -ru www1/etc/cron.daily/ntp www2/etc/cron.daily/ntp
+--- www1/etc/cron.daily/ntp	2012-06-05 13:12:19.000000000 -0700
++++ www2/etc/cron.daily/ntp	2016-10-05 05:38:52.000000000 -0700
+@@ -9,19 +9,23 @@
+ statsdir=$(cat /etc/ntp.conf | grep -v '^#' | sed -n 's/statsdir \([^ ][^ ]*\)/\1/p')
+ 
+ if [ -n "$statsdir" ] && [ -d "$statsdir" ]; then
+-	# only keep a week's depth of these
+-	find "$statsdir" -type f -mtime +7 -exec rm {} \;
++	# only keep a week's depth of these. Delete only files exactly
++	# within the directory and do not descend into subdirectories
++	# to avoid security risks on platforms where find is not using
++	# fts-library.
++	find "$statsdir" -maxdepth 1 -type f -mtime +7 -delete
+ 
+-	# compress whatever is left to save space
+-	cd "$statsdir"
+-	ls loopstats.???????? peerstats.???????? > /dev/null 2>&1
++	# compress whatever is left to save space but make sure to really
++	# do it only in the expected directory.
++	cd "$statsdir" || exit 1
++	ls -d -- *stats.???????? > /dev/null 2>&1
+ 	if [ $? -eq 0 ]; then
+ 		# Note that gzip won't compress the file names that
+ 		# are hard links to the live/current files, so this
+ 		# compresses yesterday and previous, leaving the live
+ 		# log alone.  We supress the warnings gzip issues
+ 		# about not compressing the linked file.
+-		gzip --best --quiet loopstats.???????? peerstats.???????? 
++		gzip --best --quiet -- *stats.???????? 
+ 		return=$?
+ 		case $return in
+ 		    2)
+diff -ru www1/etc/crontab www2/etc/crontab
+--- www1/etc/crontab	2016-12-05 13:50:24.000000000 -0800
++++ www2/etc/crontab	2016-12-14 20:00:00.000000000 -0800
+@@ -13,6 +13,3 @@
+ 47 22	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+ 52 22	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+ #
+-#25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+-#47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+-#52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+diff -ru www1/etc/dbus-1/system.conf www2/etc/dbus-1/system.conf
+--- www1/etc/dbus-1/system.conf	2012-02-22 00:48:38.000000000 -0800
++++ www2/etc/dbus-1/system.conf	2016-10-12 06:18:40.000000000 -0700
+@@ -68,6 +68,14 @@
+     <deny send_destination="org.freedesktop.DBus"
+           send_interface="org.freedesktop.DBus"
+           send_member="UpdateActivationEnvironment"/>
++    <deny send_destination="org.freedesktop.DBus"
++          send_interface="org.freedesktop.systemd1.Activator"/>
++  </policy>
++
++  <!-- Only systemd, which runs as root, may report activation failures. -->
++  <policy user="root">
++    <allow send_destination="org.freedesktop.DBus"
++           send_interface="org.freedesktop.systemd1.Activator"/>
+   </policy>
+ 
+   <!-- Config files are placed here that among other things, punch 
+diff -ru www1/etc/hostname www2/etc/hostname
+--- www1/etc/hostname	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/hostname	2015-07-05 10:30:36.000000000 -0700
+@@ -1 +1 @@
+-ip-10-233-17-91
++ip-10-250-168-18
+diff -ru www1/etc/init/celery.conf www2/etc/init/celery.conf
+--- www1/etc/init/celery.conf	2015-12-30 12:17:56.000000000 -0800
++++ www2/etc/init/celery.conf	2016-01-26 10:33:14.000000000 -0800
+@@ -2,6 +2,6 @@
+ start on runlevel [2345]
+ stop on runlevel [!2345]
+ 
+-exec su -c '/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py celeryd --loglevel=info -f /home/mhc/logs/celeryd.log -v 2 -E --concurrency=2' - mhc
++exec su -c '/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py celeryd --loglevel=info -f /home/mhc/logs/celeryd.log -s /home/mhc/celery-schedules -B -v 2 -E --concurrency=8 --maxtasksperchild=1' - mhc
+ 
+ respawn
+diff -ru www1/etc/init/celerybg.conf www2/etc/init/celerybg.conf
+--- www1/etc/init/celerybg.conf	2015-12-30 12:17:44.000000000 -0800
++++ www2/etc/init/celerybg.conf	2016-07-17 11:11:39.000000000 -0700
+@@ -1,7 +1,7 @@
+-description "celery background server for mhc"
++description "celery server for mhc"
+ start on runlevel [2345]
+ stop on runlevel [!2345]
+ 
+-exec su -c '/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py celeryd --loglevel=info -f /home/mhc/logs/celerybg.log -Q background -v 2 -E --concurrency=3' - mhc
++exec su -c '/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py celeryd --loglevel=info -f /home/mhc/logs/celerybg.log -Q background -v 3 -E --concurrency=12 --maxtasksperchild=10' - mhc
+ 
+ respawn
+Only in www2/etc/init: celeryhr.conf
+diff -ru www1/etc/init/mhc.conf www2/etc/init/mhc.conf
+--- www1/etc/init/mhc.conf	2016-07-11 14:52:49.000000000 -0700
++++ www2/etc/init/mhc.conf	2016-12-24 11:52:16.000000000 -0800
+@@ -3,4 +3,4 @@
+ stop on runlevel [!2345]
+ respawn
+ 
+-exec su -c 'uwsgi  --enable-threads --virtualenv /home/mhc/mhc-venv --post-buffering 32768 --buffer-size 32768 -M --no-orphans --socket /home/mhc/run/mhc.sock --chmod-socket --processes 8 -t 60 --harakiri 1800 --logto /home/mhc/logs/mhc_uwsgi.log --wsgi-file /home/mhc/mhc-backend/Backend/wsgi.py' - mhc
++exec su -c 'uwsgi  --enable-threads --virtualenv /home/mhc/mhc-venv --post-buffering 32768 --buffer-size 32768 -M --no-orphans --socket /home/mhc/run/mhc.sock --chmod-socket --processes 15 -t 60 --harakiri 9000 --logto /home/mhc/logs/mhc_uwsgi.log --wsgi-file /home/mhc/mhc-backend/Backend/wsgi.py' - mhc
+Binary files www1/etc/ld.so.cache and www2/etc/ld.so.cache differ
+Binary files www1/etc/localtime and www2/etc/localtime differ
+diff -ru www1/etc/logrotate.d/mhc www2/etc/logrotate.d/mhc
+--- www1/etc/logrotate.d/mhc	2015-10-21 08:53:55.000000000 -0700
++++ www2/etc/logrotate.d/mhc	2015-12-30 23:21:14.000000000 -0800
+@@ -9,7 +9,5 @@
+         sharedscripts
+         postrotate
+                 /usr/sbin/service mhc restart > /dev/null
+-                /usr/sbin/service celery restart >/dev/null
+-                /usr/sbin/service celerybg restart >/dev/null
+         endscript
+ }
+Only in www2/etc/nginx/conf.d: ssl.conf
+diff -ru www1/etc/nginx/proxy_params www2/etc/nginx/proxy_params
+--- www1/etc/nginx/proxy_params	2013-05-18 18:12:26.000000000 -0700
++++ www2/etc/nginx/proxy_params	2016-12-24 11:53:15.000000000 -0800
+@@ -2,8 +2,8 @@
+ proxy_set_header X-Real-IP $remote_addr;
+ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+ 
+-proxy_read_timeout 30m;
+-proxy_send_timeout 30m;
+-proxy_connect_timeout 30m;
+-client_header_timeout 30m;
+-client_body_timeout 30m;
++proxy_read_timeout 150m;
++proxy_send_timeout 150m;
++proxy_connect_timeout 150m;
++client_header_timeout 150m;
++client_body_timeout 150m;
+diff -ru www1/etc/nginx/sites-available/default www2/etc/nginx/sites-available/default
+--- www1/etc/nginx/sites-available/default	2015-11-10 09:39:57.000000000 -0800
++++ www2/etc/nginx/sites-available/default	2016-12-24 11:53:34.000000000 -0800
+@@ -13,6 +13,7 @@
+        rewrite ^(.*) https://www.mobilehealthconsumer.com$1;
+  }
+ 
++
+ server {
+        listen 80;
+        rewrite ^(.*) https://$host$1 permanent;
+@@ -27,8 +28,8 @@
+         listen 443  default_server;
+         
+ 	ssl    on;
+-	ssl_certificate    /etc/ssl/www_mobilehealthconsumer_com.crt;
+-	ssl_certificate_key    /etc/ssl/www_mobilehealthconsumer_com.key;
++	ssl_certificate    /etc/ssl/wildcardcert.crt;
++	ssl_certificate_key    /etc/ssl/wildcardcert.key;
+ 
+ 
+ 	server_name _;
+@@ -50,6 +51,7 @@
+         location /studenthealth {
+                 rewrite ^(.*) https://$host/web/pages/universitylogin.html;
+         }
++
+         location /media {
+                 root /home/mhc/mhc-backend/;
+                 index home.html;
+@@ -85,15 +87,16 @@
+                 alias /home/mhc/mhc-frontend/;
+                 index home.html;
+         }
++
+         location /web/pages/undefined {
+                 rewrite ^(.*) https://$host/web/pages/login.html;
+         }
+ 
+ 
++
+         location /partners {
+                 #wsgi conf:
+-
+-                set $test "";
++		set $test "";
+                 if ($uri ~ click) {
+                         set $test "L";
+                 }
+@@ -106,29 +109,29 @@
+                 if ($uri ~ view) {
+                         set $test "L";
+                 }
+-                if ($uri ~ oauthCallback) {
+-                        set $test "L";
+-                }
+-                if ($uri ~ oauth2Callback) {
+-                        set $test "L";
+-                }
+-                if ($uri ~ SAMLEntry) {
+-                        set $test "L";
+-                }
+-                if ($uri ~ SSO) {
+-                        set $test "L";
+-                }
++		if ($uri ~ oauthCallback) {
++			set $test "L";
++		}
++		if ($uri ~ oauth2Callback) {
++			set $test "L";
++		}
++		if ($uri ~ SAMLEntry) {
++			set $test "L";
++		}
++		if ($uri ~ SSO) {
++			set $test "L";
++		}
+                 if ($host = "www.mobilehealthconsumer.com") {
+-                        set $test "${test}H";
++			set $test "${test}H";
+                 }
+-                if ($test = "H") {
++		if ($test = "H") {
+                         rewrite ^(.*) https://wwwadmin.mobilehealthconsumer.com$1;
+-                }
++		}
+                 uwsgi_pass   unix:///home/mhc/run/mhc.sock;
+                 include        uwsgi_params;
+                 uwsgi_modifier1 30;
+                 uwsgi_param SCRIPT_NAME /partners;
+-		uwsgi_read_timeout	1800;
++		uwsgi_read_timeout	9000;
+ 
+         }
+         location /api {
+diff -ru www1/etc/ossec-init.conf www2/etc/ossec-init.conf
+--- www1/etc/ossec-init.conf	2014-12-17 23:02:48.000000000 -0800
++++ www2/etc/ossec-init.conf	2014-12-12 18:21:50.000000000 -0800
+@@ -1,4 +1,4 @@
+ DIRECTORY="/var/ossec"
+ VERSION="v2.8"
+-DATE="Wed Dec 17 23:02:48 PST 2014"
++DATE="Fri Dec 12 18:21:50 PST 2014"
+ TYPE="local"
+diff -ru www1/etc/postfix/main.cf www2/etc/postfix/main.cf
+--- www1/etc/postfix/main.cf	2014-12-17 23:09:19.000000000 -0800
++++ www2/etc/postfix/main.cf	2014-12-12 18:55:13.000000000 -0800
+@@ -18,11 +18,11 @@
+ readme_directory = no
+ 
+ # TLS parameters
+-smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
+-smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
+-smtpd_use_tls=yes
+-smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+-smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
++#smtpd_tls_cert_file=/etc/ssl/certs/ssl-cert-snakeoil.pem
++#smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
++#smtpd_use_tls=yes
++#smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
++#smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+ 
+ # See /usr/share/doc/postfix/TLS_README.gz in the postfix-doc package for
+ # information on enabling SSL in the smtp client.
+Only in www2/etc/postfix: main.cf.bak
+Only in www2/etc/postfix: sasl_passwd
+Binary files www1/etc/postfix/sasl_passwd.db and www2/etc/postfix/sasl_passwd.db differ
+diff -ru www1/etc/redis/redis.conf www2/etc/redis/redis.conf
+--- www1/etc/redis/redis.conf	2011-07-27 10:26:50.000000000 -0700
++++ www2/etc/redis/redis.conf	2016-08-12 14:50:32.000000000 -0700
+@@ -44,7 +44,7 @@
+ # verbose (many rarely useful info, but not a mess like the debug level)
+ # notice (moderately verbose, what you want in production probably)
+ # warning (only very important / critical messages are logged)
+-loglevel notice
++loglevel debug
+ 
+ # Specify the log file name. Also 'stdout' can be used to force
+ # Redis to log on the standard output. Note that if you use standard
+diff -ru www1/etc/shadow www2/etc/shadow
+--- www1/etc/shadow	2015-08-16 12:02:29.000000000 -0700
++++ www2/etc/shadow	2015-08-16 12:06:23.000000000 -0700
+@@ -32,7 +32,7 @@
+ monkeysphere:*:15561:0:99999:7:::
+ nagios:!:16050:0:99999:7:::
+ ntp:*:16075:0:99999:7:::
+-ossec:!:16422:0:99999:7:::
+-ossecm:!:16422:0:99999:7:::
+-ossecr:!:16422:0:99999:7:::
++ossec:!:16417:0:99999:7:::
++ossecm:!:16417:0:99999:7:::
++ossecr:!:16417:0:99999:7:::
+ stunnel4:!:16663:0:99999:7:::
+diff -ru www1/etc/shadow- www2/etc/shadow-
+--- www1/etc/shadow-	2015-08-16 12:02:29.000000000 -0700
++++ www2/etc/shadow-	2015-08-16 12:06:23.000000000 -0700
+@@ -32,7 +32,7 @@
+ monkeysphere:*:15561:0:99999:7:::
+ nagios:!:16050:0:99999:7:::
+ ntp:*:16075:0:99999:7:::
+-ossec:!:16422:0:99999:7:::
+-ossecm:!:16422:0:99999:7:::
+-ossecr:!:16422:0:99999:7:::
++ossec:!:16417:0:99999:7:::
++ossecm:!:16417:0:99999:7:::
++ossecr:!:16417:0:99999:7:::
+ stunnel4:!:16663:0:99999:7:::
+diff -ru www1/etc/ssh/ssh_host_dsa_key www2/etc/ssh/ssh_host_dsa_key
+--- www1/etc/ssh/ssh_host_dsa_key	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_dsa_key	2015-07-05 10:30:37.000000000 -0700
+@@ -1,12 +1,12 @@
+diff -ru www1/etc/ssh/ssh_host_dsa_key.pub www2/etc/ssh/ssh_host_dsa_key.pub
+--- www1/etc/ssh/ssh_host_dsa_key.pub	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_dsa_key.pub	2015-07-05 10:30:37.000000000 -0700
+@@ -1 +1 @@
+diff -ru www1/etc/ssh/ssh_host_ecdsa_key www2/etc/ssh/ssh_host_ecdsa_key
+--- www1/etc/ssh/ssh_host_ecdsa_key	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_ecdsa_key	2015-07-05 10:30:37.000000000 -0700
+@@ -1,5 +1,5 @@
+ -----BEGIN EC PRIVATE KEY-----
+-MHcCAQEEIE23a+3NAqTgfBdnbzHE6fmiNZJCcBHPzFTnUsNd5lngoAoGCCqGSM49
+-AwEHoUQDQgAEIB8q2saL//R1CQ/msHFq5Ly9Akt4+jSNc2DR99lJgv0IyQ0vzSZj
+-+SE5khNzMALs8GMIoH+FmQ7Di//9lHRhQw==
++MHcCAQEEIJieTbqKuI1IaCrXdWf8Pmxa9YQmgwWNt7VG/jn6S99poAoGCCqGSM49
++AwEHoUQDQgAEquJ1dKA2/TJIu4ghZjzAUUvUC9LNZAjTEmNMOAdo/pF3UcT0MnaF
++ZUebBu+X5NMjUEVIc9/7ood1fTDK0DIQ4g==
+ -----END EC PRIVATE KEY-----
+diff -ru www1/etc/ssh/ssh_host_ecdsa_key.pub www2/etc/ssh/ssh_host_ecdsa_key.pub
+--- www1/etc/ssh/ssh_host_ecdsa_key.pub	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_ecdsa_key.pub	2015-07-05 10:30:37.000000000 -0700
+@@ -1 +1 @@
+iff -ru www1/etc/ssh/ssh_host_rsa_key www2/etc/ssh/ssh_host_rsa_key
+--- www1/etc/ssh/ssh_host_rsa_key	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_rsa_key	2015-07-05 10:30:37.000000000 -0700
+@@ -1,27 +1,27 @@
+diff -ru www1/etc/ssh/ssh_host_rsa_key.pub www2/etc/ssh/ssh_host_rsa_key.pub
+--- www1/etc/ssh/ssh_host_rsa_key.pub	2016-03-13 10:40:29.000000000 -0700
++++ www2/etc/ssh/ssh_host_rsa_key.pub	2015-07-05 10:30:37.000000000 -0700
+@@ -1 +1 @@
+Only in www2/etc/ssl/certs: 2835d715.0
+Only in www2/etc/ssl/certs: c8d68ad2.0
+diff -ru www1/etc/ssl/certs/ca-certificates.crt www2/etc/ssl/certs/ca-certificates.crt
+ -----END CERTIFICATE-----
++-----END CERTIFICATE-----
+Only in www2/etc/ssl/certs: entrust.pem
+Only in www2/etc/ssl: wildcardcert.crt
+Only in www2/etc/ssl: wildcardcert.key
+Only in www1/etc/ssl: www.mobilehealthconsumer.com.crt
+Only in www1/etc/ssl: www.mobilehealthconsumer.com.key
+Only in www1/etc/ssl: www_mobilehealthconsumer_com.crt
+Only in www1/etc/ssl: www_mobilehealthconsumer_com.key
+Only in www1: www1.tar
+Only in www2: www2.tar

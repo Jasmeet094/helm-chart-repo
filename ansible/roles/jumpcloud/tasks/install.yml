@@ -1,0 +1,50 @@
+---
+- name:     Get the install script
+  uri:
+    url: "{{ jumpcloud_x_connect_url }}"
+    headers:
+      x-connect-key: "{{ jumpcloud_x_connect_key }}"
+    return_content: yes
+  delegate_to: 127.0.0.1
+  run_once: true
+  register: jumpcloud_install_script
+  check_mode: no
+  when: not jumpcloud_install_script_contents is defined
+
+- name: Display install script contents (verbose mode)
+  ansible.builtin.debug:
+    var: jumpcloud_install_script
+    verbosity: 1
+  when: not jumpcloud_install_script_contents is defined
+
+- name: Register the install script output as a variable
+  set_fact:
+    jumpcloud_install_script_contents: "{{ jumpcloud_install_script.content }}"
+  when: not jumpcloud_install_script_contents is defined
+
+- name:     Ensure temp directory exists
+  file:
+    path:  "{{ jumpcloud_temp_directory }}"
+    state:  directory
+    owner:  "{{ jumpcloud_install_script_owner }}"
+    group:  "{{ jumpcloud_install_script_group }}"
+    mode:   "{{ jumpcloud_temp_directory_mode }}"
+  become: "{{ jumpcloud_use_sudo }}"
+
+- name: Copy the string into position
+  template:
+    src:      "{{ jumpcloud_template_path }}"
+    dest:     "{{ jumpcloud_temp_directory }}/{{ jumpcloud_temp_install_file }}"
+    owner:    "{{ jumpcloud_install_script_owner }}"
+    group:    "{{ jumpcloud_install_script_group }}"
+    mode:     "{{ jumpcloud_install_script_mode }}"
+  become: "{{ jumpcloud_use_sudo }}"
+
+- name:     Execute this via the shell
+  command: "./{{ jumpcloud_temp_install_file }}"
+  args:
+    chdir: "{{ jumpcloud_temp_directory }}"
+  become: "{{ jumpcloud_use_sudo }}"
+  notify:
+    - restart JumpCloud
+...

@@ -1,0 +1,4 @@
+---
+
+env: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\1') }}"
+shard: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\2') }}"

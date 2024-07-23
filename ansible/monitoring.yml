@@ -1,0 +1,15 @@
+- name: Configure instance monitoring
+  hosts: all
+  become: yes
+  roles:
+    - role: nrpe
+    - role: webserver
+      when: "tags.Role in ['Admin', 'Web']"
+    - role: databases
+      when: "tags.Role in ['Database']"
+  tasks:
+    - name: restart nrpe
+      service: 
+        name: nagios-nrpe-server 
+        state: restarted
+      tags: monitoring

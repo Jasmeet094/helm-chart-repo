@@ -1,0 +1,43 @@
+---
+  - name: mkdir for fonts
+    file:
+      path: /usr/share/fonts/truetype/roboto/
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    tags:
+      - fonts
+
+  - name: Retrieve SSL assets from S3
+    aws_s3:
+      bucket: "{{s3_bucket}}"
+      object: "fonts/roboto/{{item}}"
+      dest: "/usr/share/fonts/truetype/roboto/{{item}}"
+      mode: get
+    with_items:
+      - "Roboto-BlackItalic.ttf"
+      - "Roboto-Black.ttf"
+      - "Roboto-BoldItalic.ttf"
+      - "Roboto-Bold.ttf"
+      - "Roboto-Italic.ttf"
+      - "Roboto-LightItalic.ttf"
+      - "Roboto-Light.ttf"
+      - "Roboto-MediumItalic.ttf"
+      - "Roboto-Medium.ttf"
+      - "Roboto-Regular.ttf"
+      - "Roboto-ThinItalic.ttf"
+      - "Roboto-Thin.ttf"
+    tags:
+      - fonts
+
+  - name: Recursively setting file prems
+    file:
+      path: /usr/share/fonts/truetype/roboto
+      state: directory
+      recurse: yes
+      owner: root
+      group: root
+      mode: '0755'
+    tags:
+      - fonts

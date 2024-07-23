@@ -1,0 +1,30 @@
+---
+- name: Run the postfix and ossec roles
+  hosts: all
+  become: true
+  roles:
+    - role: postfix
+    - role: ossec
+  tasks:
+    - name: Replace syslog settings
+      ansible.builtin.template:
+        remote_src: false
+        owner: root
+        group: root
+        mode: '0640'
+        dest: /var/ossec/rules/syslog_rules.xml
+        src: syslog_rules.xml
+      become: true
+    - name: Replace ossec rules settings
+      ansible.builtin.template:
+        remote_src: false
+        owner: root
+        group: root
+        mode: '0640'
+        dest: /var/ossec/rules/ossec_rules.xml
+        src: ossec_rules.xml
+      become: true
+    - name: Restart ossec
+      ansible.builtin.service:
+        name: ossec
+        state: restarted

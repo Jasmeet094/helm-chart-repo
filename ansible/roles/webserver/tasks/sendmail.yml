@@ -1,0 +1,8 @@
+- name: Set up cron for sending mhc-backend mail
+  cron:
+    name: send mail
+    user: mhc
+    job: "/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py send_mail >> /home/mhc/logs/mail_cron.log 2>&1"
+  become: True
+  become_user: mhc
+  when: "tags.Role in ['Admin']"

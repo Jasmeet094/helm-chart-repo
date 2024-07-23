@@ -1,0 +1,21 @@
+---
+bg_concurrency: 2
+bg_maxtaskperchild: 1
+bglow_concurrency:
+  large: 10
+  small: 1
+bglow_maxtaskperchild:
+  large: 10
+  small: 2
+celery_concurrency:
+  c6i.12xlarge: 36
+  c6i.8xlarge: 24
+  c6i.4xlarge: 12
+  c6i.2xlarge: 6
+  default: 4
+celery_maxtaskperchild: 1
+hr_concurrency: 2
+hr_maxtaskperchild: 1
+admin_server: true
+sharded_cluster: true
+region: us-west-2

@@ -1,0 +1,9 @@
+---
+- name: Install Packages
+  apt:
+     name: "{{ item }}"
+  become: True
+  with_items:
+    - stunnel
+  tags:
+    - stunnel

@@ -1,0 +1,74 @@
+---
+- name: add key for the below repo url
+  apt_key:
+    url: "{{mongo_apt_key}}"
+    state: present
+  tags:
+    - mongo
+
+- name: Add mongodb-org apt repo
+  apt_repository:
+    repo: "deb {{mongo_apt_repo}} multiverse"
+    state: present
+    filename: "{{ mongo_repo_filename }}-{{ specific_mongo_vers_major}}"
+  tags:
+    - mongo
+  become: true
+
+- name: Check if port 27017 is listening
+  wait_for:
+    port: 27017
+    delay: 5
+    timeout: 10
+    msg: "Timeout waiting for mongo to respond"
+  register: port_check
+  ignore_errors: yes
+
+- name: Set compatability setting in bash script
+  script: /data/ansible/roles/mongo/templates/setcompatibility.sh "{{ compatability_vers }}"
+  become: true
+  when: port_check.failed == false
+  tags:
+    - mongo
+
+- name: Stop mongo service
+  ansible.builtin.service:
+    name: mongod
+    state: stopped
+  tags:
+    - mongo
+  when: port_check.failed == false
+
+- name: Remove old mongo packages
+  shell: apt-get purge mongodb-org* mongo* -y
+  become: true
+  tags:
+    - mongo
+  # when: port_check.failed == false
+
+- name: pause 3 seconds for dpkg lock
+  pause:
+    seconds: 3
+  tags:
+    - mongo
+  when: port_check.failed == false
+
+- name: Install remaining mongodb Packages
+  apt:
+    name: "{{ item }}"
+  become: True
+  with_items:
+    - "{{ mongo_repo_filename }}={{ specific_mongo_vers_minor }}"
+    - "{{ mongo_repo_filename }}-server={{ specific_mongo_vers_minor }}"
+    - "{{ mongo_repo_filename }}-shell={{ specific_mongo_vers_minor }}"
+    - "{{ mongo_repo_filename }}-mongos={{ specific_mongo_vers_minor }}"
+    - "{{ mongo_repo_filename }}-tools={{ specific_mongo_vers_minor }}"
+  tags:
+    - mongo
+
+- name: Restart mongo service
+  ansible.builtin.service:
+    name: mongod
+    state: restarted
+  tags:
+    - mongo

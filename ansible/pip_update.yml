@@ -1,0 +1,34 @@
+- name: Upgrade python pip 
+  hosts: all
+  become: yes
+  tasks:
+    - name: Set facts to prevent instances without Rol tag from causing the playbook to error
+      set_fact:
+        instance_role: "{{ tags.Role | default('Undefined') }}"
+    
+    - name: get pip version before update
+      shell: pip --version | awk -F ' ' '{print$2}'
+      register: preupgrade
+      when: instance_role in ['Web','Admin']
+    
+    - name: output pip version
+      debug:
+        var: preupgrade.stdout
+      when: preupgrade.changed
+    
+    - name: Upgrade pip at the OS level
+      pip:
+        state: latest
+        name: pip
+      register: pip_upgrade
+      when: instance_role in ['Web','Admin']
+    
+    - name: get pip version after update if changed
+      shell: pip --version | awk -F ' ' '{print$2}'
+      register: postupgrade
+      when: pip_upgrade.changed
+    
+    - name: output new version
+      debug:
+        var: postupgrade.stdout
+      when: postupgrade.changed

@@ -1,0 +1,6 @@
+- name: Install clamav
+  hosts: all
+  become: yes
+  roles:
+      - clamav
+      - logrotate

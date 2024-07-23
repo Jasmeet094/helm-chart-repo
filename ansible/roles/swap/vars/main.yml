@@ -1,0 +1,5 @@
+---
+
+  # swap_space vars
+  #root_disk_size: "{{ ansible_devices.nvme0n1.partitions.nvme0n1p1.size.split('.')[0] | int }}"
+  #swap_space: "{% if root_disk_size >= 50 %}8196000000{% elif root_disk_size >=20 %}2049000000{%else %}512250000{% endif %}"

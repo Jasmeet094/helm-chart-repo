@@ -1,0 +1,13 @@
+---
+  - name: setup crontab to run at a our times
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/crontab
+      src: crontab
+    become: True
+    notify: restart cron
+    tags:
+      - crontab

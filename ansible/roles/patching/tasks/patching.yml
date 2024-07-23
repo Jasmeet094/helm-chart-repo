@@ -1,0 +1,102 @@
+---
+  # - name: Basic AMI Creation and waiting async#
+  #   amazon.aws.ec2_ami:
+  #     instance_id: "{{ instance_id }}"
+  #     wait: no
+  #     name: "Update_{{ inventory_hostname_short }}_{{ansible_date_time.iso8601_basic_short}}"
+  #     no_reboot: yes
+  #     region: "us-west-2" # if we every do multi region I applogies
+  #     tags:
+  #       Name: "Update_{{ inventory_hostname_short }}_{{ansible_date_time.iso8601_basic_short}}"
+  #       Source_Instance: "{{ instance_id }}"
+  #       DeleteAfter: "{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}"
+  #   when: apply_upgrade
+
+  - name: Update apt cache
+    apt:
+      update_cache: yes
+    become: True
+    when: not apply_upgrade
+    tags:
+      - research
+      - qa
+
+  - name: Simulate apt upgrade
+    command: apt-get upgrade -V -s
+    become: True
+    tags:
+      - research
+      - qa
+    when: not apply_upgrade
+    register: simulate_upgrade
+
+  - name: Apply apt upgrade
+    command: apt-get upgrade -V -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" 
+    become: True
+    tags:
+      - research
+      - qa
+    when: apply_upgrade
+    register: applied_upgrade
+
+  - name: Log the upgrade results
+    debug: msg="{{applied_upgrade.stdout_lines}}"
+    when: apply_upgrade
+
+  - name: Plan write log                                                                                
+    copy:                                                                                              
+      content: "{{simulate_upgrade.stdout}}" 
+      dest: "/tmp/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan.log"
+    when: not apply_upgrade
+
+  - name: Fetch Plan write log                                                                                
+    fetch:
+      src: "/tmp/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan.log"
+      dest: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan.log"
+      flat: yes
+    when: not apply_upgrade 
+  
+  - name: Ship Plan write log to S3
+    amazon.aws.aws_s3:
+      bucket: "mhc-logs"
+      mode: put
+      src: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan.log"
+      object: "os_updates/{{run_hosts}}/{{ansible_date_time.year}}/{{ansible_date_time.month}}/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan_{{user}}.log"
+    delegate_to: localhost
+    when: not apply_upgrade
+  
+  - name: Cleanup Plan write log
+    file:
+      path: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_plan.log"
+      state: absent
+    delegate_to: localhost
+    when: not apply_upgrade
+
+  - name: Apply write log                                                                                
+    copy:
+      content: "{{applied_upgrade.stdout}}" 
+      dest: "/tmp/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply.log"
+    when: apply_upgrade
+
+  - name: Fetch Apply write log                                                                                
+    fetch:                                                                                              
+      src: "/tmp/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply.log"
+      dest: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply.log"
+      flat: yes
+    when: apply_upgrade
+
+  - name: Ship Apply write log to S3
+    amazon.aws.aws_s3:
+      bucket: "mhc-logs"
+      mode: put
+      src: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply.log"
+      object: "os_updates/{{run_hosts}}/{{ansible_date_time.year}}/{{ansible_date_time.month}}/{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply_{{user}}.log"
+    delegate_to: localhost
+    when: apply_upgrade
+  
+  - name: Cleanup Apply write log
+    file:
+      path: "{{ansible_hostname}}_{{ansible_date_time.iso8601_basic_short}}_apply.log"
+      state: absent
+    delegate_to: localhost
+    when: apply_upgrade

@@ -1,0 +1,56 @@
+---
+- name: install clam-av
+  apt: 
+    name: ['clamav', 'clamav-daemon', 'clamav-freshclam']
+  register: result
+  become: true
+
+- name: ClamAV Config
+  copy:
+    remote_src: no
+    owner: root
+    group: root
+    mode: 0644
+    dest: "/etc/clamav/{{ item }}"
+    src: "{{ item }}"
+    backup: yes
+  become: True
+  with_items:
+    - clamd.conf
+  notify:
+      - restart clamav daemon
+    
+- name: stop freshclam daemon
+  systemd:
+    state: stopped
+    name: clamav-freshclam
+ 
+# ToDo: do we want this to run if this was already installed prior to this run?
+- name: Run freshclam after install
+  command: freshclam
+  register: freshclam_result
+
+- name: start freshclam daemon
+  systemd:
+    state: restarted
+    name: clamav-freshclam
+    daemon_reload: yes
+    enabled: yes
+
+- name: create cron job to get daily clamav file list 
+  cron:
+    name: "clamav files"
+    user: root
+    minute: "0"
+    hour: "19"
+    #job: find / -ctime -2 -type f -not -path "/proc/*" -not -path "/sys/*" -not -path "/dev/*" -not -path "/var/lib/lxcfs/*" >/tmp/clamscan_files.txt
+    job: find / -mtime 0 -type f \( -path "/home/mhc/mhc-backend/media/*" -o -not -path "/home/mhc/*" \) -not -path "/proc/*" -not -path "/sys/*" -not -path "/dev/*" -not -path "/var/lib/lxcfs/*" -not -path "/var/log*" -not -path "/data-post*/*" -not -path "/data-mongo*/*" >/tmp/clamscan_files.txt
+
+- name: create cron job to run daily clamav scan
+  cron:
+    name: "clamav scan"
+    state: absent
+    user: "root"
+    #minute: "30"
+    #hour: "19"
+    #job: 'clamscan -f /tmp/clamscan_files.txt -i -l /var/log/clamav/clamscan.log'

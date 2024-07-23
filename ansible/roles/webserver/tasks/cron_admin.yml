@@ -1,0 +1,19 @@
+### Untested 
+- name: Sync Admin Log
+  ansible.builtin.file:
+    path: /home/mhc/logs/sharedAdminSynch.log
+    owner: mhc
+    group: mhc
+    mode: '0644'
+    state: "touch"
+
+
+- name: Set up cron for syncing admins
+  cron:
+    name: sync admin
+    user: mhc
+    job: "/home/mhc/mhc-venv/bin/python /home/mhc/mhc-backend/manage.py sharedAdminSynch >> /home/mhc/logs/sharedAdminSynch.log 2>&1"
+  become: True
+  become_user: mhc
+  when: "tags.Role in ['Admin']"
+

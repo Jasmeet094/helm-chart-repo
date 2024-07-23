@@ -1,0 +1,210 @@
+---
+- name: Rotate the kms key used to encrypt ebs volumes
+  hosts: all
+  become: yes
+
+  vars:
+    region: us-west-2
+    kms_key_id: arn:aws:kms:us-west-2:915106308636:key/ebf2c698-a44e-4529-8f2f-cdfd6a988768
+    device_mapping:
+      db:
+        - /dev/sdm
+        - /dev/sdp
+      web:
+        - /dev/sdf # Validate this is correct for `Web`, `Admin` hosts
+
+  tasks:
+    - name: 'Stop mhc service'
+      ansible.builtin.service: 
+        name: 'mhc' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Web","Admin"]'
+
+    - name: 'Stop celery service'
+      ansible.builtin.service:
+        name: 'celery' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Web","Admin"]'
+
+    - name: 'Stop celerybg service'
+      ansible.builtin.service: 
+        name: 'celerybg' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Web","Admin"]'
+        
+    - name: 'Stop celerybglowbandwidth service'
+      service: 
+        name: 'celerybglowbandwidth' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Web","Admin"]'
+    
+    - name: 'Stop celeryhr service'
+      ansible.builtin.service: 
+        name: 'celeryhr' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Web","Admin"]'
+                  
+    - name: 'Stop postgresql service'
+      ansible.builtin.service:
+        name: 'postgresql'
+        state: 'stopped'
+      when: 'tags.Role in ["Database"]'
+
+    - name: 'Stop mongodb service'
+      ansible.builtin.service:
+        name: 'mongod' 
+        state: 'stopped' 
+      when: 'tags.Role in ["Database"]'
+
+    # TODO: Refactor `List web volumes` to check for web or db `device_mapping`
+    - name: 'List web volumes'
+      amazon.aws.ec2_vol_info:
+        filters:
+            attachment.status: 'attached'
+            attachment.device: '{{ item }}'
+            attachment.instance-id: '{{ instance_id }}'
+        region: '{{ region }}'
+      loop: '{{ device_mapping.web }}'
+      when: 'tags.Role in ["Web","Admin"]'
+      register: 'web_volumes'
+
+    - name: 'List db volumes'
+      amazon.aws.ec2_vol_info:
+        filters:
+            attachment.status: 'attached'
+            attachment.device: '{{ item }}'
+            attachment.instance-id: '{{ instance_id }}'
+        region: '{{ region }}'
+      loop: '{{ device_mapping.db }}'
+      when: 'tags.Role in ["Database"]'
+      register: 'volumes'
+
+    - name: 'Unmount mhc data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-mhc' # TODO: Validate this mount point
+        src: 'LABEL=mhcdata-vol'
+        state: 'unmounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Web","Admin"]'
+
+    - name: 'Unmount postgresql data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-postgres'
+        src: 'LABEL=postgres-vol'
+        state: 'unmounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Database"]'
+
+    - name: 'Unmount mongodb data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-mongodb'
+        src: 'LABEL=mongo-vol'
+        state: 'unmounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Database"]'
+
+    - name: 'Detach web volumes from instance'
+      amazon.aws.ec2_vol:
+        region: '{{ region }}'
+        instance: None
+        id: '{{ item.volumes[0].id }}'
+      loop: '{{ web_volumes.results }}'
+      when: 'tags.Role in ["Web","Admin"]'
+      register: 'detach_web_volume'
+
+    - name: 'Detach db volumes from instance'
+      amazon.aws.ec2_vol:
+        region: '{{ region }}'
+        instance: None
+        id: '{{ item.volumes[0].id }}'
+      loop: '{{ volumes.results }}'
+      when: 'tags.Role in ["Database"]'
+      register: 'detach_volume'
+
+    - name: 'Create web snapshot'
+      amazon.aws.ec2_snapshot:
+        volume_id: '{{ item.volumes[0].id }}'
+        description: 'Created with Ansible'
+        snapshot_tags: '{{ item.volumes[0].tags }}'
+        region: '{{ region }}'
+      loop: '{{ web_volumes.results }}'
+      when: 'tags.Role in ["Web","Admin"]'
+      register: 'web_snapshot'
+
+    - name: 'Create db snapshot'
+      amazon.aws.ec2_snapshot:
+        volume_id: '{{ item.volumes[0].id }}'
+        description: 'Created with Ansible'
+        snapshot_tags: '{{ item.volumes[0].tags }}'
+        region: '{{ region }}'
+      loop: '{{ volumes.results }}'
+      when: 'tags.Role in ["Database"]'
+      register: 'snapshot'
+
+    - name: 'Create web volumes from snapshot'
+      amazon.aws.ec2_vol:
+        instance: '{{ instance_id }}'
+        region: '{{ region }}'
+        volume_size: '{{ item.item.volumes[0].size }}'
+        device_name: '{{ item.item.volumes[0].attachment_set[0].device }}'
+        volume_type: '{{ item.item.volumes[0].type }}'
+        zone: '{{ item.item.volumes[0].zone }}'
+        encrypted: true
+        kms_key_id: '{{ kms_key_id }}'
+        snapshot: '{{ item.snapshot_id }}'
+        tags: '{{ item.item.volumes[0].tags }}'
+      loop: '{{ web_snapshot.results }}'
+      when: 'tags.Role in ["Web","Admin"]'
+      register: 'new_web_volumes'
+
+    - name: 'Create db volumes from snapshot'
+      amazon.aws.ec2_vol:
+        instance: '{{ instance_id }}'
+        region: '{{ region }}'
+        volume_size: '{{ item.item.volumes[0].size }}'
+        device_name: '{{ item.item.volumes[0].attachment_set[0].device }}'
+        volume_type: '{{ item.item.volumes[0].type }}'
+        zone: '{{ item.item.volumes[0].zone }}'
+        encrypted: true
+        kms_key_id: '{{ kms_key_id }}'
+        snapshot: '{{ item.snapshot_id }}'
+        tags: '{{ item.item.volumes[0].tags }}'
+      loop: '{{ snapshot.results }}'
+      when: 'tags.Role in ["Database"]'
+      register: 'new_volumes'
+
+    - name: 'Mount mhc data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-mhc' # TODO: Validate this mount point
+        src: 'LABEL=mhcdata-vol'
+        state: 'mounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Web","Admin"]'
+
+    - name: 'Mount postgresql data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-postgres'
+        src: 'LABEL=postgres-vol'
+        state: 'mounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Database"]'
+
+    - name: 'Mount mongodb data volume'
+      become: yes
+      ansible.posix.mount:
+        path: '/data-mongodb'
+        src: 'LABEL=mongo-vol'
+        state: 'mounted'
+        fstype: 'ext4'
+      when: 'tags.Role in ["Database"]'
+
+    - name: 'Restart OS services'
+      include_role:
+        name: restart_OS_restart_services
+      vars:
+        restart_hosts: False

@@ -1,0 +1,7 @@
+---
+# https://docs.ansible.com/ansible/latest/collections_guide/collections_installing.html#install-multiple-collections-with-a-requirements-file
+collections:
+  - name: amazon.aws
+  - name: community.mongodb
+  - name: ansible.posix
+  - name: community.general

@@ -1,0 +1,195 @@
+# Playbook: truncate_mongo_volume.yml
+# Description:
+#    This playbook creates an AMI, a new EBS volume, and runs the `mongo_to_cloudwatch.py` script.
+#    After the script runs and the overall size of the Mongo volume has been shrunk from log data
+#    uploaded to CloudWatch and deleted from the volume. The remaining Mongo data is copied to the new volume
+#    and the volume is then reattached under the old device name `/dev/sdm` and mount `data-mongodb`.
+
+---
+- name: "Truncate mongodb volume"
+  hosts: all 
+  become: true
+  vars:
+    region: us-west-2
+    instance_id: "{{ ansible_facts['board_asset_tag'] }}"
+    mongo_data_mnt: "/data-mongodb"
+    temp_mongo_mmt: "/temp-data-mongodb"
+
+  tasks:
+    - name: Gather information about instance
+      amazon.aws.ec2_instance_info:
+        region: "{{ region }}"
+        instance_ids:
+          - "{{ instance_id }}"
+      register: instance_info
+
+    - name: Get the old mongo volume id
+      ansible.builtin.set_fact:
+        old_mongo_volume_id: "{{ instance_info | community.general.json_query(mongo_block_device) }}"
+      vars:
+        mongo_block_device: "instances[].block_device_mappings[?device_name=='/dev/sdm'].ebs.volume_id | [0] | [0]"
+
+    - name: Get device name of mongo-vol
+      ansible.builtin.set_fact:
+        volume_size: "{{ ansible_facts | community.general.json_query(mongo_device_name) }}"
+      vars:
+        mongo_device_name: "devices.* | @[?links.labels[0] == 'mongo-vol'] | @[0].size"
+
+    - name: Get the kms key id used to encrypt ebs volume
+      ansible.builtin.script:
+        cmd: ../Backups/get_kms_id.py -v "{{ old_mongo_volume_id }}"
+      args:
+        executable: python3
+      delegate_to: 127.0.0.1
+      register: kms_key_id
+
+    - name: Create an AMI of the instance
+      amazon.aws.ec2_ami:
+        instance_id: "{{ ansible_facts['board_asset_tag'] }}"
+        wait: false
+        no_reboot: true
+        name: "{{ instance_info['instances'][0]['tags']['Name'] }}-rotate-volume-{{ ansible_date_time.iso8601_basic_short }}"
+        tags: "{{ instance_info['instances'][0]['tags'] }}"
+        region: "{{ region }}"
+      delegate_to: 127.0.0.1
+      register: ami_id
+
+    - name: Print the ami id
+      ansible.builtin.debug:
+        msg: "{{ ami_id.image_id }}"
+
+    - name: Copy python requirements.txt
+      ansible.builtin.copy:
+        src: ../Backups/requirements.txt
+        dest: /root/mongo_to_cloudwatch_requirements.txt
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - Remove python requirements
+
+    - name: Install python3-venv
+      ansible.builtin.package:
+        name: python3-venv
+        state: present
+
+    - name: Install python requirements.txt
+      ansible.builtin.pip:
+        requirements: /root/mongo_to_cloudwatch_requirements.txt
+        virtualenv: /root/mongo_to_cloudwatch
+      notify:
+        - Remove python venv
+
+    - name: Run the mongo to cloudwatch python script
+      ansible.builtin.script:
+        cmd: ../Backups/mongo_to_cloudwatch.py --no-upload --delete -vv
+      args:
+        executable: /root/mongo_to_cloudwatch/bin/python3
+
+    - name: Stop mongod service
+      ansible.builtin.service:
+        name: mongod
+        state: stopped
+
+    - name: Set new volume size in GB
+      ansible.builtin.set_fact:
+        new_volume_size: "{{ (volume_size[-2:] == 'GB') | ternary(volume_size[:-3], (volume_size[:-3] | float) * 1024) | int }}"
+
+    - name: Print old and new volume size
+      ansible.builtin.debug:
+        msg: "Old volume size {{ volume_size }} : New volume size {{ new_volume_size }} GB"
+
+    - name: Create a new ebs volume
+      amazon.aws.ec2_vol:
+        instance: "{{ ansible_facts['board_asset_tag'] }}"
+        region: "{{ region }}"
+        volume_size: "{{ new_volume_size }}"
+        device_name: /dev/sdf
+        volume_type: gp2
+        encrypted: true
+        kms_key_id: "{{ kms_key_id.stdout.rstrip() }}"
+      register: new_ebs_volume
+
+    - name: Create a ext4 filesystem on new volume
+      community.general.filesystem:
+        fstype: ext4
+        dev: /dev/sdf
+        opts: -L mongo-vol
+
+    - name: Mount up device by label
+      ansible.posix.mount:
+        path: "{{ temp_mongo_mnt }}"
+        src: /dev/sdf
+        fstype: ext4
+        state: mounted # we could use ephemeral but requires a newer version of ansible
+
+    - name: Copy mongo data from old to new volume # noqa: risky-file-permissions no-changed-when
+      ansible.builtin.command:
+        cmd: cp -a "{{ mongo_data_mnt }}"/. "{{ temp_mongo_mnt }}"
+      async: 86400
+      poll: 0
+      register: mongo_copy_sleeper
+
+    - name: Check on copy mongo data async task
+      ansible.builtin.async_status:
+        jid: "{{ mongo_copy_sleeper.ansible_job_id }}"
+      register: job_result
+      until: job_result.finished
+      retries: 360
+      delay: 60
+
+    - name: Unmount the old /data-mongodb dir
+      ansible.posix.mount:
+        path: "{{ mongo_data_mnt }}"
+        state: absent
+
+    - name: Unmount the new /temp-data-mongodb dir
+      ansible.posix.mount:
+        path: "{{ temp_mongo_mnt }}"
+        state: absent
+
+    - name: Print old volume id
+      ansible.builtin.debug:
+        msg: "{{ old_mongo_volume_id }}"
+
+    - name: Detach old ebs volume
+      amazon.aws.ec2_vol:
+        region: "{{ region }}"
+        id: "{{ old_mongo_volume_id }}"
+        instance: None
+
+    - name: Detach new ebs volume
+      amazon.aws.ec2_vol:
+        region: "{{ region }}"
+        id: "{{ new_ebs_volume['volume_id'] }}"
+        instance: None
+
+    - name: Re-attach new volume under old device name
+      amazon.aws.ec2_vol:
+        region: "{{ region }}"
+        id: "{{ new_ebs_volume['volume_id'] }}"
+        instance: "{{ instance_id }}"
+        device_name: /dev/sdm
+
+    - name: Mount new volume
+      ansible.posix.mount:
+        path: "{{ mongo_data_mnt }}"
+        src: /dev/sdm
+        fstype: ext4
+        state: mounted # we could use ephemeral but requires a newer version of ansible
+
+    - name: Start mongod service
+      ansible.builtin.service:
+        name: mongod
+        state: started
+
+  handlers:
+    - name: Remove python venv
+      ansible.builtin.file:
+        path: /root/mongo_to_cloudwatch
+        state: absent
+
+    - name: Remove python requirements
+      ansible.builtin.file:
+        path: /root/mongo_to_cloudwatch_requirements.txt
+        state: absent

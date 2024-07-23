@@ -1,0 +1,5 @@
+- name: Run the clone_environment role
+  hosts: all
+  become: yes
+  roles:
+    - role: clone_environment

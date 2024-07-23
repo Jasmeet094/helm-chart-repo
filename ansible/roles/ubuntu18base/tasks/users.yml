@@ -1,0 +1,7 @@
+---
+- name: Install acl package so that becoming a non-privileged user works
+  # https://github.com/ansible/ansible/issues/16048#issuecomment-296342956
+  # https://github.com/ansible/ansible/issues/16691
+  apt:
+    name: acl
+  become: True

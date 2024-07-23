@@ -1,0 +1,30 @@
+---
+- include: install.yml
+  become: True
+  
+- include: postgres.yml
+
+- name: Check for postgresql files in target location
+  stat:
+    path: /data-postgres/PG_VERSION
+  register: postgres_moved
+  become: True
+
+- include: mount_postgres.yml
+  become: True
+
+- include: move_postgres.yml
+  when: not postgres_moved.stat.exists
+  become: True
+
+- name: Start service postgresql for burcaro
+  ansible.builtin.service:
+    name: postgresql
+    state: started
+  tags:
+    - postgres
+  become: True
+
+- name: Wait for postgres to be ready
+  wait_for:
+    port: "{{psql_port}}"

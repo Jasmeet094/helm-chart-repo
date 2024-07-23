@@ -1,0 +1,34 @@
+- hosts: all
+  become: yes
+
+  vars:
+    cwa_install_path: /opt/aws/amazon-cloudwatch-agent
+    dir_to_delete:
+      - /etc/awslogs
+      - "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.d/file_awslogs.conf"
+      - "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json"
+      - "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.toml"
+      - "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.json"
+      - "{{ cwa_install_path }}/etc/env-config.json"
+      - "{{ cwa_install_path }}/etc/log-config.json"
+      - "{{ cwa_install_path }}/logs/amazon-cloudwatch-agent.log"
+      - "{{ cwa_install_path }}/logs/configuration-validation.log"
+      - "{{ cwa_install_path }}/logs/state"
+
+  tasks:
+    - name: Check if file or directory exists
+      stat:
+        path: "{{ item }}"
+      register: dir_stat
+      with_items: "{{ dir_to_delete }}"
+
+    - name: Delete files or directories if exist
+      file:
+        path: "{{ item.item }}"
+        state: absent
+      with_items: "{{ dir_stat.results }}"
+      when: item.stat.exists
+
+    - name: Run the logrotate role
+      include_role:
+        name: logrotate

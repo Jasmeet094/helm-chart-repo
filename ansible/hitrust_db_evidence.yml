@@ -1,0 +1,7 @@
+---
+- name: Run the hitrust_db_evidence role
+  hosts: all
+  become: yes
+  roles:
+    - role: hitrust_db_evidence
+      when: "tags.Role in ['Database']"

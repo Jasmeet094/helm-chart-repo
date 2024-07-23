@@ -1,0 +1,22 @@
+---
+- set_fact:
+    name: Setting up celery_extras for Admin
+    celery_extras: "-B"
+  when: tags.Role in ['Admin']
+
+- set_fact:
+    name: Setting up celery_extras for Web
+    celery_extras: ""
+  when: tags.Role in ['Web']
+
+- set_fact:
+    name: hr concurrentcy
+    hr_concurrency: 10
+  when: tags.Role in ['Admin']
+
+- debug:
+    msg: "Celery Extras for host {{inventory_hostname_short}} is {{celery_extras}}"
+  when: tags.Role in ['Admin'] or tags.Role in ['Web']
+
+- include: init.yml
+  when: tags.Role in ['Admin','Web']

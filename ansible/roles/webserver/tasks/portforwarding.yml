@@ -1,0 +1,39 @@
+# This task installs the portwarding service file onto the linux webservers, as according to the correct shard info configured via the portforwarding template
+# One the service has been installed on the correct server, the systemd service for portforwarding is started and enabled, so it can be executed by other users, and to ensure it will turn back on after a system reboot
+--- 
+  - name: "put portforwarding file"
+    become: true
+    copy: 
+      dest: /etc/systemd/system/mhc-portforwarding.service
+      group: ubuntu
+      mode: 0720
+      owner: ubuntu
+      remote_src: false
+      src: mhc-portfowarding-systemd
+    tags: 
+      - portforwarding
+    when: "tags.Environment in ['p'] and tags.Role in ['Admin']"
+
+  - name: "portfowarding template"
+    become: true
+    tags: 
+      - portforwarding
+    template: 
+      dest: /usr/bin/portforwarding-systemd.sh
+      group: ubuntu
+      mode: 0720
+      owner: ubuntu
+      remote_src: false
+      src: portforwarding-systemd
+    when: "tags.Environment in ['p'] and tags.Role in ['Admin']"
+
+  - name: "enable portforwarding systemd"
+    become: true
+    systemd: 
+      enabled: true
+      masked: false
+      name: mhc-portforwarding.service
+      state: started
+    tags: 
+      - portforwarding
+    when: "tags.Environment in ['p'] and tags.Role in ['Admin']"

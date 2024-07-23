@@ -1,0 +1,36 @@
+---
+- name: Format the device
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{postgres_drive}}"
+  become: yes
+
+- name: Create the folder for the mounted device
+  file:
+    path: "/data-postgres"
+    state: directory
+    owner: "postgres"
+    group: "postgres"
+    mode: "700"
+  become: yes
+
+- name: label the drive 
+  shell: /sbin/e2label /dev/{{postgres_drive}} postgres-vol
+  become: yes
+
+- name: Mount the device
+  mount:
+    path: "/data-postgres"
+    src: LABEL=postgres-vol
+    fstype: ext4
+    state: mounted
+    opts: defaults
+  become: yes
+
+#- name: Remove fstab entry (Ansible automatically adds it)
+#  # https://github.com/ansible/ansible-modules-core/issues/2571
+#  lineinfile:
+#    state: absent
+#    regexp: "^/dev/{{postgres_device}}.*$"
+#    path: /etc/fstab
+#  become: yes

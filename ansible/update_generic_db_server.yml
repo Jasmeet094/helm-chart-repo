@@ -1,0 +1,6 @@
+--- 
+- hosts: all
+  become: true
+  roles: 
+    - role: "{{ role }}"
+      when: "tags.Role in ['Database']"

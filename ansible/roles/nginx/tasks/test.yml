@@ -1,0 +1,4 @@
+- debug:
+    msg: host {{ inventory_hostname_short }} has env {{ env }} and shard {{ shard }} and subdomain {{subdomain}}
+  tags:
+    - testing

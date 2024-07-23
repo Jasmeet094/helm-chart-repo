@@ -1,0 +1,83 @@
+---
+- name: add key for the below repo url
+  apt_key:
+    url: "https://www.mongodb.org/static/pgp/server-6.0.asc"
+    state: present
+  tags:
+    - mongo
+
+- name: Add mongodb-org apt repo
+  apt_repository:
+    repo: "deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse"
+    state: present
+    filename: "mongodb-org-6.0"
+  tags:
+    - mongo
+  become: true
+
+- name: Check if port 27017 is listening
+  wait_for:
+    port: 27017
+    delay: 5
+    timeout: 10
+    msg: "Timeout waiting for mongo to respond"
+  register: port_check
+  ignore_errors: true
+
+- name: Stop mongo service
+  ansible.builtin.service:
+    name: mongod
+    state: stopped
+  tags:
+    - mongo
+  when: port_check.failed == false
+
+- name: Remove old mongo packages
+  shell: apt-get purge mongodb-org* mongo* -y
+  become: true
+  tags:
+    - mongo
+  when: port_check.failed == false
+
+- name: pause 3 seconds for dpkg lock
+  pause:
+    seconds: 3
+  tags:
+    - mongo
+  when: port_check.failed == false
+
+- name: "Apt-get update"
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Install remaining mongodb Packages
+  apt:
+    name: "{{ item }}"
+  become: True
+  with_items:
+    - "mongodb-org=6.0.1"
+    - "mongodb-org-database=6.0.1"
+    - "mongodb-org-server=6.0.1"
+    - "mongodb-org-mongos=6.0.1"
+    - "mongodb-org-tools=6.0.1"
+    - "mongodb-mongosh=1.5.4"
+  tags:
+    - mongo
+
+- name: Restart mongo service
+  ansible.builtin.service:
+    name: mongod
+    state: restarted
+  tags:
+    - mongo
+
+- name: Pause for 5 seconds for service restart
+  ansible.builtin.pause:
+    seconds: 5
+
+- name: Set compatability setting in bash script
+  script: /data/ansible/roles/mongo/templates/setcompatibility6.sh 6.0
+  become: true
+  when: port_check.failed == false
+  tags:
+    - mongo

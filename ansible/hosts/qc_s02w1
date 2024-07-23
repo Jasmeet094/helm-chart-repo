@@ -1,0 +1,57 @@
+# This is the default ansible 'hosts' file.
+
+[qcs02-db]
+qcs02db1.mobhealthinternal.com
+
+[qcs02-w]
+qcs02w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=10000001055
+
+[qcs02-w:vars]
+postgres_password=c487cf499b
+db_server=qcs02db1
+env=qc
+shard=s02
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'sewAteckudnudd:wrotNayttEmadwalityirgAqu%'	
+sharded_cluster=True
+
+[qcs02-db:vars]
+postgres_password=c487cf499b
+env=qc
+shard=s02
+postgres_drive=nvme1n1
+mongo_drive=nvme2n1
+sharded_cluster=True
+
+[qcs02:children]
+qcs02-db
+qcs02-w
+
+[db:vars]
+cluster_version="9.3"
+environment_subnet="172.31.64.0/19"
+shared_subnet="172.31.0.0/19"
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+postgres_drive=sdp
+mongo_drive=sdm
+
+[web:vars]
+swap_space=2048000000
+mhc_web_drive=nvme1n1
+
+[web:children]
+web_shard
+qclog-w
+
+[web_shard:children]
+qcs02-w
+
+[qc:children]
+qcs01
+qcs02
+qcs03
+qclog
+#qcs03

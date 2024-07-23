@@ -1,0 +1,49 @@
+---
+- name: Backup exisitng SSL cert
+  copy:
+    src: "{{item.file_path}}"
+    dest: "{{item.file_path}}"
+    remote_src: yes
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  with_items:
+    - {file_path: "/etc/ssl/wildcardcert.crt"}
+    - {file_path: "/etc/ssl/wildcardcert.key"}
+  ignore_errors: true
+  become: yes
+
+- name: Retrieve SSL assets from S3
+  # This requires Ansible 2.4 (via pip, probably)
+  aws_s3:
+    bucket: "{{s3_bucket}}"
+    object: "secrets/{{item.name}}"
+    dest: "{{item.path}}"
+    mode: get
+  with_items:
+    - {name: "prodcert-new-w-chain.pem", path: "/etc/ssl/wildcardcert.crt"}
+    - {name: "prodkey-new.pem", path: "/etc/ssl/wildcardcert.key"}
+  become: True
+  when: not is_vagrant
+
+- name: Use snakeoil certs when in Vagrant
+  copy:
+    src: "{{item.name}}"
+    dest: "{{item.path}}"
+  with_items:
+    - {name: "selfsigned.crt", path: "/etc/ssl/wildcardcert.crt"}
+    - {name: "selfsigned.key", path: "/etc/ssl/wildcardcert.key"}
+  become: True
+  when: is_vagrant
+
+- include: test.yml
+  become: True
+
+- include: install.yml
+  become: True
+
+- name: Restart service nginx, in all cases
+  service:
+    name: nginx
+    state: reloaded

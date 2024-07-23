@@ -1,0 +1,87 @@
+---
+- name: Gather package facts
+  ansible.builtin.package_facts:
+    manager: apt
+
+- name: Install amazon-cloudwatch-agent if absent
+  ansible.builtin.apt:
+    deb: https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+  when: '"amazon-cloudwatch-agent" not in ansible_facts.packages'
+  notify: Reload cloudwatch agent
+
+- name: Set instance env to tag environment
+  ansible.builtin.set_fact:
+    logrotate_instance_env: "{{ tags.Environment }}"
+  tags:
+    - postgres
+
+- name: Conditionally set instance env to prod
+  ansible.builtin.set_fact:
+    logrotate_instance_env: "prod"
+  when: tags.Environment == "p"
+  tags:
+    - postgres
+
+- name: Set application to the instance role
+  ansible.builtin.set_fact:
+    logrotate_application: "{{ tags.Role }}"
+  tags:
+    - postgres
+
+- name: Create log list for web servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs | combine(web_cloudwatch_logs, recursive=true) }}"
+  when: application is defined and application == "Web"
+  tags:
+    - postgres
+
+- name: Create log list for admin servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs | combine(web_cloudwatch_logs, admin_cloudwatch_logs, recursive=true) }}"
+  when: application is defined and application == "Admin"
+  tags:
+    - postgres
+
+# ToDo: Someone should validate which logs we need
+- name: Create log list for night servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs + web_cloudwatch_logs + admin_cloudwatch_logs }}"
+  when: application is defined and application == "Nightly"
+  tags:
+    - postgres
+
+- name: Create log list for db servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs + db_cloudwatch_logs }}"
+  when: application is defined and application == "Database"
+  tags:
+    - postgres
+    - mongo
+
+- name: Create log list for ftp servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs + sftp_cloudwatch_logs }}"
+  when: application is defined and application == "FTP"
+
+- name: Create log list for Development servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs }}"
+  when: application is defined and application == "Development"
+
+- name: Create log list for Jetbrains servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs }}"
+  when: application is defined and application == "Jetbrains"
+
+- name: Create log list for other servers
+  ansible.builtin.set_fact:
+    logrotate_file_list: "{{ default_cloudwatch_logs }}"
+  when: application is not defined
+
+- name: Write agent config file
+  ansible.builtin.template:
+    src: cloudwatch_unified_agent.j2
+    dest: "{{ cwa_agent_config_file }}"
+    mode: "0644"
+    force: true
+  notify: Reload cloudwatch agent

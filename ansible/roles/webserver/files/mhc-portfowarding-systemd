@@ -1,0 +1,14 @@
+[Unit]
+Description=mhc remote ssh service
+After=network.target
+
+[Service]
+Type=forking
+User=ubuntu
+Group=ubuntu
+Restart=on-failure
+RestartSec=60
+ExecStart=/usr/bin/portforwarding-systemd.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+
+---
+  - name: stop JumpCloud
+    service:
+      name:  jcagent
+      state: stopped
+    ignore_errors: yes # Testing
+
+  - name: remove jc files
+    file: dest="{{item}}" state=absent
+    with_items:
+      - "/opt/jc/ca.crt"
+      - "/opt/jc/client.crt"
+      - "/opt/jc/client.key"
+      - "/opt/jc/jcagent.conf"
+      

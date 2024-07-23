@@ -1,0 +1,14 @@
+- name: Restart nginx service 
+  hosts: all
+  become: yes
+  tasks:
+  
+    - name: adding line to ops
+      path: /home/mhc/mhc-backend/localsetting.py
+      line: APNS_CERTIFICATE_FILE_PATH = '/home/mhc/crypt/MobileHealthProductionAPNS.pem'
+
+    - name: Restart service nginx, in all cases
+      ansible.builtin.service:
+        name: mhc
+        state: restarted
+      when: "tags.Role in ['Admin', 'Web']"

@@ -1,0 +1,47 @@
+---
+driver:
+  name: terraform
+  root_module_directory: test/fixtures/01
+  parallelism: 4
+
+provisioner:
+  name: terraform
+
+platforms:
+  - name: terraform
+
+suites:
+  - name: "01"
+    driver:
+      root_module_directory: test/fixtures/01
+    verifier:
+      name: terraform
+      systems:
+        - name: Public Subnets should have direct access to the internet
+          backend: ssh
+          key_files: 
+            - test/fixtures/01/key.pem 
+          hosts_output: ip_public
+          user: ec2-user
+          controls:
+            - reach_google
+            - public_subnet
+        - name: Private Subnets should have indirect access to the internet
+          backend: ssh
+          key_files: 
+            - test/fixtures/01/key.pem 
+          hosts_output: ip_private
+          user: ec2-user
+          proxy_command: ssh -oStrictHostKeyChecking=no -i test/fixtures/01/key.pem ec2-user@<%= `terraform output -state test/fixtures/01/terraform.tfstate.d/kitchen-terraform-01-terraform/terraform.tfstate ip_public 2>/dev/null `.strip %> -W %h:%p
+          controls:
+            - reach_google
+            - private_subnet
+        - name: Isolated Subnets should not be able to access the internet
+          backend: ssh
+          key_files: 
+            - test/fixtures/01/key.pem 
+          hosts_output: ip_isolated
+          user: ec2-user
+          proxy_command: ssh -oStrictHostKeyChecking=no -i test/fixtures/01/key.pem ec2-user@<%= `terraform output -state test/fixtures/01/terraform.tfstate.d/kitchen-terraform-01-terraform/terraform.tfstate ip_public 2>/dev/null `.strip %> -W %h:%p
+          controls:
+            - isolated_subnet

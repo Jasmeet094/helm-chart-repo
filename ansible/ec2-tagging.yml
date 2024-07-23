@@ -1,0 +1,5 @@
+- name: Run the ec2-tagging role
+  hosts: all
+  become: yes
+  roles:
+    - role: ec2-tagging

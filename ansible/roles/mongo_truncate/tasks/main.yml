@@ -1,0 +1,46 @@
+---
+- name: Count old documents in m_audit_event collection
+  community.mongodb.mongodb_shell:
+    db: mhc
+    mongo_cmd: mongo
+    eval: |
+      db.m_audit_event.find({
+        "timestamp": { "$lt": new Date((new Date()) - {{truncate_before_years}} * 365 * 86400000 - {{truncate_before_months}} * 30 * 86400000 - {{truncate_before_days}} * 86400000)}
+      }).count()
+  register: m_audit_event_count
+
+- ansible.builtin.debug:
+    msg: Will delete {{ m_audit_event_count.transformed_output[0] }} records from m_audit_event
+
+- name: Delete old data from m_audit_event collection
+  community.mongodb.mongodb_shell:
+    db: mhc
+    mongo_cmd: mongo
+    eval: |
+      db.m_audit_event.deleteMany({
+        "timestamp": { "$lt": new Date((new Date()) - {{truncate_before_years}} * 365 * 86400000 - {{truncate_before_months}} * 30 * 86400000 - {{truncate_before_days}} * 86400000)}
+      })
+  when: not count_only
+
+- name: Find number of old documents in m_event collection
+  community.mongodb.mongodb_shell:
+    db: mhc
+    mongo_cmd: mongo
+    eval: |
+      db.m_event.find({
+        "date": { "$lt": new Date((new Date()) - {{truncate_before_years}} * 365 * 86400000 - {{truncate_before_months}} * 30 * 86400000 - {{truncate_before_days}} * 86400000)}
+      }).count()
+  register: m_event_count
+
+- ansible.builtin.debug:
+    msg: Will delete {{ m_event_count.transformed_output[0] }} records from m_event
+
+- name: Delete old data from m_event collection
+  community.mongodb.mongodb_shell:
+    db: mhc
+    mongo_cmd: mongo
+    eval: |
+      db.m_event.deleteMany({
+        "date": { "$lt": new Date((new Date()) - {{truncate_before_years}} * 365 * 86400000 - {{truncate_before_months}} * 30 * 86400000 - {{truncate_before_days}} * 86400000)}
+      })
+  when: not count_only

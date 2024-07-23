@@ -1,0 +1,5 @@
+---
+   authentication_sns_topic: arn:aws:sns:us-west-2:913835907225:QA_Auth_Log_Report
+   timezone: America/Los_Angeles
+   #postfix_enable: True
+   postfix_enable: False

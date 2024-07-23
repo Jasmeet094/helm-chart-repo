@@ -1,0 +1,30 @@
+---
+- name: Install python and tools
+  apt:
+    name: "{{ item }}"
+  become: True
+  with_items:
+    - python-apt
+    - python-dev
+    - python-virtualenv
+    - python-pip
+    - python3-pip
+    - build-essential
+    - libpq-dev
+    - git
+    - ecryptfs-utils
+    - xmlsec1
+    - libxml2-dev
+    - libxslt1-dev
+    - swig
+    - libjpeg8
+    - libjpeg62-dev
+    - libfreetype6
+    - libfreetype6-dev
+
+- include: users.yml
+
+- name: Install requests python package for nagios scripts
+  pip:
+    name: requests
+    executable: /usr/bin/pip

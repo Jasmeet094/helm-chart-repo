@@ -1,0 +1,18 @@
+---
+   location: "/data-postgres/"
+   psql_version: "14"
+   effective_cache_size: "850MB"
+   random_page_cost: "1.1"
+   work_mem: "32MB"
+   maintenance_work_mem: "170MB"
+   shared_buffers: "{% if tags.Environment == 'p' %}5GB{% else %}128MB{% endif %}"
+   max_wal_size: "{% if tags.Environment == 'p' %}15GB{% else %}512MB{% endif %}"
+   max_connection: "{% if tags.Environment == 'p' %}'500'{% else %} '250' {% endif %}"
+   log_min_duration_statement: "4000"
+   postgres_apt_key: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+   postgres_apt_repo: http://apt.postgresql.org/pub/repos/apt/
+   environment_subnet: "172.31.0.0/16" # if nonpord use x if prod use y
+   shared_subnet: "172.31.0.0/16" # Lookups SS Subnets
+   psql_port: "6432"
+   track_activity_query_size: "50000"
+   max_locks_per_transaction: "4000"

@@ -1,0 +1,3 @@
+---
+  - debug:
+      msg: host {{ inventory_hostname_short }} has env {{ env }} and shard {{ shard }} with an instance_id {{ instance_id }}

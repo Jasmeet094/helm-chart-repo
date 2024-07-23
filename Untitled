@@ -1,0 +1,9 @@
+uid=LDAP,ou=Users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com
+memberOf=cn=AwsVpnDR,ou=Users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com
+memberOf=cn=AwsVpn,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com
+
+
+LDAP exception on ldaps://ldap.jumpcloud.com/ (facility='search (u'ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com', 2, u'(&(uid=mkohn)(memberOf=cn=AwsVpnDR,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com))')'): user not found that meets specified requirements: memberOf=cn=AwsVpnDR,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com: auth/authldap:127,python2.7/threading:783,python2.7/threading:810,python2.7/threading:763,python/threadpool:210,python/context:59,python/context:37,auth/authldap:94,auth/authldap:127,util/error:61,util/error:44
+
+LDAP exception on ldaps://ldap.jumpcloud.com/ (facility='search (u'uid=LDAP,ou=Users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com', 2, u'(&(uid=mkohn)(memberOf=cn=AwsVpn,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com))')'): user not found that meets specified requirements: memberOf=cn=AwsVpn,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com: auth/authldap:127,python2.7/threading:783,python2.7/threading:810,python2.7/threading:763,python/threadpool:210,python/context:59,python/context:37,auth/authldap:94,auth/authldap:127,util/error:61,util/error:44
+LDAP invalid credentials on ldaps://ldap.jumpcloud.com/: {'desc': 'Invalid credentials'} (facility='user_bind on u'uid=mkohn,ou=Users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com' via search (u'ou=Users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com', 2, u'(&(uid=mkohn)(memberOf=cn=AwsVpn,ou=users,o=5798fb357e51bd7c14b10ca9,dc=jumpcloud,dc=com))')')

@@ -1,0 +1,5 @@
+- name: Run the mhc_metadata role
+  hosts: all
+  become: yes
+  roles:
+    - role: mhc_metadata

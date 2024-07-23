@@ -1,0 +1,10 @@
+---
+ses_smtp_region: us-east-1
+ses_smtp_port: 587
+ses_smtp_host: "email-smtp.{{ ses_smtp_region }}.amazonaws.com"
+ses_smtp_user: "{{ lookup('amazon.aws.aws_secret', 'ses-smtp-user', region='us-west-2') }}"
+ses_smtp_username: "{{ ses_smtp_user['smtp_username'] }}"
+ses_smtp_password: "{{ ses_smtp_user['smtp_password'] }}"
+postfix_hostname: "{{ inventory_hostname_short }}.mobilehealthconsumer.com"
+postfix_canonical_name: "{{ inventory_hostname_short }}@mobilehealthconsumer.com"
+use_hostname: true

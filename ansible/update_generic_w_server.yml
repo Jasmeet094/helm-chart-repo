@@ -1,0 +1,6 @@
+- hosts: all
+  become: yes
+  roles:
+    - role: "{{ role }}"
+      when: tags.Role in ['Admin', 'Web', 'Nightly']
+      

@@ -1,0 +1,20 @@
+{"widgets": [
+    {"height": 9,
+     "properties": {
+         "start": "-PT3H",
+         "end": "P0D",
+         "title": "WAF Blocked and Counted Requests",
+         "view": "timeSeries",
+         "metrics": [
+             ["WAF", "BlockedRequests", "WebACL", "${waf_name}", "Region", "${region}", "Rule", "ALL", {"period": 60, "stat": "Sum", "yAxis": "right"}],
+             [".", "AllowedRequests", ".", ".", ".", ".", ".", ".", {"period": 60, "stat": "Sum", "yAxis": "left"}],
+             [".", "AllowedRequests", ".", "${waf_name}", "Region", "${region}", ".", "${waf_name}PartnersUriUpdateXSS", {"period": 60, "stat": "Sum", "yAxis": "right"}],
+             [".", "AllowedRequests", ".", "${waf_name}", "Region", "${region}", ".", "${waf_name}PartnersUriConfigXSS", {"period": 60, "stat": "Sum", "yAxis": "right"}]
+         ],
+         "region": "${region}"
+     },
+     "type": "metric",
+     "width": 21,
+     "x": 0,
+     "y": 0}]
+}

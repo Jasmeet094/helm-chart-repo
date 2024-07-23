@@ -1,0 +1,26 @@
+---
+  - name: put rabbitmq-server /etc/init.d file
+    copy:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0755
+      dest: /etc/init.d/rabbitmq-server
+      src: files/rabbitmq-server
+    become: True
+
+  - name: put rabbitmq-server rabbitmq-env.conf file
+    copy:
+      remote_src: False
+      owner: rabbitmq
+      group: rabbitmq
+      mode: 0644
+      dest: /etc/rabbitmq/rabbitmq-env.conf
+      src: files/rabbitmq-env.conf
+    become: True
+    
+  - name: Restart Rabbitmq service
+    service: 
+      name: rabbitmq-server 
+      state: restarted
+    become: yes

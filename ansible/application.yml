@@ -1,0 +1,18 @@
+- name: Run application roles
+  hosts: all
+  become: true
+  tasks:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+
+  roles:
+    - {role: mhc_metadata}
+    - {role: ec2-tagging}
+    - {role: databases, when: "tags.Role in ['Database']"}
+    - {role: webserver, when: "tags.Role in ['Admin', 'Web']"}
+    - {role: bucardo, when: "tags.Role in ['Admin', 'Database'] and tags.Shard not in ['log']"}
+    # This logic is different depending on whether or not you're adding to a shard, or creating a brand new shard
+    # If you're creating a brand new shard, this will require bucardo user being created manually on log servers
+    # This requires commenting out logic in the /roles/bucardo/tasks/main.yml on lines 19, 26, 31, 41, 59, 87,
+    # and 98 to comment out:' and ("log" not in inventory_hostname_short)'

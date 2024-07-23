@@ -1,0 +1,31 @@
+[shared-services]
+#ssmon01.mobhealthinternal.com 
+#ssop01.mobhealthinternal.com use_hostname=false
+#sscfr01.mobhealthinternal.com use_hostname=false
+#sftppvt.mobilehealthconsumer.com
+#ssrdb01pvt.mobilehealthconsumer.com
+jenkins.mobilehealthconsumer.com
+
+#[shared-services-new]
+#ssops01-new.mobhealthinternal.com
+#ssftp01.mobhealthinternal.com
+#ssrdb01-new.mobhealthinternal.com
+#ssmon01-new.mobhealthinternal.com
+
+[shared-services:vars]
+# IAM user SSMON-icinga
+postfix_enable=True
+
+#[shared-services-new:vars]
+#postfix_enable=True
+#luks_disable=True
+
+#[shared-services-test-ubuntu18]
+#ssops02.mobhealthinternal.com use_hostname=false
+
+#[shared-services-test-ubuntu18:vars]
+## IAM user SSMON-icinga
+#postfix_enable=True
+#ansible_python_interpreter=/usr/bin/python3
+#luks_disable=True
+#server=ssops02

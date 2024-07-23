@@ -1,0 +1,5 @@
+---
+
+- include: luks_setup.yml
+  tags:
+    - luks

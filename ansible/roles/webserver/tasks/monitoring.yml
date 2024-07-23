@@ -1,0 +1,119 @@
+---
+
+  - debug:
+      msg:  "ubuntu version is {{ psql_version }}"
+    tags:
+      - quickrun
+
+  # - cron:
+  #     name: sync bucardo user
+  #     user: mhc
+  #     minute: "*/30"
+  #     job: "/home/mhc/bin/bucardo_update.sh {{ burcaro_user_id }} >> /home/mhc/logs/bucardo_sync.log 2>&1"
+  #   when: tags.Role in ['Admin']
+  #   # tags:
+  #   #   - monitoring
+  #   become: True
+
+  # - cron:
+  #     name: sync bucardo login shard
+  #     user: mhc
+  #     minute: "*/30"
+  #     job: "python3 /home/mhc/bin/bucardo_shard_replication.py"
+  #   when: tags.Role in ['Admin'] and tags.Shard in ['s01']
+  #   tags:
+  #     - monitoring
+  #   become: True
+
+  - name: put sudoers.d file
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0640
+      dest: /etc/sudoers.d/{{ item }}
+      src: sudoers.d/{{ item }}
+    become: True
+    with_items:
+      - 51-mhc-monitoring
+    tags:
+      - monitoring
+
+  - name: Put Monitoring Checks
+    copy:
+      remote_src: False
+      owner: nagios
+      group: nagios
+      mode: 0775
+      dest: /usr/lib/nagios/plugins/{{ item }}
+      src: monitoring_scripts/{{ item }}
+    become: True
+    with_items:
+      - check_bucardo.py
+      - check_celery_queue.py
+      - check_celery.py
+      - check_mongodb.py
+      - check_encryption.sh
+      - check_rabbitmq.py
+      - check_redis.py
+      - check_proc_mem.sh
+      - check_specific_celery_queue.sh
+    tags:
+      - monitoring
+
+  - name: Put Monitoring Checks
+    template:
+      remote_src: False
+      owner: nagios
+      group: nagios
+      mode: 0775
+      dest: /usr/lib/nagios/plugins/{{ item }}
+      src: monitoring_scripts/{{ item }}
+    become: True
+    with_items:
+      - check_file_age_custom.py
+    tags:
+      - monitoring
+
+
+  # - name: Put bucardo force sync script
+  #   copy:
+  #       remote_src: False
+  #       owner: mhc
+  #       group: mhc
+  #       mode: 0755
+  #       dest: "/home/mhc/bin/{{ item }}"
+  #       src: "monitoring_scripts/{{ item }}"
+  #   become: True
+  #   with_items:
+  #     - bucardo_update.sh
+  #     - bucardo_shard_replication.py
+  #   tags:
+  #     - mhc_application
+  #     - monitoring
+  #   when: admin_server
+
+  - name: install pip into base OS
+    pip:
+      name: "{{ item }}"
+    tags:
+      - monitoring
+    become: True
+    with_items:
+      - docopt
+      - pymongo
+      - requests
+
+  - name: Put Monitoring config into place
+    template:
+      remote_src: False
+      owner: nagios
+      group: nagios
+      mode: 0775
+      dest: /etc/nagios/nrpe.d/webserver.cfg
+      src: monitoring_config/webserver.cfg
+    become: True
+    tags:
+      - monitoring
+      - quickrun
+    notify: restart nrpe

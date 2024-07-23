@@ -1,0 +1,11 @@
+- name: Grep localsettings.py for `cert_file`
+  hosts: all
+  become: yes
+  tasks:
+  - name: "Searching for a String"
+    shell: grep cert_file /home/mhc/mhc-backend/localsettings.py
+    register: op
+    ignore_errors: yes
+
+  - debug:
+      msg: "{{ op.stdout_lines }}"

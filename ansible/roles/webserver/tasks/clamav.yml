@@ -1,0 +1,9 @@
+---
+  - name: "clamav files"
+    cron:
+      name: "ClamAV Scans"
+      user: root
+      minute: "0"
+      hour: "19"
+      #job: find / -ctime -2 -type f -not -path "/proc/*" -not -path "/sys/*" -not -path "/dev/*" -not -path "/var/lib/lxcfs/*" >/tmp/clamscan_files.txt
+      job: find / -mtime 0 -type f \( -path "/home/mhc/mhc-backend/media/*" -o -not -path "/home/mhc/*" \) -not -path "/proc/*" -not -path "/sys/*" -not -path "/dev/*" -not -path "/var/lib/lxcfs/*" -not -path "/var/log*" -not -path "/data-post*/*" -not -path "/data-mongo*/*" >/tmp/clamscan_files.txt

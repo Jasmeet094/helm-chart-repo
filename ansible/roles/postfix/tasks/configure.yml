@@ -1,0 +1,78 @@
+---
+- name: Configure Postfix main.cf
+  ansible.builtin.lineinfile:
+    backup: true
+    path: /etc/postfix/main.cf
+    regexp: "^{{ item.variable }}\ ="
+    line: "{{ item.variable }} = {{ item.value }}"
+    state: present
+  with_items:
+    - {variable: 'relayhost', value: "{{ ses_smtp_host }}:{{ ses_smtp_port }}"}
+    - {variable: 'smtp_sasl_auth_enable', value: 'yes'}
+    - {variable: 'smtp_sasl_security_options', value: 'noanonymous'}
+    - {variable: 'smtp_sasl_password_maps', value: 'hash:/etc/postfix/sasl_passwd'}
+    - {variable: 'smtp_use_tls', value: 'yes'}
+    - {variable: 'smtp_tls_security_level', value: 'encrypt'}
+    - {variable: 'smtp_tls_note_starttls_offer', value: 'yes'}
+    - {variable: 'myhostname', value: '{{ postfix_hostname }}'}
+    - {variable: 'mydestination', value: '{{ postfix_hostname }}, localhost.localdomain, localhost'}
+    - {variable: 'smtp_tls_CAfile', value: '/etc/ssl/certs/ca-certificates.crt'}
+  tags:
+    - postfix
+  notify: Restart postfix
+
+- name: Configure Postfix main.cf for sendfrom
+  ansible.builtin.lineinfile:
+    backup: true
+    path: /etc/postfix/main.cf
+    regexp: "^{{ item.variable }}\ ="
+    line: "{{ item.variable }} = {{ item.value }}"
+    state: present
+  with_items:
+    - {variable: 'sender_canonical_maps', value: 'regexp:/etc/postfix/sender_canonical'}
+  when: use_hostname
+  tags:
+    - postfix
+  notify: Restart postfix
+
+- name: Create /etc/postfix/sasl_passwd
+  ansible.builtin.lineinfile:
+    backup: true
+    create: true
+    path: /etc/postfix/sasl_passwd
+    regexp: "^{{ ses_smtp_host }}"
+    line: "{{ ses_smtp_host }}:{{ ses_smtp_port }} {{ ses_smtp_username }}:{{ ses_smtp_password }}"
+    state: present
+    mode: "0644"
+  tags:
+    - postfix
+  notify: Restart postfix
+  register: postfix_sasl_passwd
+
+- name: Postmap hash:/etc/postfix/sasl_passwd
+  ansible.builtin.command: postmap hash:/etc/postfix/sasl_passwd
+  tags:
+    - postfix
+  changed_when: postfix_sasl_passwd.changed
+  notify: Restart postfix
+
+- name: Change permissions on /etc/postfix/sasl_passwd.db
+  ansible.builtin.file:
+    path: /etc/postfix/sasl_passwd
+    mode: "0600"
+  tags:
+    - postfix
+  notify: Restart postfix
+
+- name: Create /etc/postfix/sender_canonical
+  ansible.builtin.lineinfile:
+    backup: true
+    create: true
+    path: /etc/postfix/sender_canonical
+    regexp: ".*{{ postfix_canonical_name }}"
+    line: "/(.*?)@(.*)/ {{ postfix_canonical_name }}"
+    state: present
+    mode: "0644"
+  tags:
+    - postfix
+  notify: Restart postfix

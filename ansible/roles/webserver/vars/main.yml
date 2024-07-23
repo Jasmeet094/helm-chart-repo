@@ -1,0 +1,16 @@
+---
+  env: "{{tags.Environment}}"
+  shard: "{{tags.Shard}}"
+  envshard: "{{env}}{{shard}}"
+  # localsettings.py vars
+  client_hrs_api_key: ""
+  client_hrs_id: ""
+  client_hrs_secret: ""
+  client_pass_key: ""
+  # email_aws_password: ""
+  # email_aws_user: ""
+  uwsgi_processes: "{% if 'ps' in inventory_hostname_short %}60{% elif 'plog' in inventory_hostname_short %}15{% else %}5{% endif %}"
+  uwsgi_max_requests: "{% if 'ps' in inventory_hostname_short %}500{% elif 'plog' in inventory_hostname_short %}100{% else %}100{% endif %}"
+  uwsgi_reload_on_rss: "{% if 'ps' in inventory_hostname_short %}800{% elif 'plog' in inventory_hostname_short %}150{% else %}150{% endif %}"
+  alightwell_shards: ['ps01', 'ps02', 'ps07', 'qas01']
+  operations_management_publickey: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCS2NF0BBugNMo4kCqVTC8O4E1+2Ig74Q3j7AJpFjDNI2dOqlbbH1vhrZmCpM7GkswX/xg9qGzJqZwIvr6px8jumZKXfhY9IU6fCtZmTUURFTOue6tbyQw+iqozhB//FHTUXVHTZvxCC8QeYpOlOm7XUmibVASs9XYkaPeDbVsRH4LdmJ6PtELN7DXgFXVIZDF6HG+HwThgsYivHiXou8n6ODUL864RPBJBrmSbXZ1F+tQaMzF0xyYDIZX+zc8ePQFWkJdO4UFJIH3ge3nqEFkR+g4UIZuNDpVTUL2P2KaOdkIeeKVnGbbK8NorrmSf/R6CgrzuNFDD2RMJ/Pbt4HQz operations@ManagementServer

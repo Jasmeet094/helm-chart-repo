@@ -1,0 +1,6 @@
+--- 
+truncate_before_years: 2
+truncate_before_months: 0
+truncate_before_days: 0
+
+count_only: true

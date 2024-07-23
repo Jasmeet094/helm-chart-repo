@@ -1,0 +1,11 @@
+- hosts: all
+  become: yes
+  tasks:
+    - name: Check open ssl version
+      shell: "openssl version"
+      register: openssl
+      
+    - name: Show shell results
+      debug: 
+        var: openssl.stdout_lines
+

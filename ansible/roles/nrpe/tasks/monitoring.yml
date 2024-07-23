@@ -1,0 +1,83 @@
+
+---
+- name: Check if nrpe.cfg stat.exist
+  stat:
+    path: /etc/nagios/nrpe.cfg
+  register: nrpe
+  tags:
+    - monitoring
+
+# should be cleaned up
+- name: install nagios-nrpe-server
+  apt: name=nagios-nrpe-server state=present
+  when: nrpe.stat.isreg is not defined
+  tags:
+    - monitoring
+  become: True
+
+- name: install jq which is required for checks
+  apt: name=jq state=present
+  tags:
+    - monitoring
+  become: True
+
+- name: Put NRPE.cfg
+  template:
+    src: nrpe.cfg.j2
+    #src: /home/ubuntu/operations/ansible/roles/nrpe/templates/nrpe.cfg.j2
+    dest: /etc/nagios/nrpe.cfg
+    force: yes
+    remote_src: False
+    owner: nagios
+    group: nagios
+    mode: 0644
+  become: True
+  notify: restart nrpe
+  tags:
+    - monitoring
+
+- name: Put mhc nrpe
+  template:
+    remote_src: False
+    owner: nagios
+    group: nagios
+    mode: 0644
+    dest: /etc/nagios/nrpe.d/mhc.cfg
+    src: mhc.cfg
+  become: True
+  notify: restart nrpe
+  tags:
+    - monitoring
+
+- name: install perl library for check_linux_stats plugin
+  apt:
+    name: libsys-statistics-linux-perl
+
+- name: install pymongo from pip
+  pip: name=pymongo executable=pip
+  become: True
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+
+- name: copy scripts to target server
+  copy:
+    src: "{{item}}"
+    dest: "/usr/lib/nagios/plugins/{{item}}"
+    owner: root
+    group: root
+    mode: 0755
+  notify: restart nrpe
+  with_items:
+    - check_linux_stats
+    - check_oom.sh
+  tags:
+    - monitoring
+
+# Uncomment when being run from the latest version of ansible
+# - name: Allow the nagios user to sudo /usr/lib/nagios/plugins/check_oom.sh
+#   community.general.sudoers:
+#     name: allow-nagios-oom
+#     state: present
+#     user: nagios
+#     commands: /usr/lib/nagios/plugins/check_oom.sh
+#   tags:
+#     - monitoring

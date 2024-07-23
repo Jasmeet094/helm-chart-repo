@@ -1,0 +1,5 @@
+---
+    nrpe_critical_total_procs: "{% if tags.Environment == 'p' %}1200{% else %}500{% endif %}"
+    nrpe_warning_total_procs:  "{% if tags.Environment == 'p' %}1500{% else %}400{% endif %}"
+    disk_alert_warning: "{% if tags.Environment == 'p' %}5%{% else %}8%{% endif %}"
+    disk_alert_critical: "{% if tags.Environment == 'p' %}3%{% else %}5%{% endif %}"

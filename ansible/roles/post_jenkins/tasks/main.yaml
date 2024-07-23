@@ -1,0 +1,21 @@
+-  #name: Django manage fixtures
+  #shell: bash -c "source /home/mhc/mhc-venv/bin/activate && {{item}}"
+  #with_items:
+  #    - ./manage.py loaddata fixtures/initial_fixture.json # ToDo: Enginerring to make new fixture for prod
+  #args:
+  #  chdir: /home/mhc/mhc-backend
+  #become_user: mhc
+  #when: "tags.Role in ['Admin']"
+  ## Only do this if we are creating a new Environment!
+
+- include: shard_updates.yml
+  when: "tags.Shard not in ['log']"
+
+- name: Django manage fixtures
+  shell: bash -c "source /home/mhc/mhc-venv/bin/activate && {{item}}"
+  with_items:
+    - ./manage.py updateSqlSequences
+  args:
+    chdir: /home/mhc/mhc-backend
+  become_user: mhc
+  when: "tags.Role in ['Admin']"

@@ -1,0 +1,15 @@
+- name: Create ami of ec2 instance
+  hosts: all
+  become: true
+  tasks:
+    - name: Basic AMI Creation and waiting async#
+      amazon.aws.ec2_ami:
+        instance_id: "{{ instance_id }}"
+        wait: false
+        name: "Update_{{ inventory_hostname_short }}_{{ ansible_date_time.iso8601_basic_short }}"
+        no_reboot: true
+        region: "us-west-2" # if we every do multi region I applogies
+        tags:
+          Name: "Update_{{ inventory_hostname_short }}_{{ ansible_date_time.iso8601_basic_short }}"
+          Source_Instance: "{{ instance_id }}"
+          DeleteAfter: "{{ '%Y-%m-%d' | strftime((ansible_date_time.epoch | int) + (86400 * 7)) }}"

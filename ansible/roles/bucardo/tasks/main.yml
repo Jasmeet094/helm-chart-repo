@@ -1,0 +1,107 @@
+---
+- apt_key:
+    url: "{{postgres_apt_key}}"
+    state: present
+    
+- apt_repository:
+    repo: "deb {{postgres_apt_repo}} bionic-pgdg main"
+    state: present
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+
+- name: Set bucardo_host variable
+  set_fact:
+      bucardo_host: "{% if 'db' in inventory_hostname_short %}localhost{% else %}{{env}}{{shard}}db1pvt.mobilehealthconsumer.com{% endif %}"
+
+- name: Install Bucardo packages
+  apt:
+    name: bucardo
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: Install Bucardo RC file
+  template:
+    src: bucardorc.j2
+    dest: /etc/bucardorc
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: create a bucardo machine user
+  user:
+    name: bucardo
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: Install a pgpass file for bucardo user
+  template:
+    src: pgpass.j2
+    dest: /var/lib/bucardo/.pgpass
+    mode: 0600
+    owner: bucardo
+    group: bucardo
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: Install a pgpass file for postgres user
+  template:
+    src: pgpass.j2
+    dest: /var/lib/postgresql/.pgpass
+    mode: 0600
+    owner: postgres
+    group: postgres
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short)'
+
+- name: Create bucardo run directory
+  file:
+    path: /var/run/bucardo
+    owner: bucardo
+    group: bucardo
+    state: directory
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: start postgresql
+  service: name=postgresql state=started
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short)'
+
+- name: Set up Postgres for bucardo
+  command: psql -c "{{item}}"
+  become: True
+  become_user: postgres
+  with_items:
+    - "CREATE DATABASE {{bucardo_db}}"
+    - "CREATE USER {{bucardo_user}} SUPERUSER PASSWORD '{{postgres_password}}'"
+    - "GRANT ALL ON DATABASE {{bucardo_db}} TO {{bucardo_user}};"
+  ignore_errors: True
+  vars:
+    ansible_ssh_pipelining: true
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short)'
+
+# Note: I think this needs to be updated to only ron on web
+# triple check this before next run
+- name: Run bucardo install
+  shell: echo 'P' | DBUSER={{bucardo_user}} DBNAME={{bucardo_db}} bucardo install -batch
+  become: True
+  become_user: bucardo
+  ignore_errors: True
+  vars:
+    ansible_ssh_pipelining: true
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: Install a default bucardo
+  copy:
+    remote_src: False
+    src: bucardo
+    dest: /etc/default/bucardo
+    mode: 0644 # Matches all the other files in /etc/default
+    owner: root
+    group: root
+  become: True
+  when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+- name: Disble bucardo on DB servers
+  ansible.builtin.systemd:
+    state: stopped
+    name: bucardo
+    enabled: no
+    force: yes
+  when: "tags.Role in ['Database'] and tags.Shard in ['Log']"

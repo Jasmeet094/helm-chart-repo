@@ -1,0 +1,6 @@
+---
+# vars file for awscli
+  awscli_version: 1.11.129
+  boto3_version: 1.4.5
+  u18_awscli_version: 1.16.180
+  u18_boto3_version: 1.9.175

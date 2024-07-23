@@ -1,0 +1,38 @@
+#prior we were checking to see if the root drive wasn't a given number, however, now we link the /dev/nvme to the /dev/sd mapping on each reboot or drive attachment for udev rules.
+#Also, TF creates the webserver secondary mount points as the /dev/sdf drive, so safe to set it statically, but can convert to variable in group_vars/all or hosts files if you prefer
+
+- name: Create ext4 filesystem
+  filesystem:
+    fstype: ext4
+    dev: /dev/sdf
+  #when: ansible_devices.nvme1n1.links.labels[0] is not defined and ansible_devices.nvme0n1.partitions.nvme0n1p1.links.labels[0] == "cloudimg-rootfs" and "'db' not in inventory_hostname | to_lower"
+  tags:
+    - mhc-data
+
+- name: label data-mhc volume
+  shell: /sbin/e2label /dev/sdf mhcdata-vol
+  become: yes
+
+# added logic to check if nvme1n1 is not the root drive 
+- name: mount /data-mhc device if non-root drive.
+  become: yes
+  mount:
+    path: /data-mhc
+    src: LABEL=mhcdata-vol
+    state: mounted
+    fstype: ext4
+    opts: defaults
+  #when: ansible_devices.nvme1n1.links.labels[0] is not defined and ansible_devices.nvme0n1.partitions.nvme0n1p1.links.labels[0] == "cloudimg-rootfs" and "'db' not in inventory_hostname | to_lower"
+  tags:
+    - mhc-data
+
+- name: set permissions on mount point
+  become: yes
+  file:
+    path: "/data-mhc"
+    mode: 0755
+    owner: root
+    group: root
+  ignore_errors: yes
+  tags:
+    - mhc-data

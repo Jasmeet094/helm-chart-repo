@@ -1,0 +1,10 @@
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Add ignore_invalid_headers off to NGINX config
+      lineinfile:
+        path: /etc/nginx/sites-available/mhc
+        insertafter: "client_max_body_size 100m;"
+        line: "    ignore_invalid_headers off;"
+      when: '"db" not in inventory_hostname_short'

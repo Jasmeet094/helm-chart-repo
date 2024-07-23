@@ -1,0 +1,17 @@
+# Location: /etc/systemd/system/celeryhr.service
+# systemctl enable celeryhr
+# systemctl start celeryhr
+# systemctl | grep celeryhr
+# https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+
+[Unit]
+Description=MHC Celeryd
+After=mhc.service
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/etc/systemd/system/celery_startup
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

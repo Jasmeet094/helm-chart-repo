@@ -1,0 +1,69 @@
+---
+- name: install clam-av
+  apt:
+    name: ["clamav", "clamav-daemon"]
+  register: result
+  become: true
+
+- name: ClamAV Config
+  copy:
+    remote_src: no
+    owner: root
+    group: root
+    mode: 0644
+    dest: "/etc/clamav/{{ item }}"
+    src: "{{ item }}"
+    backup: yes
+  become: True
+  with_items:
+    - clamd.conf
+  notify:
+    - restart clamav daemon
+
+- name: stop freshclam daemon
+  systemd:
+    state: stopped
+    name: clamav-freshclam
+
+- name: Run freshclam after install
+  command: freshclam
+  register: freshclam_result
+
+- name: start freshclam daemon
+  systemd:
+    state: restarted
+    name: clamav-freshclam
+    daemon_reload: yes
+    enabled: yes
+
+- name: Install mailutils to send email notifications
+  apt:
+    name: mailutils
+    state: present
+
+- name: Copy clamav scan script
+  copy:
+    src: "../files/clamscan.sh"
+    dest: "/etc/clamav/clamscan_daily.sh"
+
+- name: Update clamscan script permissions
+  file:
+    path: "/etc/clamav/clamscan_daily.sh"
+    state: touch
+    mode: 0775
+
+- name: create cron job to get daily clamav file list
+  cron:
+    name: "clamav scan files"
+    user: root
+    minute: "0"
+    hour: "19"
+    job: find / -mtime 0 -type f \( -path "/home/mhc/mhc-backend/media/*" -o -not -path "/home/mhc/*" \) -not -path "/proc/*" -not -path "/sys/*" -not -path "/dev/*" -not -path "/var/lib/lxcfs/*" -not -path "/var/log*" -not -path "/data-post*/*" -not -path "/data-mongo*/*" >/tmp/clamscan_files.txt
+
+- name: Create cron for clamav daily scan
+  cron:
+    name: "clamav scan"
+    user: root
+    minute: "0"
+    hour: "23"
+    job: "/etc/clamav/clamscan_daily.sh {{ email_recipient }} {{ dir_to_scan }}"

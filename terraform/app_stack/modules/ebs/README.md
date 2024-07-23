@@ -1,0 +1,1 @@
+The EBS module is bare-bones, but standalone so that instances can be give one or more attached volumes from Terraform. Without the module, details of terraform's `aws_volume_attachment` would be exposed at the shard level (this hiding is merely a design choice).

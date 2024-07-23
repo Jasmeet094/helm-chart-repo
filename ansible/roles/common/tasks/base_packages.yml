@@ -1,0 +1,30 @@
+---
+
+- name: Install logrotate
+  apt:
+    name: logrotate
+  become: True
+
+- name: Install ntp
+  apt:
+    name: ntp
+  become: True
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '12.04' or ansible_distribution_version == '14.04' or ansible_distribution_version == '16.04'
+
+
+- name: Install chrony
+  apt:
+    name: chrony
+  become: True
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+
+- name: Install poppler utils
+  apt:
+    name: poppler-utils
+  become: True
+
+- name: remove unattended-upgrades
+  apt:
+    name: unattended-upgrades
+    state: absent
+  become: True

@@ -1,0 +1,18 @@
+---
+- name: Put Postgres Config in place
+  template:
+    remote_src: False
+    owner: postgres
+    group: postgres
+    mode: 0775
+    dest: /etc/postgresql/{{ psql_version }}/main/{{ item }}
+    src: "{{ psql_version }}/{{ item }}"
+    backup: true
+  become: True
+  with_items:
+     - postgresql.conf
+     - pg_hba.conf
+  notify: restart postgresql
+  tags:
+     - postgres
+     - config

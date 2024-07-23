@@ -1,0 +1,37 @@
+# Playbook: upgrade_ubuntu_release.yml
+# Description: This playbook will upgrade Ubuntu to the new stable release.
+# It performs the upgrade without any prompts and selects the default action when a question arises.
+
+---
+- name: Upgrade ubuntu release
+  hosts: all
+  become: true
+
+  environment:
+    DEBIAN_FRONTEND: noninteractive
+
+  tasks:
+    - name: Create dpkg config file
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/01configuration
+        content: |
+          Dpkg::Options {
+            "--force-confdef";
+            "--force-confold";
+          }
+        mode: "0644"
+
+    - name: Upgrade packages
+      ansible.builtin.apt:
+        update_cache: true
+        allow_change_held_packages: true
+        upgrade: full
+
+    - name: Reboot the instance
+      ansible.builtin.reboot:
+
+    - name: Upgrade ubuntu release # noqa: no-changed-when
+      ansible.builtin.command: do-release-upgrade -f DistUpgradeViewNonInteractive
+
+    - name: Reboot the instance
+      ansible.builtin.reboot:

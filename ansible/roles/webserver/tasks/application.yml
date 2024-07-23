@@ -1,0 +1,162 @@
+---
+- name: Make MHC app dirs
+  file:
+    dest: "{{item.path}}"
+    state: directory
+    mode: 0775
+    owner: "{{item.owner}}"
+    group: "{{item.owner}}"
+  with_items:
+    - {path: /home/mhc/mhc-backend, owner: mhc}
+    - {path: /home/mhc/mhc-backend/media, owner: mhc}
+    - {path: /home/mhc/mhc-frontend, owner: mhc}
+    - {path: /data-mhc/crypt, owner: mhc}
+    - {path: /data-mhc/crypt/csv_files, owner: mhc}
+    - {path: /data-mhc/crypt/samldir, owner: mhc}
+    - {path: /home/mhc/mhc-backend/configs, owner: mhc}
+    - {path: /home/mhc/keys, owner: mhc}
+  become: True
+  tags:
+    - secrets
+
+- name: Symlink MHC crypt path
+  file:
+    src: /data-mhc/crypt
+    path: /home/mhc/crypt
+    group: mhc
+    owner: mhc
+    state: link
+    force: yes
+  become: True
+  tags:
+    - secrets
+
+- name: Symlink csv_files path
+  file:
+    src: /data-mhc/crypt/csv_files
+    path: /home/mhc/mhc-backend/media/csv_files
+    group: mhc
+    owner: mhc
+    state: link
+    force: yes
+  become: True
+  tags:
+    - secrets
+
+- name: remove pvt from inventory_hostname short
+  set_fact:
+      url_hostname: "{{ inventory_hostname_short.replace('pvt', '') }}"
+  tags:
+    - localsettings
+
+- name: Set Record ID
+  set_fact:
+    db_shard_name: "Shard {{ tags.Shard.replace('log', '2').replace('s', '') | int }}"
+  tags:
+    - localsettings
+
+- name: Set weburl prod
+  set_fact:
+    weburl: "www"
+  when: "tags.Environment in ['p']"
+  tags:
+    - localsettings
+
+- name: Set weburl non prod
+  set_fact:
+    weburl: "{{ tags.Environment }}"
+  when: "tags.Environment not in ['p']"
+  tags:
+    - localsettings
+    # Fixed this to have the correct health check url, or related 
+
+# BASEURL Logic
+# log: environment 
+# plog: www
+# shard: envshard
+
+- name: Set baseurl shard
+  set_fact:
+    baseurl: "{{tags.Environment}}{{tags.Shard}}"
+  when: "tags.Shard not in ['log']"
+  tags:
+    - localsettings
+
+- name: Set baseurl log, nonprod
+  set_fact:
+    baseurl: "{{tags.Environment}}"
+  when: "tags.Environment not in ['p']"
+  tags:
+    - localsettings
+
+- name: Set baseurl log, prod
+  set_fact:
+    baseurl: "www"
+  when: "tags.Environment in ['p'] and tags.Shard in ['log']"
+  tags:
+    - localsettings
+
+
+- name: Install localsettings.py
+  template:
+    src: localsettings.py
+    dest: /home/mhc/mhc-backend/localsettings.py
+    owner: mhc
+    group: mhc
+    backup: yes
+  become: True
+  notify: restart mhc
+  tags:
+    - localsettings
+
+- name: Setup Crypt Folders
+  file:
+      dest: "{{item.path}}"
+      state: directory
+      mode: 0775
+      owner: "{{item.owner}}"
+      group: "{{item.owner}}"
+  with_items:
+    - {path: /home/mhc/crypt/blackhawk, owner: mhc}
+  become: True
+  tags:
+    - secrets
+
+- name: Retrieve protected assets from S3
+  # This requires Ansible 2.4 (via pip, probably)
+  aws_s3:
+    bucket: "{{s3_bucket}}"
+    object: "secrets/{{item.name}}"
+    dest: "{{item.path}}"
+    mode: get
+  with_items:
+    - {name: "{{saml_keyfile}}", path: "/home/mhc/crypt/{{saml_keyfile}}"}
+    - {name: "{{saml_certfile}}", path: "/home/mhc/crypt/{{saml_certfile}}"}
+    - {name: "{{saml_keyfile}}", path: "/home/mhc/crypt/samldir/{{saml_keyfile}}"}
+    - {name: "{{saml_certfile}}", path: "/home/mhc/crypt/samldir/{{saml_certfile}}"}
+    - {name: "keys/mhc_keys_meta", path: "/home/mhc/keys/meta"}
+    - {name: "keys/mhc_keys_1", path: "/home/mhc/keys/1"}
+    - {name: "blackhawk-2020/Reward-Fenton-MobileHealthConsumers-API-Integration.pem", path: "/home/mhc/crypt/blackhawk/Reward-Fenton-MobileHealthConsumers-API-Integration.pem" }
+  become: True
+  when: not is_vagrant
+  tags:
+    - secrets
+
+- name: Use snakeoil certs when in Vagrant
+  copy:
+    src: "{{item.name}}"
+    dest: "{{item.path}}"
+  with_items:
+    - {name: "selfsigned.key", path: "/home/mhc/crypt/{{saml_keyfile}}"}
+    - {name: "selfsigned.crt", path: "/home/mhc/crypt/{{saml_certfile}}"}
+  become: True
+  when: is_vagrant
+
+- name: Install other application files
+  copy:
+    src: "{{item}}"
+    dest: "/home/mhc/{{item}}"
+  with_items:
+    - mhc-backend/configs/samlconfig.py
+    - mhc-backend/configs/urls.py
+  become: True

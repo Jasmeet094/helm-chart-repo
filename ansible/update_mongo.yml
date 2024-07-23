@@ -1,0 +1,84 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    specific_mongo_vers_36_major: "3.6"
+    mongo_apt_key_4: "https://www.mongodb.org/static/pgp/server-4.0.asc"
+    mongo_apt_repo_4: "https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0"
+    specific_mongo_vers_4_minor: "4.0.27"
+    specific_mongo_vers_4_major: "4.0"
+    mongo_apt_key_42: "https://www.mongodb.org/static/pgp/server-4.2.asc"
+    mongo_apt_repo_42: "https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2"
+    specific_mongo_vers_42_minor: "4.2.18"
+    specific_mongo_vers_42_major: "4.2"
+    mongo_apt_key_44: "https://www.mongodb.org/static/pgp/server-4.4.asc"
+    mongo_apt_repo_44: "https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4"
+    specific_mongo_vers_44_minor: "4.4.13"
+    specific_mongo_vers_44_major: "4.4"
+    mongo_apt_key_5: "https://www.mongodb.org/static/pgp/server-5.0.asc"
+    mongo_apt_repo_5: "https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/5.0"
+    specific_mongo_vers_5_minor: "5.0.6"
+    specific_mongo_vers_5_major: "5.0"
+
+  tasks:  
+    - name: Basic AMI Creation and waiting async#
+      amazon.aws.ec2_ami:
+        instance_id: "{{ instance_id }}"
+        wait: no
+        name: "Update_mongo_{{ inventory_hostname_short }}_{{ansible_date_time.iso8601_basic_short}}"
+        no_reboot: yes
+        region: "us-west-2" # if we every do multi region I applogies
+        tags:
+          Name: "Update_{{ inventory_hostname_short }}_{{ansible_date_time.iso8601_basic_short}}"
+          Source_Instance: "{{ instance_id }}"
+          DeleteAfter: "{{ '%Y-%m-%d' | strftime( ( ansible_date_time.epoch | int ) + ( 86400 * 7 )  ) }}"
+      tags:
+        - mongo
+
+    - name: 4.0 install and upgrade
+      include_role: 
+        name: mongo
+      tags:
+        - mongo
+      vars:
+        specific_mongo_vers_minor: "{{ specific_mongo_vers_4_minor }}"
+        mongo_apt_key: "{{ mongo_apt_key_4 }}"
+        mongo_apt_repo: "{{ mongo_apt_repo_4 }}"
+        specific_mongo_vers_major: "{{ specific_mongo_vers_4_major }}"
+        compatability_vers: "{{ specific_mongo_vers_36_major }}"
+
+    - name: 4.2 install and upgrade
+      include_role: 
+        name: mongo
+      tags:
+        - mongo
+      vars:
+        specific_mongo_vers_minor: "{{ specific_mongo_vers_42_minor }}"
+        mongo_apt_key: "{{ mongo_apt_key_42 }}"
+        mongo_apt_repo: "{{ mongo_apt_repo_42 }}"
+        specific_mongo_vers_major: "{{ specific_mongo_vers_42_major }}"
+        compatability_vers: "{{ specific_mongo_vers_4_major }}"
+  
+    - name: 4.4 install and upgrade
+      include_role: 
+        name: mongo
+      tags:
+        - mongo
+      vars:
+        specific_mongo_vers_minor: "{{ specific_mongo_vers_44_minor }}"
+        mongo_apt_key: "{{ mongo_apt_key_44 }}"
+        mongo_apt_repo: "{{ mongo_apt_repo_44 }}"
+        specific_mongo_vers_major: "{{ specific_mongo_vers_44_major }}"
+        compatability_vers: "{{ specific_mongo_vers_42_major }}"
+  
+    - name: 5.0 install and upgrade
+      include_role: 
+        name: mongo
+      tags:
+        - mongo
+      vars:
+        specific_mongo_vers_minor: "{{ specific_mongo_vers_5_minor }}"
+        mongo_apt_key: "{{ mongo_apt_key_5 }}"
+        mongo_apt_repo: "{{ mongo_apt_repo_5 }}"
+        specific_mongo_vers_major: "{{ specific_mongo_vers_5_major }}"
+        compatability_vers: "{{ specific_mongo_vers_44_major }}"

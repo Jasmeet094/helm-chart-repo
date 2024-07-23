@@ -1,0 +1,26 @@
+[uwsgi]
+master = true
+{% if "ps" in inventory_hostname_short %}
+processes = {{ prod_processes }}
+{% elif "plog" in inventory_hostname_short %}
+processes = {{ plog_processes }}
+{% else %}
+processes = 5
+{% endif %}
+enable-threads = true
+virtualenv = /home/mhc/mhc-venv
+fastrouter-post-buffering = 32768
+buffer-size = 32768
+no-orphans = true
+harakiri = 1800
+logto = /home/mhc/logs/mhc_uwsgi.log
+wsgi-file = /home/mhc/mhc-backend/Backend/wsgi.py
+die-on-term = true
+uid = mhc
+socket = /home/mhc/run/mhc.sock
+chown-socket = mhc:www-data
+chmod-socket = 660
+vacuum = true
+log-date = %%H:%%M:%%S
+logformat-strftime
+log-format = [%(ftime)|%(tmsecs)|pid: %(pid)|from: %(var.HTTP_X_FORWARDED_FOR)|via: %(addr)|user: %(user_id)| %(method) %(uri)  |%(vars) vars in %(pktsize) bytes] => generated %(rsize) bytes in %(msecs) msecs (%(proto) %(status)) %(headers) headers in %(hsize) bytes (%(switches) switches on core %(core)) |accessed: %(accessed_user_id)

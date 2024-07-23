@@ -1,0 +1,89 @@
+---
+- name: Install Nginx
+  apt:
+     name: nginx, libnginx-mod-http-headers-more-filter
+  tags:
+    - nginx
+
+- name: Check for existing dhparam file
+  stat:
+    path: /etc/nginx/dhparam.pem
+  register: dhparam_check
+
+- name: Create DH param file
+  command: openssl dhparam -dsaparam -out /etc/nginx/dhparam.pem 4096
+  when: not dhparam_check.stat.exists
+
+  #- debug:
+  #msg: "host {{ inventory_hostname_short }} has env {{ env }} and shard {{ shard }}"
+
+- name: Install MHC site file
+  template:
+    src: nginx_site_mhc.j2
+    dest: /etc/nginx/sites-available/mhc
+    backup: yes
+
+- name: Install ssl.conf
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/nginx/conf.d/
+    src: files/ssl.conf
+    backup: yes
+  become: True
+
+- name: Remove the default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Symlink the MHC site file
+  file:
+    path: /etc/nginx/sites-enabled/mhc
+    src: /etc/nginx/sites-available/mhc
+    state: link
+
+- name: Creates directory
+  file:
+    path: "/etc/nginx/headers.d"
+    state: directory
+    owner: root
+    group: root
+
+- name: install mhc_headers files
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: "{{item.path}}"
+    src: "{{item.name}}"
+    backup: yes
+  become: True
+  with_items:
+    - {name: "mhc_headers.conf", path: "/etc/nginx/headers.d/mhc_headers.conf"}
+    - {name: "mhc_headers_nocsp.conf", path: "/etc/nginx/headers.d/mhc_headers_nocsp.conf"}
+
+- name: install ssl.conf
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/nginx/conf.d/
+    src: files/ssl.conf
+    backup: yes
+  become: True
+ 
+- name: install nginx.conf
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/nginx/
+    src: files/nginx.conf
+    backup: yes
+  become: True

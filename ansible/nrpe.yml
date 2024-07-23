@@ -1,0 +1,5 @@
+- name: Run the nrpe role 
+  hosts: all
+  become: yes
+  roles:
+    - nrpe

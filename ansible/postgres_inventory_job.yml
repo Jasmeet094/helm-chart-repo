@@ -1,0 +1,24 @@
+- name: List postgres databases 
+  hosts: all
+  become: yes
+  vars:
+    psql_port: "6432"
+  tasks:
+    - name: Find postgres version
+      command: locate bin/postgres
+      register: pg_version_output
+      when: "tags.Role in ['Database']"
+
+    - debug: msg="{{ pg_version_output }}"
+
+    - name: List Databases
+      become_user: postgres
+      command: psql -p 6432 -c \\l
+      register: pg_database_output
+      when: "tags.Role in ['Database']"
+
+    - debug: msg="{{ pg_database_output }}"
+
+   
+    
+

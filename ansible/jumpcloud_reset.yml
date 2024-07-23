@@ -1,0 +1,30 @@
+- name: Remove and reinstall jumpcloud
+  hosts: all
+  become: yes
+  vars:
+    jumpcloud_use_sudo: yes
+    jumpcloud_force_install: yes
+    
+  tasks:
+    - name: stop JumpCloud
+      service:
+        name:  jcagent
+        state: stopped
+      ignore_errors: yes
+
+    - name: remove jc files
+      file: 
+        dest: "{{ item }}" 
+        state: absent
+      with_items:
+        - "/opt/jc/ca.crt"
+        - "/opt/jc/client.crt"
+        - "/opt/jc/client.key"
+        - "/opt/jc/jcagent.conf"
+      ignore_errors: yes
+
+    - name: Jumpcloud Install
+      include_role:
+        name: jumpcloud       
+      vars:
+        jumpcloud_force_install: "yes"

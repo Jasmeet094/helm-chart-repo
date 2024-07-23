@@ -1,0 +1,171 @@
+# This is the default ansible 'hosts' file.
+
+[qas01-db]
+qas01db1.mobhealthinternal.com
+
+[qas01-db:vars]
+postgres_password=c487cf499b
+postgres_drive=sdp
+mongo_drive=sdm
+env=qa
+shard=s01
+sharded_cluster=True
+
+[qas01-w]
+qas01w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=214751 mhc_web_drive=nvme1n1 env=qa shard=s01
+qas01w2.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=5 bglow_concurrency=2 bglow_maxtaskperchild=2 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=2 admin_server=false env=qa shard=s01
+
+[qas01-w:vars]
+postgres_password=c487cf499b
+db_server=qas01db1
+env=qa
+shard=s01
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'WharpeushyelEfUnJaikpoogloocdicHyavmekgi^'
+sharded_cluster=True
+
+[qas01:children]
+qas01-db
+qas01-w
+
+[qas02-db]
+qas02db1.mobhealthinternal.com
+
+[qas02-w]
+qas02w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=10000001055
+
+[qas02-w:vars]
+postgres_password=c487cf499b
+db_server=qas02db1
+env=qa
+shard=s02
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'sewAteckudnudd:wrotNayttEmadwalityirgAqu%'	
+sharded_cluster=True
+
+[qas02-db:vars]
+postgres_password=c487cf499b
+env=qa
+shard=s02
+postgres_drive=sdp
+mongo_drive=sdm
+sharded_cluster=True
+
+[qas02:children]
+qas02-db
+qas02-w
+
+[qas03-w]
+qas03w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=20000000384
+
+[qas03-w:vars]
+postgres_password=c487cf499b
+db_server=qas03db1
+env=qa
+shard=s03
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+sharded_cluster=True
+
+[qas03-db:vars]
+postgres_password=c487cf499b
+env=qa
+shard=s03
+sharded_cluster=True
+
+[qas03:children]
+qas03-db
+qas03-w
+
+[qas04-w]
+qas04w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=20000000384
+
+[qas04-w:vars]
+postgres_password=c487cf499b
+db_server=qas03db1
+env=qa
+shard=s04
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+sharded_cluster=True
+
+[qas04-db:vars]
+postgres_password=c487cf499b
+env=qa
+shard=s04
+sharded_cluster=True
+
+[qas04:children]
+qas04-db
+
+[qalog-w:vars]
+postgres_password=c487cf499b
+db_server=qalogdb1
+env=qa
+shard=log
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'KrafvomejyifCecOcWityuHydNafInyenJihuims$'
+sharded_cluster=True
+
+[qalog-db]
+qalogdb1.mobhealthinternal.com
+
+[qalog-db:vars]
+postgres_password=c487cf499b
+env=qa
+shard=log
+postgres_drive=sdp
+mongo_drive=sdm
+sharded_cluster=True
+
+[qalog-w]
+qalogw1.mobhealthinternal.com mhc_proccess=3
+
+[qas03-db]
+qas03db1.mobhealthinternal.com
+
+[qas04-db]
+qas04db1.mobhealthinternal.com
+
+[qalog:children]
+qalog-db
+qalog-w
+
+[db:children]
+qas01-db
+qas02-db
+qalog-db
+qas03-db
+qas04-db
+
+[db:vars]
+cluster_version="14"
+environment_subnet="172.31.64.0/19"
+shared_subnet="172.31.0.0/19"
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+postgres_drive=sdp
+mongo_drive=sdm
+
+[web:vars]
+swap_space=2048000000
+mhc_web_drive=nvme1n1
+
+[web:children]
+web_shard
+qalog-w
+
+[web_shard:children]
+qas01-w
+qas02-w
+qas03-w
+qas04-w
+
+[qa:children]
+qas01
+qas02
+qas03
+qas04
+qalog

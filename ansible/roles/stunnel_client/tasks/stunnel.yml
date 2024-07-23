@@ -1,0 +1,38 @@
+---
+
+- debug:
+    msg: "host {{ inventory_hostname_short }} has env {{ env }} and shard {{ shard }}"
+
+- name: Put stunnel client config in place
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/stunnel/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+    - mhc.conf
+  tags:
+    - stunnel
+
+- name: Put stunnel client default in place
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/default/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+    - stunnel4
+  notify: restart stunnel4
+  tags:
+    - stunnel
+
+- name: restart stunnel4
+  service: name=stunnel4 state=restarted
+  become: True
+  when: is_vagrant == False

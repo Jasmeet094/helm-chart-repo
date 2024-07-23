@@ -1,0 +1,54 @@
+---
+  - include: monitoring.yml
+
+  - name: install psycopg2 from pip
+    pip: name=psycopg2 executable=pip
+    become: True
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+
+  - name: (Re)start postgres
+    service: name=postgresql state=restarted
+    become: True
+
+  - name: Wait for Postgres to finish restart
+    wait_for:
+      port: 6432
+
+  - name: Check for existing DB user
+    command: >
+      psql -tqA -c "select role_name from information_schema.enabled_roles where role_name = '{{db_user}}';"
+    become: True
+    become_user: postgres
+    vars:
+      ansible_ssh_pipelining: true
+    register: db_user_exists
+
+  - name: Set up DB user for app
+    command: psql -c "{{item}}"
+    become: True
+    become_user: postgres
+    with_items:
+      - CREATE ROLE {{db_user}} with password '{{postgres_password}}';
+      - CREATE DATABASE {{db_name}};
+      - GRANT ALL on DATABASE {{db_name}} to {{db_user}};
+      - ALTER ROLE {{db_user}} WITH LOGIN;
+    vars:
+      ansible_ssh_pipelining: true
+    no_log: True
+    # when: db_user_exists.stdout != db_user
+    ignore_errors: yes
+
+  - name: Create extension when djangostack
+    become: True
+    become_user: postgres
+    command: psql -U postgres {{db_name}} -c "{{item}}"
+    with_items:
+      - CREATE EXTENSION IF NOT EXISTS pg_trgm SCHEMA pg_catalog;
+    vars:
+      ansible_ssh_pipelining: true
+    no_log: False
+    when: db_name == "djangostack"
+
+
+  #- name check if file exists in s3 
+  #- if prior one exists, download file and do psql on that file into the  djangostack database

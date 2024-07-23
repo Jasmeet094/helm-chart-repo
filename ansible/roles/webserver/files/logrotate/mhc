@@ -1,0 +1,13 @@
+/home/mhc/logs/*.log {
+        daily
+        missingok
+        rotate 366
+        compress
+        delaycompress
+        notifempty
+        create 644 mhc mhc
+        sharedscripts
+        postrotate
+                /usr/sbin/service mhc restart > /dev/null
+        endscript
+}

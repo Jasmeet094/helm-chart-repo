@@ -1,0 +1,80 @@
+---
+- name: check if swap file exists
+  stat:
+    path: "{{ swap_file }}"
+  register: swap_file_check
+  tags:
+    - swap
+
+- name: grep to find the root device, it will have a partition
+  #shell: 'lsblk |grep nvme[0-9]n[0-9]p1 -o'
+  shell: '/bin/ls -l /dev/disk/by-label |/bin/grep cloudimg-rootfs |cut -d "/" -f 3'
+  register: root_device
+
+- name: Return the root device size in bytes
+  shell: 'lsblk -o SIZE /dev/{{root_device.stdout}} -b | tail -1'
+  register: root_device_size
+
+- debug: var=root_device.stdout
+
+- debug: var=root_device_size.stdout
+
+- debug:
+    msg: "{{ root_device_size.stdout |int }} disk={{ root_device | type_debug }}"
+
+#- debug:
+#    msg: "{{ swap_space |int }} type={{ swap_space | type_debug }}"
+
+#- debug:
+#    msg: "{{ ansible_devices.nvme0n1.partitions.nvme0n1p1.links.labels[0] }}"
+
+#- debug:
+#    msg: "{{ ansible_devices.nvme1n1.partitions.nvme1n1p1.links.labels[0] }}"
+   
+# added  Should add some additional logic to scan up to two more disks
+# Dymanically sets swap, if it's larger than a certain amount, set swap to 8 gigs, else set to 2 gigs
+- name: create swap file if root drive, and doesn't already exist.
+  become: yes
+  command: fallocate -l "{% if root_device_size.stdout |int >= 53687091200 %}4196000000{%else %}2049000000{% endif %}" {{ swap_file }}
+  when: not swap_file_check.stat.exists
+  tags:
+    - swap
+
+- name: set permissions on swap file
+  become: yes
+  file:
+    path: "{{ swap_file }}"
+    mode: 0600
+  ignore_errors: yes
+  tags:
+    - swap
+
+- name: format swap file
+  become: yes
+  command: mkswap {{ swap_file }}
+  when: not swap_file_check.stat.exists
+  tags:
+    - swap
+
+- name: add to fstab
+  become: yes
+  lineinfile:
+    dest: /etc/fstab
+    regexp: "{{ swap_file }}"
+    line: "{{ swap_file }} none swap sw 0 0"
+  tags:
+    - swap
+
+- name: turn on swap
+  become: yes
+  command: swapon -a
+  tags:
+    - swap
+
+- name: set swapiness
+  become: yes
+  sysctl:
+    name: vm.swappiness
+    value: "1"
+  tags:
+    - swap

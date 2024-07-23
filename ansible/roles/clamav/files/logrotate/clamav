@@ -1,0 +1,9 @@
+/var/log/clamav/clamscan.log {
+        daily
+        missingok
+        rotate 30
+        compress
+        delaycompress
+        notifempty
+        create 0644 clamav adm
+}

@@ -1,0 +1,13 @@
+- name: Update ssl cert in pip package
+  hosts: all
+  become: true
+  tasks:
+    - name: Update SSL Cert in pip package
+      ansible.builtin.copy:
+        remote_src: false
+        owner: mhc
+        group: mhc
+        mode: '0664'
+        dest: /home/mhc/mhc-venv/lib/python2.7/site-packages/requests/cacert.pem
+        src: "{{ playbook_dir }}/files/cacert.pem"
+      become: true

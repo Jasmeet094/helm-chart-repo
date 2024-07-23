@@ -1,0 +1,17 @@
+---
+- name: Add postgres apt repo
+  hosts: all
+  become: yes
+  vars:
+    postgres_apt_key: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    postgres_apt_repo: http://apt.postgresql.org/pub/repos/apt/
+  tasks:
+    - apt_key:
+        url: "{{postgres_apt_key}}"
+        state: present
+      when: tags.Role == "Admin"
+    
+    - apt_repository:
+        repo: "deb {{postgres_apt_repo}} bionic-pgdg main"
+        state: present
+      when: tags.Role == "Admin"

@@ -1,0 +1,226 @@
+- name: Upgrade postgres
+  hosts: all
+  become: yes
+  vars:
+    psql_version: 14
+    psql_port: "6432"
+    temp_upgrade_port: "6433"
+    orignal_cluster: 9.6
+    restart_hosts: True
+    ANSIBLE_JINJA2_NATIVE: true
+    temp_path: "/data-postgres/14/"
+    path: "/data-postgres/"
+  tasks:
+    - name: Region
+      debug:
+        msg: "Instance ID: {{instance_id}}"
+
+    - name: Database Role pre Upgrade
+      include_role:
+        name:  databases
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+      vars:
+        psql_port: "{{ temp_upgrade_port }}"
+        location: "{{ temp_path }}"
+        
+    - name: Database Role pre Upgrade
+      include_role:
+        name:  logrotate
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+
+
+    - name: Webserver Role
+      include_role:
+        name:  webserver
+      when: "tags.Role in ['Admin', 'Web', 'Nightly']"
+      tags:
+        - postgres
+
+    - name: Stop service postgresql, if started
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: "{{temp_path}}"
+        state: directory
+        owner: postgres
+        group: postgres
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+
+    - name: Copy files from var-lib to /data-postgres-14
+      copy: 
+        remote_src: True 
+        src: /var/lib/postgresql/14/main/
+        dest: "{{temp_path}}"
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+
+    - name: Change file ownership, group and permissions
+      ansible.builtin.file:
+        path: "{{temp_path}}"
+        owner: postgres
+        group: postgres
+        mode: '0700'
+        recurse: true
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+ 
+    - name: Run pg_upgrade
+      shell: >
+        cd /tmp;
+        /usr/lib/postgresql/{{psql_version}}/bin/pg_upgrade 
+        --retain
+        --link
+        -b /usr/lib/postgresql/{{orignal_cluster}}/bin
+        -B /usr/lib/postgresql/{{psql_version}}/bin
+        -d /data-postgres/
+        -D {{ temp_path }}
+        -o "-c config_file=/etc/postgresql/{{orignal_cluster}}/main/postgresql.conf"
+        -O "-c config_file=/etc/postgresql/{{psql_version}}/main/postgresql.conf"
+        -p {{ psql_port }}
+        -P {{ temp_upgrade_port }}  | tee -a /tmp/pg_upgrade.log
+      become_user: postgres
+      async: 36000
+      poll: 10
+      tags:
+        - postgres
+      register: pg_upgrade_output
+      when: "tags.Role in ['Database']"
+
+    - debug: msg="{{ pg_upgrade_output }}"
+      tags:
+        - postgres
+
+    - name: Upload pg_upgrade.log to S3                                                                               
+      amazon.aws.aws_s3:
+        bucket: "mhc-logs"
+        mode: put
+        src: "/tmp/{{item}}"
+        object: "postgres_updates/{{ansible_hostname}}/{{item}}_{{ansible_date_time.iso8601_basic_short}}.log"
+      tags:
+        - postgres
+      with_items:
+        - "pg_upgrade_internal.log"
+        - "pg_upgrade_server.log"
+        - "pg_upgrade.log"
+        - "pg_upgrade_utility.log"
+      when: "tags.Role in ['Database']"
+    
+    - name: Start service postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+    
+    - name: Update exentions
+      shell: |
+        cat /tmp/update_extensions.sql | psql -p {{ temp_upgrade_port }}
+      become_user: postgres
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+      register: pg_extention_output
+
+    - debug: msg="{{ pg_extention_output }}"
+      tags:
+        - postgres
+
+    - name: Upload pg_extention_output to S3
+      amazon.aws.aws_s3:
+        bucket: "mhc-logs"
+        mode: put
+        content: "{{ pg_extention_output }}"
+        object: "postgres_updates/{{ansible_hostname}}/{{ansible_date_time.iso8601_basic_short}}_update_extensions.log"
+      tags:
+          - postgres
+      when: "tags.Role in ['Database']"
+     
+    - name: Run Vacumm
+      shell: |
+        /usr/lib/postgresql/{{psql_version}}/bin/vacuumdb --all --analyze-in-stages -p {{ temp_upgrade_port }}
+      register: pg_vacumm_output
+      become_user: postgres
+      become: yes
+      async: 3600
+      poll: 10
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+
+    - debug: msg="{{ pg_vacumm_output }}"
+      tags:
+        - postgres
+
+    - name: Upload pg_vacumm_output to S3
+      amazon.aws.aws_s3:
+        bucket: "mhc-logs"
+        mode: put
+        content: "{{ pg_vacumm_output }}"
+        object: "postgres_updates/{{ansible_hostname}}/{{ansible_date_time.iso8601_basic_short}}_pg_vacuum_output.log"
+      tags:
+          - postgres
+      when: "tags.Role in ['Database']"
+    
+    - name: Stop service postgresql to move around data volumes
+      ansible.builtin.service:
+        name: postgresql
+        state: stopped
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+
+    - name: Remove a list of packages
+      apt:
+        pkg:
+          - postgresql-{{ orignal_cluster }}
+          - postgresql-contrib-{{ orignal_cluster }}
+          - postgresql-client-{{ orignal_cluster }}
+          - postgresql-plperl-{{ orignal_cluster }}
+        state: absent
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+    
+    - name: Cloudwatch Log reconfigure
+      include_role:
+        name:  logrotate
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+      vars:
+        psql_version: 14
+
+    - name: Database Role post Upgrade
+      include_role:
+        name:  databases
+      when: "tags.Role in ['Database']"
+      tags:
+        - postgres
+      vars:
+        # psql_port: "{{ psql_port }}"
+        location: "{{ temp_path }}"
+        psql_version: 14
+
+    - name: Start service postgresql
+      ansible.builtin.service:
+        name: postgresql
+        state: started
+      tags:
+        - postgres
+      when: "tags.Role in ['Database']"
+      ignore_errors: yes

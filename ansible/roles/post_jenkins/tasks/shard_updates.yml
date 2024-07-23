@@ -1,0 +1,135 @@
+# This is all commented out since Leena said that she would handle the installation of the Bucardo setup for new shards - Look into the checkbox in jenkins that says "setup bucardo"
+
+# - name: Run MHC bucardo setup commands
+#   command: "{{item}}"
+#   become: True
+#   become_user: bucardo
+#   ignore_errors: True
+#   vars:
+#     ansible_ssh_pipelining: true
+#   with_items:
+#     - bucardo add db shard_{{tags.Shard}} dbname=djangostack host={{tags.Environment}}{{tags.Shard}}db1pvt.mobilehealthconsumer.com port=6432 pass={{postgres_password}}
+#     - bucardo add db login dbname=djangostack host={{tags.Environment}}logdb1pvt.mobilehealthconsumer.com port=6432 pass={{postgres_password}}
+#     - bucardo add table partners_userplan db=shard_{{tags.Shard}}
+#     - bucardo add table partners_partnergroup db=shard_{{tags.Shard}}
+#     - bucardo add table partners_address db=shard_{{tags.Shard}}
+#     - bucardo add table partners_partner db=shard_{{tags.Shard}}
+#     - bucardo add table partners_client db=shard_{{tags.Shard}}
+#     - bucardo add table partners_plan db=shard_{{tags.Shard}}
+#     - bucardo add table auth_group db=shard_{{tags.Shard}}
+#     - bucardo add table partners_branding db=shard_{{tags.Shard}}
+#     - bucardo add table partners_planyear db=shard_{{tags.Shard}}
+#     - bucardo add table partners_infocontent db=shard_{{tags.Shard}}
+#     - bucardo add table partners_shard db=shard_{{tags.Shard}}
+#     - bucardo add table partners_abstractsecurityconfig db=shard_{{tags.Shard}}
+#     - bucardo add table partners_mhcclientsecurityconfig db=shard_{{tags.Shard}}
+#     - bucardo add table partners_mhcadminsecurityconfig db=shard_{{tags.Shard}}
+#     - bucardo add table partners_mhcuser db=shard_{{tags.Shard}}
+#     - bucardo add table partners_clientprogram db=shard_{{tags.Shard}}
+#     - bucardo add relgroup login_group public.partners_userplan public.partners_partnergroup public.partners_address public.partners_partner public.partners_client public.partners_plan public.auth_group public.partners_branding public.partners_planyear public.partners_infocontent public.partners_shard public.partners_mhcclientsecurityconfig public.partners_mhcadminsecurityconfig public.partners_abstractsecurityconfig public.partners_mhcuser public.partners_clientprogram
+#     - bucardo add dbgroup login_dbgroup shard_{{tags.Shard}}:source login:target
+#     - bucardo add sync login_sync dbs=login_dbgroup relgroup=login_group
+#   when: 'sharded_cluster == True and ("db" in inventory_hostname_short or "w1" in inventory_hostname_short) and ("log" not in inventory_hostname_short)'
+
+# This command creates a key, and could be used to create a unique key per shard, but would need to be circled back to
+# - command: "apg -m 50 -x 50 -n 1"
+#   register: apg_output
+#   when: "tags.Role in ['Admin']"
+
+# - name: Setting secret
+#   set_fact:
+#     login_server_secret: "{{ apg_output.stdout }}"
+#   when: "tags.Role in ['Admin']"
+
+# - debug:
+#     msg: "login_server_secret is {{ login_server_secret }}"
+#   when: "tags.Role in ['Admin']"
+
+- name: Derive shard idOffset value
+  set_fact:
+    raw_offset: "{{ tags.Shard.replace('log', '1').replace('s', '') | int * 10000000000 }}"
+  # In Shard 1, the ID offset is 1
+  # In Shard 2 or higher, the ID offset (shard number - 1) * 10000000000
+
+- name: Set shard_offset
+  set_fact:
+    shard_offset: "{% if raw_offset == '10000000000' %}1{% else %}{{raw_offset | int - 10000000000}}{% endif %}"
+
+- name: Set Record ID
+  set_fact:
+    record_id: "{{ tags.Shard.replace('log', '2').replace('s', '') | int + 1}}"
+
+- name: Set Shard ID
+  set_fact:
+    shard_id: "{{ tags.Shard.replace('log', '2').replace('s', '') | int}}"
+
+- name: Handle login shards
+  set_fact:
+    shard_name: "Shard {{shard_id}}"
+    
+- name: Construct INSERT query
+  set_fact:
+    insert_statement: >-
+      INSERT INTO partners_shard ("id", "name", "baseURL", "adminURL", "idOffset", "secret")
+      select
+        '{{record_id}}',
+        '{{shard_name}}',
+        'https://{{tags.Environment}}{{tags.Shard}}.mobilehealthconsumer.com',
+        'https://{{tags.Environment}}{{tags.Shard}}w1.mobilehealthconsumer.com',
+        '{{shard_offset}}',
+        '{{login_server_secret}}'
+      WHERE NOT EXISTS (SELECT name FROM partners_shard WHERE name = '{{tags.Shard}}');      
+  when: "tags.Shard not in ['s01'] and tags.Role in ['Admin']"
+
+- name: Construct INSERT query
+  set_fact:
+    insert_statement: >-
+      UPDATE
+        partners_shard
+        SET "baseURL" = 'https://{{tags.Environment}}{{tags.Shard}}.mobilehealthconsumer.com',
+        "adminURL" = 'https://{{tags.Environment}}{{tags.Shard}}w1.mobilehealthconsumer.com',
+        "secret" = '{{login_server_secret}}',
+        "idOffset" = '1'
+        WHERE id = 1;
+  when: "tags.Shard in ['s01'] and tags.Role in ['Admin']"
+
+
+- debug:
+    msg: "Shard info record_id is {{ record_id }} raw offset is {{ raw_offset }} shard_offset is {{ shard_offset }} shard_name is {{ tags.Shard }} {{ insert_statement }}"
+  when: "tags.Role in ['Admin']"
+
+- name: construct sql file
+  template:
+    src: run.sql
+    dest: "/tmp/run_{{item.dest}}.sql"
+    owner: mhc
+    group: mhc
+    mode: 0664
+  with_items:
+    - {dest: "{{tags.Shard}}", statement: "{{insert_statement}}" }
+    - {dest: "log", statement: "{{insert_statement}}" }
+  when: "tags.Role in ['Admin']"
+    
+# - name: Update partners_shard table with login server secret
+#   command: "bash /tmp/run_{{item}}.sql"
+#   become_user: mhc
+#   become: true
+#   with_items:
+#    - "{{tags.Shard}}"
+#    - "log"
+#   when: "tags.Role in ['Admin']"
+
+# - name: Remove SQL file
+#   file: dest="/tmp/run_{{item}}.sql" state=absent
+#   with_items:
+#     - "{{tags.Shard}}"
+#     - "log"
+#   when: "tags.Role in ['Admin']"
+
+- name: Restart mhc service
+  service: name=mhc state=restarted
+
+- name: Restart bucardo service
+  service: name=bucardo state=restarted
+  when: cloned_shard == "false" and tags.Role in ['Admin'] and tags.Shard != "log"
+

@@ -1,0 +1,4 @@
+---
+no_reboot: True
+apply_upgrade: False
+aws_region: us-west-2

@@ -1,0 +1,37 @@
+---
+- name: Check for additional volumes
+  stat:
+    path: "/dev/{{item.name}}"
+  register: device_checks
+  with_items: "{{ additional_devices }}"
+  when: additional_devices is defined
+
+#- debug:
+#    msg:  "{{ device_checks }}"
+
+#- debug:
+#    msg:  "{{ additional_devices }}"
+
+- name: Define temporary variable
+  # because of
+  #  [WARNING]: when statements should not include jinja2 templating delimiters such as {{ }} or {% %}. Found: {{ device_checks.results | map(attribute='stat.exists') | any }}
+  set_fact:
+    volumes_exist: "{{ device_checks.results | map(attribute='stat.exists') | any }}"
+  when: device_checks is defined
+
+- set_fact:
+    volumes: "{{ device_checks.results | selectattr('stat.exists', 'equalto', true) | map(attribute='item') | list | default([]) }}"
+  when: volumes_exist
+
+- debug:
+    msg: "Found secondary volumes: {% for volume in  volumes %}{{volume.name}} {% endfor %}"
+  when: volumes is defined
+
+- set_fact:
+    volumes: ""
+  when: volumes is undefined
+
+- include: cryptsetup.yml
+  with_items: "{{volumes}}"
+  become: yes
+  when: volumes != "" 

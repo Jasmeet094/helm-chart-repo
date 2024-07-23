@@ -1,0 +1,13 @@
+---
+   bg_concurrency: 2
+   bg_maxtaskperchild: 1
+   bglow_concurrency: 10
+   bglow_maxtaskperchild: 10
+   celery_concurrency: 2
+   celery_maxtaskperchild: 1
+   hr_concurrency: 2
+   hr_maxtaskperchild: 1
+   admin_server: true
+   sharded_cluster: true
+
+   

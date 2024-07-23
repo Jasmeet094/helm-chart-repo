@@ -1,0 +1,15 @@
+#!/bin/sh
+
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+
+printf "\n\n"
+printf "#################################################################################################\n"
+printf "# This computer system is the property of Mobile Health Consumer, Inc.                      	#\n" 
+printf "#											    	#\n"
+printf "# This system is for authorized use only.						    	#\n" 
+printf "# Unauthorized or improper use of this system may result in civil charges, 		    	#\n"
+printf "# criminal penalties, and administrative disciplinary action including termination.	    	#\n"
+printf "#											    	#\n"
+printf "# Employees and contracted resources of Mobile Health Consumer, Inc, have no personal	    	#\n" 
+printf "# privacy rights in any information/files they place, view, access, or transmit on this system. #\n"
+printf "#################################################################################################\n\n"

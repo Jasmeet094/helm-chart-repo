@@ -1,0 +1,54 @@
+---
+- name: set facts
+  set_fact:
+    ossec_tarball: "ossec-hids-{{ ossec_version }}.tar.gz"
+    ossec_sha_file: "ossec-hids-{{ ossec_version }}.tar.gz.sha256"
+  tags: ossec
+
+- name: Install build-essential
+  apt:
+    name: build-essential
+  tags: ossec
+
+- name: Get and extract OSSEC
+  unarchive:
+    src: "https://github.com/ossec/ossec-hids/archive/{{ ossec_version }}.tar.gz"
+    dest: /tmp/
+    remote_src: true
+  tags: ossec
+
+- name: Get and extract missing dependencies
+  unarchive:
+    src: "https://github.com/PhilipHazel/pcre2/archive/refs/tags/pcre2-{{ pcre2_version }}.tar.gz"
+    dest: "/tmp/ossec-hids-{{ ossec_version }}/src/external/"
+    remote_src: true
+  tags: ossec
+
+- name: Install the preloaded-vars.conf
+  template:
+    src: preloaded-vars.conf
+    dest: "/tmp/ossec-hids-{{ ossec_version }}/etc/preloaded-vars.conf"
+    mode: 0644
+  tags: ossec
+
+- name: Run OSSEC install script
+  command: "/tmp/ossec-hids-{{ ossec_version }}/install.sh > /tmp/oss-install.log 2>&1"
+  changed_when: false
+  tags: ossec
+
+- name: Install MHC's ossec.conf
+  template:
+    src: ossec_xml.j2
+    dest: /var/ossec/etc/ossec.conf
+    owner: root
+    group: ossec
+    mode: 0440
+  notify: restart ossec
+  tags: ossec
+
+- name: Ensure ossec is started
+  service:
+    name: ossec
+    state: restarted
+  become: true
+  tags: ossec

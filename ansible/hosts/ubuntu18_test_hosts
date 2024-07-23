@@ -1,0 +1,17 @@
+[ubuntu18]
+#ubuntu18-ansible-test.mobhealthinternal.com
+qc-testlogw1.mobhealthinternal.com
+
+[ubuntu18:vars]
+server=ubuntu18-ansible-test
+luks_disable=True
+postfix_enable=True
+ansible_python_interpreter=/usr/bin/python3
+luks_disable=True
+admin_server=True
+env=test
+shard=s01
+enable_ossec=True
+postgres_password=c487cf499b
+login_server_secret=TkBtXsx24vsiDG9ZlMvICoZxjBNIhm3BaQS2zLJZFegm
+secret_key=TkBtXsx24vsiDG9ZlMvICoZxjBNIhm3BaQS2zLJZFegm

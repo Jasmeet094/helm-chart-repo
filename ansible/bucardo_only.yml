@@ -1,0 +1,13 @@
+# - hosts: all
+#  become: yes
+#  tasks:
+#    - apt:
+#        update_cache: yes
+
+- name: Run the bucardo role
+  hosts: all
+  become: true
+  # vars_files:
+  #   - vars/aws_keys.yml
+  roles:
+    - bucardo

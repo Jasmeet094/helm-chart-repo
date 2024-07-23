@@ -1,0 +1,17 @@
+# Location: /etc/systemd/system/celerybglowbandwidth.service
+# systemctl enable celerybglowbandwidth
+# systemctl start celerybglowbandwidth
+# systemctl | grep celerybglowbandwidth
+# https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+
+[Unit]
+Description=MHC Celerybglowbandwidth
+After=mhc.service
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/etc/systemd/system/celerybglowbandwidth_startup
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

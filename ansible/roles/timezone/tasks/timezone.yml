@@ -1,0 +1,14 @@
+---
+# tasks file for adriagalin.timezone
+- name: set /etc/timezone
+  template:
+    src: etc/timezone.j2
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0644
+  become: True
+  notify: update tzdata
+  tags:
+    - common
+    - timezone

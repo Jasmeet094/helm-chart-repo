@@ -1,0 +1,13 @@
+---
+  - name: Put logrotate config for clamscan
+    copy:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/logrotate.d/
+      src: logrotate/clamav
+    register: config_file
+    become: True
+    tags:
+      - logrotate

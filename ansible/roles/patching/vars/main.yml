@@ -1,0 +1,34 @@
+---
+
+servers:
+  - qalogdb1
+  - qalogw1
+  - qas01db1
+  - qas01w1
+  - qas01w2
+  - qas02db1
+  - qas02w1
+
+shards:
+  -
+    name: log
+    passphrase: uAOTGASD9S7anc7UgNB3
+  -
+    name: s01
+    passphrase: z7Da?Yx64trE4w2.ED\(n
+  -
+    name: s02
+    passphrase: uAOTGASD9S7anc7UgNB3
+
+services:
+  db:
+    - postgresql
+    - mongodb
+  w:
+    - celery
+    - celeryhr
+    - celerybg
+    - celerybglowbandwidth
+    - redis-server
+    - rabbitmq-server
+    - mhc

@@ -1,0 +1,36 @@
+- hosts: all
+  become: yes
+
+  tasks:
+  - name: Backup Localsettings.py
+    ansible.builtin.copy:
+      src: /home/mhc/mhc-backend/localsettings.py
+      dest: "/tmp/localsettings_{{ ansible_date_time.date }}.py"
+      remote_src: true
+    when: "tags.Role in ['Admin', 'Web']"
+    
+  - name: Update mhc-backend EMAIL_HOST_USER localsettings.py file
+    replace:
+      path: /home/mhc/mhc-backend/localsettings.py
+      regexp: "(^EMAIL_HOST_USER = ')(.*)$"
+      replace: "\\1{{email_aws_user}}'"
+      owner: mhc
+      group: mhc
+      mode: '0644'
+    when: "tags.Role in ['Admin', 'Web']"
+  
+  - name: Update mhc-backend EMAIL_HOST_PASSWORD localsettings.py file
+    replace:
+      path: /home/mhc/mhc-backend/localsettings.py
+      regexp: "(^EMAIL_HOST_PASSWORD = ')(.*)$"
+      replace: "\\1{{email_aws_password}}'"
+      owner: mhc
+      group: mhc
+      mode: '0644'
+    when: "tags.Role in ['Admin', 'Web']"
+
+  - name: Reload service mhc, in all cases
+    ansible.builtin.service:
+      name: mhc
+      state: restarted
+    when: "tags.Role in ['Admin', 'Web']"

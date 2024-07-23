@@ -1,0 +1,174 @@
+- name: Set facts
+  set_fact:
+    instance_role: "{{ tags.Role | default('Undefined') }}"
+    instance_shard: "{{ tags.Shard | default('Undefined') }}"
+  tags:
+    - postgres
+
+
+- name: Stop Bucardo
+  command: bucardo stop
+  become: true
+  become_user: bucardo
+  when: instance_role == 'Admin' and instance_shard != 'log'
+  ignore_errors: yes 
+  tags:
+    - postgres
+
+- name: Reboot if needed, then stop and start services
+  block:
+    - name: Reboot a slow machine that might have lots of updates to apply
+      reboot:
+        reboot_timeout: 360
+      when: restart_hosts|bool
+                  
+    - name: ensure mhc is stop
+      service: 
+        name: mhc 
+        state: stopped 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+      tags:
+        - postgres
+    
+    - name: ensure rabbitmq-server is stop
+      service: 
+        name: rabbitmq-server 
+        state: stopped 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+
+    - name: ensure celerybg is stop
+      service: 
+        name: celerybg 
+        state: stopped 
+        enabled: yes
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celery is stop
+      service: 
+        name: celery 
+        state: stopped 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+        
+    - name: ensure celerybglowbandwidth is stop
+      service: 
+        name: celerybglowbandwidth 
+        state: stopped 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celeryhr is stop
+      service: 
+        name: celeryhr 
+        state: stopped 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+    
+    - name: Stop postgresql
+      service: 
+        name: postgresql 
+        state: stopped 
+        enabled: yes
+      when: instance_role == 'Database'
+      tags:
+        - postgres
+    
+    - name: Stop Mongod
+      service: 
+        name: mongod 
+        state: stopped 
+        enabled: yes 
+      when: instance_role == 'Database'
+    
+    - name: Stop stunnel4
+      service: 
+        name: stunnel4 
+        state: stopped 
+        enabled: yes
+      when: instance_role in ['Web','Admin','Database']           
+    
+    - name: Start postgresql
+      service: 
+        name: postgresql 
+        state: started 
+        enabled: yes
+      when: instance_role == 'Database'
+      tags:
+        - postgres
+    
+    - name: started mongod
+      service: 
+        name: mongod 
+        state: started 
+        enabled: yes 
+      when: instance_role in ['Database']
+    
+    - name: started stunnel4
+      service: 
+        name: stunnel4 
+        state: started 
+        enabled: yes
+      when: instance_role in ['Web','Admin','Database']    
+    
+    - name: ensure rabbitmq-server is started
+      service: 
+        name: rabbitmq-server 
+        state: started 
+        enabled: yes
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celerybg is started
+      service: 
+        name: celerybg 
+        state: started 
+        enabled: yes
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celery is started
+      service: 
+        name: celery 
+        state: started 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celerybglowbandwidth is started
+      service: 
+        name: celerybglowbandwidth 
+        state: started 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure celeryhr is started
+      service: 
+        name: celeryhr 
+        state: started 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+    
+    - name: ensure mhc is start
+      service: 
+        name: mhc 
+        state: started 
+        enabled: yes 
+      when: instance_role in ['Web','Admin']
+      tags:
+        - postgres
+  become: True
+
+- name: Quick pause for bucardo servers
+  pause:
+    seconds: 15
+  when: instance_role == 'Admin' and instance_shard != 'log'
+  tags:
+    - postgres
+
+- name: Start Bucardo
+  command: bucardo start
+  become: true
+  become_user: bucardo
+  when: instance_role == 'Admin' and instance_shard != 'log'
+  ignore_errors: yes
+  tags:
+    - postgres

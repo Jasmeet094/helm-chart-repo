@@ -1,0 +1,72 @@
+---
+- name: Put Monitoring Checks
+  copy:
+    remote_src: False
+    owner: nagios
+    group: nagios
+    mode: 0775
+    dest: /usr/lib/nagios/plugins/{{ item }}
+    src: monitoring_scripts/{{ item }}
+  become: True
+  with_items:
+     - check_encryption.sh
+     - check_mhc_user_count.sh
+     - check_postgres_db_connections.sh
+  tags:
+     - monitoring
+
+
+- name: Check if nrpe.cfg stat.exist
+  stat:
+    path: /etc/nagios/nrpe.cfg
+  register: nrpe
+  tags:
+    - monitoring
+    - postgres
+
+- name: Put pgpass file
+  template:
+     remote_src: False
+     owner: nagios
+     group: nagios
+     mode: 0400
+     dest: /var/lib/nagios/.pgpass
+     src: monitoring_scripts/pgpass.j2
+  become: True
+  when: nrpe.stat.exists
+
+- name: Put montoring config files
+  template:
+     remote_src: False
+     owner: nagios
+     group: nagios
+     mode: 0400
+     dest: /etc/nagios/nrpe.d/databases.cfg
+     src: monitoring_config/databases.cfg.j2
+  become: True
+  when: nrpe.stat.exists
+  notify: restart nrpe
+  tags:
+    - monitoring
+    - postgres
+
+- name: install check_postgres
+  apt: name={{ item }} state=present
+  with_items:
+    - check-postgres
+  when: nrpe.stat.exists
+  tags:
+    - monitoring
+  become: True
+
+- name: put sudoers file
+  template:
+     remote_src: False
+     owner: root
+     group: root
+     mode: 0640
+     dest: /etc/sudoers.d/51-mhc-monitoring
+     src: sudoers.d/51-mhc-monitoring
+  tags:
+    - monitoring
+  become: True

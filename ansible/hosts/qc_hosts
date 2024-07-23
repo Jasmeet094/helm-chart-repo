@@ -1,0 +1,144 @@
+# This is the default ansible 'hosts' file.
+
+[qcs01-db]
+qcs01db1.mobhealthinternal.com
+
+[qcs01-db:vars]
+postgres_password=c487cf499b
+postgres_drive=nvme1n1
+mongo_drive=nvme2n1
+env=qc
+shard=s01
+sharded_cluster=True
+
+[qcs01-w]
+qcs01w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=214751 mhc_web_drive=nvme1n1 env=qc shard=s01
+qcs01w2.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=5 bglow_concurrency=2 bglow_maxtaskperchild=2 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=2 admin_server=false env=qc shard=s01
+
+[qcs01-w:vars]
+postgres_password=c487cf499b
+db_server=qcs01db1
+env=qc
+shard=s01
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'WharpeushyelEfUnJaikpoogloocdicHyavmekgi^'
+sharded_cluster=True
+
+[qcs01:children]
+qcs01-db
+qcs01-w
+
+[qcs02-db]
+qcs02db1.mobhealthinternal.com
+
+[qcs02-w]
+qcs02w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=10000001055
+
+[qcs02-w:vars]
+postgres_password=c487cf499b
+db_server=qcs02db1
+env=qc
+shard=s02
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'sewAteckudnudd:wrotNayttEmadwalityirgAqu%'	
+sharded_cluster=True
+
+[qcs02-db:vars]
+postgres_password=c487cf499b
+env=qc
+shard=s02
+postgres_drive=nvme1n1
+mongo_drive=nvme2n1
+sharded_cluster=True
+
+[qcs02:children]
+qcs02-db
+qcs02-w
+
+[qcs03-w]
+qcs03w1.mobhealthinternal.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=20000000384
+
+[qcs03-w:vars]
+postgres_password=c487cf499b
+db_server=qcs03db1
+env=qc
+shard=s03
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+sharded_cluster=True
+
+[qcs03-db:vars]
+postgres_password=c487cf499b
+env=qc
+shard=s03
+sharded_cluster=True
+
+[qcs03:children]
+qcs03-db
+qcs03-w
+
+[qclog-w:vars]
+postgres_password=c487cf499b
+db_server=qclogdb1
+env=qc
+shard=log
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'KrafvomejyifCecOcWityuHydNafInyenJihuims$'
+sharded_cluster=True
+
+[qclog-db]
+qclogdb1.mobhealthinternal.com
+
+[qclog-db:vars]
+postgres_password=c487cf499b
+env=qc
+shard=log
+postgres_drive=nvme1n1
+mongo_drive=nvme2n1
+sharded_cluster=True
+
+[qclog-w]
+qclogw1.mobhealthinternal.com mhc_proccess=3
+
+[qcs03-db]
+qcs03db1.mobhealthinternal.com
+
+[qclog:children]
+qclog-db
+qclog-w
+
+[db:children]
+qcs01-db
+qcs02-db
+qclog-db
+qcs03-db
+
+[db:vars]
+cluster_version="14"
+environment_subnet="172.31.64.0/19"
+shared_subnet="172.31.0.0/19"
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+postgres_drive=sdp
+mongo_drive=sdm
+
+[web:vars]
+swap_space=2048000000
+mhc_web_drive=nvme1n1
+
+[web:children]
+web_shard
+qclog-w
+
+[web_shard:children]
+qcs01-w
+qcs02-w
+qcs03-w
+
+[qc:children]
+qcs01
+qcs02
+qcs03
+qclog

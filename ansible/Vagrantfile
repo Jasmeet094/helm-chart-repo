@@ -1,0 +1,78 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/trusty64"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "4196"
+    vb.cpus = 4
+
+    # https://gist.github.com/leifg/4713995#gistcomment-2031819
+    file_to_disk = 'second_volume.vdi'
+    unless File.exist?(file_to_disk)
+      vb.customize ['createhd', '--filename', file_to_disk, '--size', 500 * 1024]
+    end
+    vb.customize [
+      'storageattach', :id, '--storagectl', 'SATAController', '--port', 1,
+      '--device', 0, '--type', 'hdd', '--medium', file_to_disk
+    ]
+
+    file_to_disk = 'postgres_volume.vdi'
+    unless File.exist?(file_to_disk)
+      vb.customize ['createhd', '--filename', file_to_disk, '--size', 500 * 1024]
+    end
+    vb.customize [
+      'storageattach', :id, '--storagectl', 'SATAController', '--port', 2,
+      '--device', 0, '--type', 'hdd', '--medium', file_to_disk
+    ]
+
+    file_to_disk = 'mongo_volume.vdi'
+    unless File.exist?(file_to_disk)
+      vb.customize ['createhd', '--filename', file_to_disk, '--size', 500 * 1024]
+    end
+    vb.customize [
+      'storageattach', :id, '--storagectl', 'SATAController', '--port', 3,
+      '--device', 0, '--type', 'hdd', '--medium', file_to_disk
+    ]
+  end
+
+  config.vm.define "instance" do |instance|
+    config.vm.network "forwarded_port", guest: 80, host: 8080
+    # config.vm.synced_folder "../data", "/vagrant_data"
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    # ansible.verbose = "vvv"
+    # ansible.start_at_task = 'Check for services'
+
+    ansible.extra_vars = {
+      is_vagrant: "True",
+      ses_host: ENV['VAGRANT_SES_HOST'],
+      ses_port: ENV['VAGRANT_SES_PORT'],
+      email_aws_user: ENV['VAGRANT_SES_USER'],
+      email_aws_password: ENV['VAGRANT_SES_PASS'],
+
+      apply_upgrade: "False",
+      env: "dev",
+      shard: "s01",
+      server: "w1",
+      admin_server: "True",
+      sharded_cluster: "True",
+
+      luks_passphrase: "s3cr3t",
+      postgres_password: "postgres",
+      login_server_secret: "oJat42PjgGIcvCFBWaSp4ESoTErf0mfTwOoFmMDg8d3J",
+      secret_key: "oJat42PjgGIcvCFBWaSp4ESoTErf0mfTwOoFmMDg8d3J"
+    }
+
+    ansible.groups = {
+      # this causes all of the distinct plays in base_playbook to be run on our
+      # one instance, which means we get to test them all.
+      "web" => ["instance"],
+      "db"  => ["instance"]
+    }
+
+    ansible.playbook = "base_playbook.yml"
+  end
+end

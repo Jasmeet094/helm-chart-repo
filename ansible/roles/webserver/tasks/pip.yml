@@ -1,0 +1,28 @@
+---
+  - name: Install python and tools
+    apt:
+      name: "{{ item }}"
+    become: True
+    with_items:
+      - python-dev
+      - python-virtualenv
+      - python-pip
+      - build-essential
+      - libpq-dev
+      - git
+      - ecryptfs-utils
+      - xmlsec1
+      - redis-server
+      - libxml2-dev
+      - libxslt1-dev
+      - swig
+      - libfreetype6
+      - rabbitmq-server
+      - libfreetype6-dev
+    tags:
+      - mhc_application
+
+  - name: Upgrade pip at the OS level
+    pip:
+      state: latest
+      name: pip

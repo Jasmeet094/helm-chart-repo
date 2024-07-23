@@ -1,0 +1,34 @@
+- name: OS patching
+  hosts: all
+
+  vars:
+    apply_upgrade: false
+    restart_hosts: false
+
+  vars_prompt:
+    - name: user
+      prompt: Enter your name here. Avoid this message by including a '-e user=you' on your initial command.
+      private: false
+
+  tasks:
+    - name: Print warning and option to cancel
+      ansible.builtin.debug:
+        msg: 'NOTE: This will update OS packages. Press "ctrl-c a" now to cancel.'
+      when: apply_upgrade | bool
+
+    - name: Pause for 5 seconds
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: Trigger an aws_backup
+      ansible.builtin.include_role:
+        name: aws_backup
+
+    - name: Run patching role
+      ansible.builtin.include_role:
+        name: patching
+
+    - name: Run service restart role on Apply Upgrades
+      ansible.builtin.include_role:
+        name: restart_OS_restart_services
+      when: apply_upgrade | bool

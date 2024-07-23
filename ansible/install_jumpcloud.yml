@@ -1,0 +1,6 @@
+- hosts: all
+  vars:
+    jumpcloud_use_sudo: yes
+    jumpcloud_force_install: yes
+  roles:
+    - role: jumpcloud

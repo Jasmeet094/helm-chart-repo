@@ -1,0 +1,42 @@
+- hosts: all
+  become: yes
+ 
+  tasks:
+    - name: Backup exisitng SSL cert
+      copy:
+        src: "{{item.file_path}}"
+        dest: "{{item.file_path}}"
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0644
+        backup: yes
+      with_items:
+        - {file_path: "/home/mhc/crypt/wildcardcert.crt"}
+        - {file_path: "/home/mhc/crypt/wildcardcert.key"}
+      ignore_errors: true
+      become: yes
+      when: tags.Role in ['Web', 'Admin']
+
+    - name: Retrieve SSL assets from S3
+      # This requires Ansible 2.4 (via pip, probably)
+      aws_s3:
+        bucket: "mhc-secure"
+        object: "secrets/{{item.name}}"
+        dest: "{{item.path}}"
+        mode: get
+      with_items:
+        - {name: "mhc-certs/mhc-cert-wildcard-2021-2022.pem", path: "/home/mhc/crypt/wildcardcert.crt"}
+        - {name: "mhc-certs/mhc-cert-wildcard-2021-2022.pem", path: "/home/mhc/crypt/wildcardcert.key"}
+      become: True
+      when: tags.Role in ['Web', 'Admin']
+
+    - name: stop mhc
+      service: name=mhc state=stopped
+      become: yes
+      when: tags.Role in ['Web', 'Admin']
+
+    - name: start mhc
+      service: name=mhc state=started
+      become: yes
+      when: tags.Role in ['Web', 'Admin']

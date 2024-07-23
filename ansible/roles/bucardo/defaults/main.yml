@@ -1,0 +1,8 @@
+---
+bucardo_db: bucardo
+bucardo_user: bucardo
+bucardo_pass: bucardo
+postgres_apt_key: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+postgres_apt_repo: http://apt.postgresql.org/pub/repos/apt/
+env: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\1') }}"
+shard: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\2') }}"

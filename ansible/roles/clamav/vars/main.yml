@@ -1,0 +1,3 @@
+---
+email_recipient: "clamav-reports@mobilehealthconsumer.com"
+dir_to_scan: "/tmp/clamscan_files.txt"

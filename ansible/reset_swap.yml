@@ -1,0 +1,24 @@
+---
+- hosts: all
+  become: yes
+  
+  tasks:
+  - name: Turn swap off
+    become: true
+    shell: swapoff -v /mnt/test_swapfile.swap
+
+  - name: Remove line in file from /etc/fstab
+    ansible.builtin.lineinfile:
+      path: /etc/fstab
+      state: absent
+      regexp: "swapfile"
+
+  - name: Remove swap file
+    become: true
+    ansible.builtin.file:
+        path: /mnt/test_swapfile.swap
+        state: absent
+
+  - name: Re-apply swap role
+    include_role:
+      name: swap

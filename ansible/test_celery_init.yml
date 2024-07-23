@@ -1,0 +1,5 @@
+- hosts: all 
+  become: yes
+  roles:
+    - role: celery_init
+      when: 'celery_apps is defined'

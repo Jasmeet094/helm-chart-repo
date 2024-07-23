@@ -1,0 +1,41 @@
+---
+  - name: mhc systemd service file
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/systemd/system/{{ item }}
+      src: init_ubuntu18/{{ item }}
+      backup: yes
+    become: True
+    with_items:
+      - mhc.service
+    tags:
+      - init
+
+  - name: mhc systemd startup file
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0755
+      dest: /etc/systemd/system/{{ item }}
+      src: init_ubuntu18/{{ item }}
+      backup: yes
+    become: True
+    with_items:
+      - mhc_startup
+    notify: restart mhc
+    tags:
+      - init
+
+  - name: mhc service systemd enable
+    systemd:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+      masked: no
+      force: yes
+    with_items:
+      - mhc

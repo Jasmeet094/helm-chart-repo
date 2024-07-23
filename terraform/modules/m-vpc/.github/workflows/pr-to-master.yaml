@@ -1,0 +1,97 @@
+name: PR to Master
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  standards-tests:
+    runs-on: ubuntu-latest
+    container:
+      image: docker://alpine:3
+    name: Module Standards Tests
+    env:
+      BINARY: fogsource
+      FH_SERVICE_TOKEN: ${{ secrets.FH_SERVICE_TOKEN }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - name: Add Git
+        run : apk add --no-cache git go curl bash
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
+      - name: Setup Git Repository
+        run: | 
+          git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+          git fetch --prune --unshallow
+      - name: Retrieve latest fogsource binary
+        run: |
+          apk add --no-cache curl unzip jq
+
+          AUTH_HEADER="Authorization: token ${FH_SERVICE_TOKEN}"
+          URL='https://api.github.com/repos/FoghornConsulting/fogsource/releases/latest'
+          ZIP='latest.zip'
+
+          curl -H "${AUTH_HEADER}" "${URL}" -s \
+            | jq '.assets[] | select(.name | contains("linux-amd64"))'.id -r \
+            | xargs -I ASSET_ID curl -H "${AUTH_HEADER}" -H "Accept: application/octet-stream" https://api.github.com/repos/FoghornConsulting/fogsource/releases/assets/ASSET_ID -L -o "${ZIP}"
+
+          unzip "${ZIP}"
+
+          [[ -e "${BINARY}" ]]
+          chmod +x "${BINARY}"
+
+      - name: Retrieve terraform-docs
+        run: |
+          URL=$(curl -s https://api.github.com/repositories/60978152/releases/latest | jq '.assets[] | select(.name | contains("linux-amd64"))'.browser_download_url -r)
+          TARGET_PATH='/bin/terraform-docs'
+          curl -sL "${URL}" -o /tmp/terraform-docs.tar.gz
+          tar -xf /tmp/terraform-docs.tar.gz terraform-docs
+          mv ./terraform-docs "${TARGET_PATH}"
+          chmod +x "${TARGET_PATH}"
+          terraform-docs version
+
+      - name: Retrieve terraform
+        run: |
+          AUTH_HEADER="Authorization: token ${FH_SERVICE_TOKEN}"
+          URL='https://api.github.com/repos/hashicorp/terraform/releases/latest'
+
+          TF_VERSION=$(curl -H "${AUTH_HEADER}" "${URL}" -s | jq '.tag_name' -r | sed 's/^v//')
+          TF_ZIP=terraform_"$TF_VERSION"_linux_amd64.zip
+          
+          curl -sO https://releases.hashicorp.com/terraform/$TF_VERSION/$TF_ZIP
+          unzip $TF_ZIP
+          chmod +x terraform
+          mv terraform /bin/
+
+      - name: Check tfstandards
+        run: |
+          pwd
+          ls -lash
+          ./"${BINARY}" tfstandards 
+
+      - name: Functional Testing
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_FOGSOURCE_TEST1 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_FOGSOURCE_TEST1 }}
+        run: | 
+          export AWS_DEFAULT_REGION=us-east-2
+          apk add gcc musl-dev python3 py3-pip bash python3-dev libffi-dev make
+          curl --location --silent --fail --show-error -o /bin/terratest_log_parser https://github.com/gruntwork-io/terratest/releases/download/v0.13.13/terratest_log_parser_linux_amd64
+          chmod +x /bin/terratest_log_parser
+          cd test/
+          go test -v -timeout 120m | tee /dev/stderr | terratest_log_parser -outputdir test_output
+          cd ../
+          grep -v FAIL test/test_output/summary.log # This sets the exit code based on whether a faliure happened or not. 
+      - name: Archive Test Logs
+        uses: actions/upload-artifact@v2
+        with:
+          name: integration-test-logs
+          path: test/test_output/
+      - name: Publish Integration Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v1
+        if: always()
+        with:
+          files: test/test_output/*.xml

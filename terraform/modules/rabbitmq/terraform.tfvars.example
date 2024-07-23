@@ -1,0 +1,12 @@
+  friendly_name_prefix = "MQ"
+  common_tags = {
+    "App"         = "RabbitMQ"
+    "Environment" = "dev"
+    "Terraform"   = "True"
+  }
+  shard             = "test"
+  vpc_id            = "vpc-0123456789abc"
+  broker_subnet_ids = ["subnet-0123456789abc", "subnet-0123456789abc", "subnet-0123456789abc"]
+
+  console_username = "mquser123"
+  console_password = "mqpassword123"

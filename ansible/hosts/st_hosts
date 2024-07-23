@@ -1,0 +1,87 @@
+# This is the default ansible 'hosts' file.
+[sts01-db]
+sts01db1pvt.mobilehealthconsumer.com
+
+[sts01-db:vars]
+postgres_password=c487cf499b
+postgres_drive=sdp
+mongo_drive=sdm
+env=st
+shard=s01
+sharded_cluster=True
+
+[sts01-w]
+sts01w1pvt.mobilehealthconsumer.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=214751 mhc_web_drive=sdf env=st shard=s01
+sts01w2pvt.mobilehealthconsumer.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 burcaro_user_id=214751 mhc_web_drive=sdf env=st shard=s01
+
+
+[sts01-w:vars]
+postgres_password=c487cf499b
+db_server=sts01db1
+env=st
+shard=s01
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'WharpeushyelEfUnJaikpoogloocdicHyavmekgi^'
+sharded_cluster=True
+
+[sts01:children]
+sts01-db
+sts01-w
+
+[stlog-w]
+stlogw1pvt.mobilehealthconsumer.com mhc_proccess=3
+stlogw2pvt.mobilehealthconsumer.com mhc_proccess=3
+
+[stlog-w:vars]
+postgres_password=c487cf499b
+db_server=stlogdb1
+env=st
+shard=log
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'KrafvomejyifCecOcWityuHydNafInyenJihuims$'
+sharded_cluster=True
+
+[stlog-db]
+stlogdb1pvt.mobilehealthconsumer.com
+
+[stlog-db:vars]
+postgres_password=c487cf499b
+env=st
+shard=log
+postgres_drive=sdp
+mongo_drive=sdm
+sharded_cluster=True
+
+[stlog:children]
+stlog-db
+stlog-w
+
+[db:vars]
+cluster_version="14"
+environment_subnet="172.31.64.0/19"
+shared_subnet="172.31.0.0/19"
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+postgres_drive=sdp
+mongo_drive=sdm
+
+[db:children]
+sts01-db
+stlog-db
+
+[web:vars]
+swap_space=2048000000
+mhc_web_drive=sdf
+
+[web:children]
+web_shard
+stlog-w
+
+[web_shard:children]
+sts01-w
+
+[st:children]
+sts01
+stlog

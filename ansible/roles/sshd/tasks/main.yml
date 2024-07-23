@@ -1,0 +1,85 @@
+---
+
+#- debug: var=db_server
+#- debug: var=inventory_hostname
+# We were setting db_server, but that limits the scope of hosts this can apply too.  using inventory_hostname should
+# work for all hosts, but of course, test and troubleshoot if you run into issues.
+
+- name: Set facts for instance tags. Avoids failures if tag is undefined.
+  set_fact:
+    instance_env: "{{ tags.Environment | default('Undefined') }}"
+    instance_role: "{{ tags.Role | default('Undefined') }}"
+
+- name: Create list of ssh users based on instance environment and Role
+  set_fact:
+    user_list: "{% if instance_env in item.value.allowed_envs and instance_role in item.value.allowed_roles %}{{ (user_list | default([])) + item.value.users }}{% else %}{{ user_list | default([]) }}{% endif %}"
+  loop: "{{ ssh_users | dict2items }}"
+
+- name: List users from flattened lists, for next step
+  set_fact:
+    user_item: "{% for key in all_public_keys %}{% if key.name == item %}{{ key }}{% endif %}{% endfor %}"
+  loop: "{{ user_list }}"
+  register: user_items
+
+- name: Create list of SSH user keys
+  set_fact:
+    users: "{{user_items.results | map(attribute='ansible_facts.user_item') | list }}"
+
+- name: Tasks for overwriting old keys
+  block:
+    - name: Write user keys to temp file for proper formatting
+      lineinfile:
+        create: yes
+        path: "/tmp/tempkeyfile.txt"
+        state: present
+        line: "{{item.public_key}}"
+      with_items: "{{users}}"
+    
+    - name: Read temp file contents into memory
+      slurp:
+        src: "/tmp/tempkeyfile.txt"
+      register: slurpfile
+    
+    - name: Add authorized keys to ubuntu user
+      authorized_key:
+        user: ubuntu
+        key: "{{ slurpfile['content'] | b64decode }}"
+        exclusive: True
+      # Since it's a bit wordy:
+      # no_log: True
+    
+    - name: Remove temp key file
+      file:
+        path: "/tmp/tempkeyfile.txt"
+        state: absent
+  when: overwrite and users|length > 0
+
+- name: Add authorized keys to ubuntu user
+  authorized_key:
+    user: ubuntu
+    key: "{{item.public_key}}"
+  with_items:
+    - "{{users}}"
+  when: not overwrite
+
+- name: Put ssh config
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/ssh/sshd_config
+    src: sshd_config
+  become: True
+  when: 'not "sftp" in inventory_hostname'
+
+- name: Put ssftp ssh config
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/ssh/sshd_config
+    src: ssftp_sshd_config
+  become: True
+  when: '"sftp" in inventory_hostname'

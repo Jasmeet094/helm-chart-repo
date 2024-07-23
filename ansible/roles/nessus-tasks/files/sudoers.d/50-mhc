@@ -1,0 +1,29 @@
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service mhc restart
+mhc ALL=(ALL)NOPASSWD:/etc/init.d/nginx restart
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celery restart
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybg restart
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybglowbandwidth restart
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celeryhr restart
+
+
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service mhc start
+mhc ALL=(ALL)NOPASSWD:/etc/init.d/nginx start
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celery start
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybg start
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybglowbandwidth start
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celeryhr start
+
+
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service mhc stop
+mhc ALL=(ALL)NOPASSWD:/etc/init.d/nginx stop
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celery stop
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybg stop
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybglowbandwidth stop
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celeryhr stop
+
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service mhc status
+mhc ALL=(ALL)NOPASSWD:/etc/init.d/nginx status
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celery status
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybg status
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celerybglowbandwidth status
+mhc ALL=(ALL)NOPASSWD:/usr/sbin/service celeryhr status

@@ -1,0 +1,14 @@
+[Unit]
+Description=MHC application
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+#User=mhc
+#Group=www-data
+ExecStart=/etc/systemd/system/mhc_startup
+Restart=on-failure
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

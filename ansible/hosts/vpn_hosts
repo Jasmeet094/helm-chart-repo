@@ -1,0 +1,5 @@
+[openvpn-prod]
+vpn.mobhealthinternal.com
+
+[openvpn-prod:vars]
+ansible_ssh_user = openvpnas

@@ -1,0 +1,28 @@
+---
+# This scriplet can be included in a playbook to perform Mongodb upgrades.
+- name: "stop mongodb service"
+  ansible.builtin.systemd_service:
+    name: mongodb
+    state: stopped
+- name: "upgrade mongo apt packages to version {{item[1]}}"
+  ansible.builtin.apt:
+    pkg:
+      - "mongodb-org={{item[1]}}"
+      - "mongodb-org-mongos={{item[1]}}"
+      - "mongodb-org-server={{item[1]}}"
+      - "mongodb-org-shell={{item[1]}}"
+    state: present
+    # this is required because at least one GPG key is expired
+    allow_unauthenticated: true
+- name: "start mongodb service"
+  ansible.builtin.systemd_service:
+    name: mongodb
+    state: started
+- name: wait naively for mongo to upgrade
+  ansible.builtin.pause:
+    seconds: 30
+- name: "setfeatureCompatibilityVersion to {{item[0]}} via `mongo` cli"
+  ansible.builtin.command: "mongo --eval \"db.adminCommand({ setFeatureCompatibilityVersion: '{{item[0]}}' })\""
+- name: "set featureCompatibilityVersion to {{item[0]}} via ansible community mongodb provider"
+  community.mongodb.mongodb_shell:
+  eval: "db.adminCommand( { setFeatureCompatibilityVersion: '{{item[0]}}' } )"

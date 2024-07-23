@@ -1,0 +1,1203 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "VPC by Foghorn Consulting v1.1",
+  "Parameters" : {
+    "VPCName": {
+      "Description" : "Name of this VPC",
+      "Type" : "String",
+      "Default": "VPC"
+    },
+
+    "EnvironmentTag" : {
+      "Description" : "Environment that this VPC contains",
+      "Type" : "String",
+      "Default" : "All",
+      "AllowedValues" : ["All","Development","DR","Staging","QA","Production","POC"],
+      "ConstraintDescription" : "Must be from the pick list."
+    },
+
+    "Supernet": {
+      "Description": "First two octets of private class B supernet",
+      "Type": "String",
+      "Default" : "10.1",
+      "AllowedPattern": "(172\\.3[0-1])|(172.2\\d)|(172.1[6-9])|(10.25[0-4])|(10.2[0-4]\\d)|(10\\.1\\d\\d)|(10\\.\\d\\d)|(10\\.\\d)|(192\\.168)",
+      "ConstraintDescription": "Supernet must be the first two octets of a valid class B private subnet. Eg. 172.16, or 10.25"
+    }
+  },
+
+  "Mappings" : {
+    "DHCPDomainName" : {
+      "us-east-1"      : { "DomainName" : "ec2.internal" },
+      "us-west-2"      : { "DomainName" : "us-west-2.compute.internal" },
+      "us-west-1"      : { "DomainName" : "us-west-1.compute.internal" },
+      "eu-west-1"      : { "DomainName" : "eu-west-1.compute.internal" },
+      "ap-southeast-1" : { "DomainName" : "ap-southeast-1.compute.internal" },
+      "ap-southeast-2" : { "DomainName" : "ap-southeast-2.compute.internal" },
+      "ap-northeast-1" : { "DomainName" : "ap-northeast-1.compute.internal" },
+      "sa-east-1"      : { "DomainName" : "sa-east-1.compute.internal" }
+    }
+  },
+
+  "Resources": {
+    "vpcFWS": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Ref":"VPCName"}
+          }
+        ]
+      }
+    },
+
+    "snSSAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ShareServices-AZ1"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snNPAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".48.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "NonProduction-AZ1"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snProdAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".192.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Production-AZ1"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snQAAZ1": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".64.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "0", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "QA-AZ1"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snSSAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".8.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ShareServices-AZ2"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snNPAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".32.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "NonProduction-AZ2"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snProdAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".200.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Production-AZ2"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snQAAZ2": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".72.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "1", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "QA-AZ2"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snSSAZ3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".16.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ShareServices-AZ3"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snNPAZ3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".40.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "NonProduction-AZ3"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snProdAZ3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".208.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Production-AZ3"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+    "snQAAZ3": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "MapPublicIpOnLaunch": "true",
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".80.0/21"]]
+        },
+        "AvailabilityZone": { "Fn::Select" : [ "2", { "Fn::GetAZs" : "" } ] },
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "QA-AZ3"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+
+    "igwFWS": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "IGW"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "dhcpFWS": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": { "Fn::FindInMap" : [ "DHCPDomainName", { "Ref" : "AWS::Region" }, "DomainName" ]},
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ],
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "DHCP"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "aclSS": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "SS", "ACL"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "aclNP": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "NP","ACL"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "aclProd": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "Prod", "ACL"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "aclQA": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          },
+          {
+            "Key": "Name",
+            "Value": {"Fn::Join": ["-",[
+              { "Ref" : "VPCName" },
+              "QA", "ACL"]]
+            }
+          }
+        ]
+      }
+    },
+
+    "aclEgressaclss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclSS"
+        }
+      }
+    },
+
+    "aclIngressaclss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclSS"
+        }
+      }
+    },
+
+    "aclEgressaclprodallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+    "aclEgressaclprodallowprod": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".192.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+    "aclEgressaclproddenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+
+    "aclEgressaclprodallowall": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+
+    "aclIngressaclprodallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+    "aclIngressaclprodallowprod": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".192.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+    "aclIngressaclproddenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+
+    "aclINgressaclprodallowall": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        }
+      }
+    },
+    "aclEgressaclNPallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+    "aclEgressaclNPallowNP": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".32.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+    "aclEgressaclNPdenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+
+    "aclEgressaclNPallowtoall": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+
+
+    "aclIngressaclNPallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+    "aclIngressaclNPallowNP": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".32.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+    "aclIngressaclNPdenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+
+
+    "aclIngressaclNP": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        }
+      }
+    },
+
+    "aclEgressaclQAallowQA": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+    "aclEgressaclQAallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".64.0/19"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+    "aclEgressaclQAdenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+
+    "aclEgressaclQAallowall": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+
+    "aclIngressaclQAallowQA": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "1",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+    "aclIngressaclQAallowss": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".64.0/19"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "2",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+    "aclIngressaclQAdenysuper": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": {"Fn::Join": ["",[
+          { "Ref" : "Supernet" },
+          ".0.0/16"]]
+        },
+        "Protocol": "-1",
+        "RuleAction": "deny",
+        "RuleNumber": "99",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+
+    "aclIngressaclQAallowall": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        }
+      }
+    },
+
+    "igwAttachFWS": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "InternetGatewayId": {
+          "Ref": "igwFWS"
+        }
+      }
+    },
+
+    "dhcpAssocFWS": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "DhcpOptionsId": {
+          "Ref": "dhcpFWS"
+        }
+      }
+    },
+
+
+    "routeTablePublic": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpcFWS"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Route-Public"
+          },
+          {
+            "Key": "Environment",
+            "Value": {"Ref":"EnvironmentTag"}
+          }
+        ]
+      }
+    },
+
+    "routeIGW": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "GatewayId": {
+          "Ref": "igwFWS"
+        }
+      },
+      "DependsOn": "igwFWS"
+    },
+
+    "snAclAssocSSAZ1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclSS"
+        },
+        "SubnetId": {
+          "Ref": "snSSAZ1"
+        }
+      }
+    },
+
+    "snRouteAssocSSAZ1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snSSAZ1"
+        }
+      }
+    },
+
+    "snAclAssocSSAZ2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclSS"
+        },
+        "SubnetId": {
+          "Ref": "snSSAZ2"
+        }
+      }
+    },
+
+    "snRouteAssocSSAZ2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snSSAZ2"
+        }
+      }
+    },
+    "snAclAssocSSAZ3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclSS"
+        },
+        "SubnetId": {
+          "Ref": "snSSAZ3"
+        }
+      }
+    },
+
+    "snRouteAssocNPAZ1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ1"
+        }
+      }
+    },
+    "snAclAssocNPAZ1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ1"
+        }
+      }
+    },
+    "snRouteAssocNPAZ2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ2"
+        }
+      }
+    },
+    "snAclAssocNPAZ2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ2"
+        }
+      }
+    },
+    "snRouteAssocNPAZ3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ3"
+        }
+      }
+    },
+    "snAclAssocNPAZ3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclNP"
+        },
+        "SubnetId": {
+          "Ref": "snNPAZ3"
+        }
+      }
+    },
+    "snRouteAssocProdAZ3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ3"
+        }
+      }
+    },
+    "snAclAssocProdAZ3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ3"
+        }
+      }
+    },
+    "snRouteAssocProdAZ2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ2"
+        }
+      }
+    },
+    "snAclAssocProdAZ2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ2"
+        }
+      }
+    },
+    "snRouteAssocProdAZ1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ1"
+        }
+      }
+    },
+    "snAclAssocProdAZ1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclProd"
+        },
+        "SubnetId": {
+          "Ref": "snProdAZ1"
+        }
+      }
+    },
+    "snRouteAssocQAAZ3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ3"
+        }
+      }
+    },
+    "snAclAssocQAAZ3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ3"
+        }
+      }
+    },
+    "snRouteAssocQAAZ2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ2"
+        }
+      }
+    },
+    "snAclAssocQAAZ2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ2"
+        }
+      }
+    },
+    "snRouteAssocQAAZ1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "routeTablePublic"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ1"
+        }
+      }
+    },
+    "snAclAssocQAAZ1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "aclQA"
+        },
+        "SubnetId": {
+          "Ref": "snQAAZ1"
+        }
+      }
+    }
+  },
+  "Outputs" : {
+    "MHCVPC" : {
+      "Description" : "VPC ID for region",
+      "Value" :   {"Ref": "vpcFWS"},
+      "Export" : {
+        "Name" : "VPCID"
+      }
+    }
+  }
+}

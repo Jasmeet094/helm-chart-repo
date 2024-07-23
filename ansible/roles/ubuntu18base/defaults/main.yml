@@ -1,0 +1,4 @@
+---
+  admin_server: false
+  saml_keyfile: prodkey-new.pem
+  saml_certfile: prodcert-new.pem

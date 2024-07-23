@@ -1,0 +1,37 @@
+---
+- name: Check whether Postgres data directory is already linked
+  stat:
+    path: "/var/lib/postgresql/{{psql_version}}/main"
+  register: postgres_path
+
+- name: Copy postgres packaged files to data volume
+  synchronize:
+    src: /var/lib/postgresql/{{psql_version}}/main/
+    dest: /data-postgres
+  delegate_to: "{{ inventory_hostname }}"
+  when: postgres_path.stat.exists and postgres_path.stat.isdir
+
+- name: Backup the old postgres files
+  command: "mv /var/lib/postgresql/{{psql_version}}/main /var/lib/postgresql/{{psql_version}}/main.old"
+  args:
+    creates: "/var/lib/postgresql/{{psql_version}}/main.old"
+    removes: "/var/lib/postgresql/{{psql_version}}/main"
+  when: postgres_path.stat.exists and postgres_path.stat.isdir
+
+- name: Link the data directory to the original postgres location
+  file:
+    src: /data-postgres
+    dest: "/var/lib/postgresql/{{psql_version}}/main"
+    state: link
+    owner: postgres
+    group: postgres
+    mode: 0700
+  when: not postgres_path.stat.exists
+
+- name: Change mode of data directory
+  file:
+    path: /data-postgres
+    group: postgres
+    mode: 0700
+    owner: postgres
+    state: touch

@@ -1,0 +1,28 @@
+---
+- name: Format the device
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{mongo_drive}}"
+  become: yes
+
+- name: Create the folder for the mounted device
+  file:
+    path: "/data-mongodb"
+    state: directory
+    owner: "mongodb"
+    group: "mongodb"
+    mode: "755"
+  become: yes
+
+- name: label the drive
+  shell: /sbin/e2label /dev/{{mongo_drive}} mongo-vol
+  become: yes
+
+- name: Mount the device
+  mount:
+    path: "/data-mongodb"
+    src: LABEL=mongo-vol
+    fstype: ext4
+    state: mounted
+    opts: defaults
+  become: yes

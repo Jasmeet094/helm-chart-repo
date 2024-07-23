@@ -1,0 +1,14 @@
+---
+- debug: var=inventory_hostname_short
+
+- include: base_packages.yml
+- include: authentication_reporting.yml
+
+- name: Check for cloud.cfg
+  stat:
+    path: /etc/cloud/cloud.cfg
+  register: in_the_cloud
+
+- include: hostnames.yml
+  become: True
+  when: in_the_cloud.stat.exists

@@ -1,0 +1,22 @@
+- hosts: all
+  become: yes
+ 
+  tasks:
+    - name: put rabbitmq-server rabbitmq-env.conf file
+      copy:
+        remote_src: False
+        owner: rabbitmq
+        group: rabbitmq
+        mode: 0644
+        dest: /etc/rabbitmq/rabbitmq-env.conf
+        src: files/rabbitmq-env.conf
+      become: True
+      register: service_conf
+      when: '"db" not in inventory_hostname_short'
+
+    - name: Restart Rabbitmq service
+      service: 
+        name: rabbitmq-server 
+        state: restarted
+      become: yes
+      when: service_conf.changed

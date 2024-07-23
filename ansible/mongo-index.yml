@@ -1,0 +1,104 @@
+---
+- name: Add mongodb index
+  hosts: all
+  become: yes
+  tasks:
+    - name: m_event name
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_event
+            state: present
+            options:
+              name: name_1
+            keys:
+              name: 1
+      when: tags.Role == "Admin"
+    - name: m_event user
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_event
+            state: present
+            options:
+              name: user_1
+            keys:
+              user: 1
+      when: tags.Role == "Admin"
+    - name: m_event date
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_event
+            state: present
+            options:
+              name: date_1
+            keys:
+              date: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_event instanceID
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_event
+            state: present
+            options:
+              name: instanceID_1
+            keys:
+              instanceID: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_event timestamp
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_event
+            state: present
+            options:
+              name: timestamp_1
+            keys:
+              timestamp: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_event model
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_event
+            state: present
+            options:
+              name: model_1
+            keys:
+              model: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_event timestamp
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_event
+            state: present
+            options:
+              name: timestamp_1
+            keys:
+              timestamp: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_initiation_event user
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_initiation_event
+            state: present
+            options:
+              name: user_1
+            keys:
+              user: 1
+      when: tags.Role == "Admin"
+    - name: m_audit_initiation_event timestamp
+      community.mongodb.mongodb_index:
+        indexes:
+          - database: mhc
+            collection: m_audit_initiation_event
+            state: present
+            options:
+              name: timestamp_1
+            keys:
+              timestamp: 1
+      when: tags.Role == "Admin"

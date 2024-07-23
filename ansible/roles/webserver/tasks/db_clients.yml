@@ -1,0 +1,39 @@
+---
+  - debug:
+      msg:  "ubuntu version is {{ ansible_distribution_major_version }}"
+    tags:
+      - postgres
+
+  - apt_key:
+      url: "{{postgres_apt_key}}"
+      state: present
+    tags:
+      - postgres
+
+  - apt_repository:
+      repo: "deb {{postgres_apt_repo}} trusty-pgdg main"
+      state: present
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '14'
+    tags:
+      - postgres
+
+  - apt_repository:
+      repo: "deb {{postgres_apt_repo}} bionic-pgdg main"
+      state: present
+    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18'
+    tags:
+      - postgres
+
+  - name: Update apt cache for new key
+    apt:
+      update_cache: True
+  - name: Install db_clients
+    apt:
+        name: "{{ item }}"
+    become: True
+    with_items:
+       - mongodb-clients
+       - postgresql-client-{{psql_version}}
+    tags:
+     - database
+     - postgres

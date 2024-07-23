@@ -1,0 +1,5 @@
+---
+- name: restart stunnel4
+  service: name=stunnel4 state=restarted
+  become: True
+  when: is_vagrant == False

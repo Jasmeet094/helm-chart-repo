@@ -1,0 +1,39 @@
+---
+- name: Check whether mongo path is already linked
+  stat:
+    path: /var/lib/mongodb
+  register: mongo_path
+
+- name: Copy mongo packaged files to data volume
+  synchronize:
+    src: /var/lib/mongodb/
+    dest: /data-mongodb
+  delegate_to: "{{ inventory_hostname }}"
+  when: mongo_path.stat.exists and mongo_path.stat.isdir
+
+- name: Backup the old mongo files
+  command: mv /var/lib/mongodb /var/lib/mongodb.old
+  args:
+    creates: /var/lib/mongodb.old
+    removes: /var/lib/mongodb
+  when: mongo_path.stat.exists and mongo_path.stat.isdir
+
+- name: Link the data directory to the original Mongo location
+  file:
+    src: /data-mongodb
+    dest: /var/lib/mongodb
+    state: link
+    owner: mongodb
+    group: mongodb
+    mode: 0755
+  when: mongo_path.stat.exists and mongo_path.stat.isdir
+
+- name: Change ownership of the mongo data files
+  ansible.builtin.file:
+    path: /data-mongodb
+    owner: mongodb
+    group: mongodb
+    state: directory
+    mode: 0755
+  when: mongo_path.stat.exists and mongo_path.stat.isdir
+

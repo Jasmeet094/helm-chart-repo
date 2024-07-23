@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh ubuntu@{{env}}{{shard}}n1pvt.mobilehealthconsumer.com -R 6379:localhost:6379 -R 5672:localhost:5672 -R 15672:localhost:15672 -R 25672:localhost:25672 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 -f tail -f /dev/null

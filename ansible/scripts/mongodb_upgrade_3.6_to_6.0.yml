@@ -1,0 +1,31 @@
+---
+- name: upgrade mongodb 3.6 to mongodb 6.0 on ubuntu 18.04
+  hosts: Database
+  become: yes
+  vars:
+    versions: ["4.0", "4.2", "4.4", "5.0", "6.0"]
+    releases: ["4.0.28", "4.2.25", "4.4.28", "5.0.24", "6.0.13"]
+  tasks:
+    - name: remove broken postgres repo
+      ansible.builtin.file:
+        name: /etc/apt/sources.list.d/apt_postgresql_org_pub_repos_apt.list
+        state: absent
+    - name: add apt signing key for Mongo repos
+      ansible.builtin.shell: "curl -fsSL https://pgp.mongodb.com/server-{{item}}.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-{{item}}.gpg --dearmor"
+      args:
+        creates: "/usr/share/keyrings/mongodb-server-{{item}}.gpg"
+      loop: "{{versions}}"
+    - name: add mongo apt repositories
+      ansible.builtin.apt_repository:
+        repo: deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-{{item}}.gpg ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/{{item}} multiverse
+        state: present
+        update_cache: false
+      loop: "{{versions}}"
+      # The `--allow-insecure-repositories` is required for Mongo 4.0, whose GPG
+      # key is expired, and is a (mostly) undocumented option, and as such is
+      # not supported by Ansible.
+    - name: "update the apt cache"
+      ansible.builtin.command: apt-get update --allow-insecure-repositories
+    - name: "upgrade mongodb and friends"
+      include_tasks: upgrade_mongo.yml
+      loop: "{{versions | zip(releases) | list}}"

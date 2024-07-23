@@ -1,0 +1,4 @@
+---
+
+- name: updating  motd
+  template: src=93-mhc-motd dest=/etc/update-motd.d/93-mhc-motd owner=root group=root mode=0755

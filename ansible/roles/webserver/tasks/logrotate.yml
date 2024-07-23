@@ -1,0 +1,27 @@
+---
+  - name: Put logrotate config for mhc
+    copy:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/logrotate.d/
+      src: logrotate/mhc
+    register: config_file
+    become: True
+    tags:
+      - logrotate
+
+  - name: Put logrotate config for bucardo
+    copy:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/logrotate.d/
+      src: logrotate/bucardo
+    register: config_file
+    become: True
+    when: tags.Role in ['Admin']
+    tags:
+      - logrotate

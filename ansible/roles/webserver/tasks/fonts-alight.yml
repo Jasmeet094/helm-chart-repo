@@ -1,0 +1,42 @@
+---
+  - name: mkdir for fonts
+    file:
+      path: /usr/share/fonts/truetype/alight/
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    tags:
+      - fonts
+
+  - name: Retrieve SSL assets from S3
+    aws_s3:
+      bucket: "{{s3_bucket}}"
+      object: "fonts/alight/{{item}}"
+      dest: "/usr/share/fonts/truetype/alight/{{item}}"
+      mode: get
+    with_items:
+      - "FSThriveElliotWeb-Bold.ttf"
+      - "FSThriveElliotWeb-Bold.woff"
+      - "FSThriveElliotWeb-Heavy.ttf"
+      - "FSThriveElliotWeb-Heavy.woff"
+      - "FSThriveElliotWeb-Light.ttf"
+      - "FSThriveElliotWeb-Light.woff"
+      - "FSThriveElliotWeb-Regular.ttf"
+      - "FSThriveElliotWeb-Regular.woff"
+      - "tds-icons.eot"
+      - "tds-icons.svg"
+    tags:
+      - fonts
+
+  - name: Recursively setting file prems
+    file:
+      path: /usr/share/fonts/truetype/alight
+      state: directory
+      recurse: yes
+      owner: root
+      group: root
+      mode: '0755'
+    tags:
+      - fonts
+    

@@ -1,0 +1,44 @@
+---
+  - name: celery systemd service config ubuntu18
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/systemd/system/{{ item }}
+      src: init_ubuntu18/{{ item }}
+      backup: yes
+    become: True
+    with_items:
+      - celery.service
+      - celerybg.service
+      - celerybglowbandwidth.service
+      - celeryhr.service
+
+  - name: celery systemd exec ubuntu18
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0755
+      dest: /etc/systemd/system/{{ item }}
+      src: init_ubuntu18/{{ item }}
+      backup: yes
+    become: True
+    with_items:
+      - celery_startup
+      - celerybg_startup
+      - celerybglowbandwidth_startup
+      - celeryhr_startup
+
+  - name: celeryd system enable ubuntu18
+    systemd:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+      masked: no
+    with_items:
+      - celery
+      - celeryhr
+      - celerybg
+      - celerybglowbandwidth

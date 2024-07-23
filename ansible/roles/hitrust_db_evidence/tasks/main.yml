@@ -1,0 +1,26 @@
+- name: Copy script file to the DB server
+  template:
+    src: "pgsql-audit.sh"
+    dest: "/tmp/pgsql-audit.sh"
+    owner: "postgres"
+    group: "postgres"
+
+- name: Execute the script and output to a log file
+  shell: bash /tmp/pgsql-audit.sh > /tmp/pgsql-audit.log
+  become: yes
+  become_user: "postgres"
+
+- name: Retrieve the log file from the server and store locally
+  fetch:
+    flat: yes
+    src: "/tmp/pgsql-audit.log"
+    dest: "{{inventory_hostname}}-pgsql-audit.log"
+
+- name: Remove audit files form the server
+  file:
+    path: "{{item}}"
+    state: absent
+  with_items:
+    - "/tmp/pgsql-audit.sh"
+    - "/tmp/pgsql-audit.log"
+

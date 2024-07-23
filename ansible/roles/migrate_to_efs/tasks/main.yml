@@ -1,0 +1,99 @@
+---
+- name: Ansible check directory exists example.
+  stat:
+    path: /mnt/env-efs
+  register: mount 
+
+- name: install nfs-common
+  apt:
+    name: nfs-common
+  # when: not mount.stat.exists
+
+- name: create directory /mnt/env-efs
+  ansible.builtin.file:
+    path: /mnt/env-efs
+    state: directory
+    mode: '0755'
+    owner: mhc
+    group: mhc
+    recurse: true
+  # when: not mount.stat.exists
+
+- name: Mount EFS
+  ansible.posix.mount:
+    src: "{{ tags['Environment'] }}-efs.mobilehealthconsumer.com:/"
+    path: /mnt/env-efs
+    opts: defaults,_netdev
+    boot: true
+    state: mounted
+    fstype: nfs4
+  # when: not mount.stat.exists
+
+#- name: create directories /mnt/env-efs
+#  ansible.builtin.file:
+#    path: /mnt/env-efs/{{ item }}
+#    state: directory
+#    mode: '0755'
+#    owner: mhc
+#    group: mhc
+#    recurse: true
+#  # when: not mount.stat.exists
+#  with_items: "{{ directories }}"
+#  ignore_errors: yes
+
+# - name: create /mnt/env-efs/* directories
+#   ansible.builtin.file:
+#     path: "/home/mhc/mhc-backend/media/{{ item }}/{{inventory_hostname_short}}.txt"
+#     state: touch
+#   with_items: "{{ directories }}"
+#   when: not mount.stat.exists
+#   ignore_errors: yes
+
+# - name: move /home/mhc/mhc-backend/media/benefitsSummaries/* to /mnt/env-efs/benefitsSummaries
+#   command: "sudo mv /home/mhc/mhc-backend/media/benefitsSummaries/* /mnt/env-efs/benefitsSummaries"
+#   args:
+#     creates: /mnt/env-efs/benefitsSummaries/{{inventory_hostname_short}}.txt
+#   when: not mount.stat.exists
+
+# - name: move /home/mhc/mhc-backend/media/clientBranding/* to /mnt/env-efs/clientBranding
+#   command: "sudo mv /home/mhc/mhc-backend/media/clientBranding/  /mnt/env-efs/clientBranding"
+#   args:
+#     creates: /mnt/env-efs/clientBranding/{{inventory_hostname_short}}.txt
+#   when: not mount.stat.exists and Tag.Role in ["Admin"]
+
+
+# - name: move /home/mhc/mhc-backend/media/clientBranding/* to /tmp/clientBranding
+#   command: "sudo mv /home/mhc/mhc-backend/media/clientBranding/  /tmp/clientBranding"
+#   args:
+#     creates: /mnt/env-efs/clientBranding/{{inventory_hostname_short}}.txt
+#   when: not mount.stat.exists and Tag.Role not in ["Admin"]
+
+# - name: move /home/mhc/mhc-backend/media/img/* to /mnt/env-efs/img
+#   command: "sudo mv /home/mhc/mhc-backend/media/img/  /mnt/env-efs/img"
+#   args:
+#     creates: /mnt/env-efs/img/{{inventory_hostname_short}}.txt
+#   when: not mount.stat.exists
+
+# - name: move /home/mhc/mhc-backend/media/layoutElementImages/* to /mnt/env-efs/layoutElementImages
+#   command: "sudo mv /home/mhc/mhc-backend/media/layoutElementImages/ /mnt/env-efs/layoutElementImages"
+#   args:
+#     creates: /mnt/env-efs/layoutElementImages/{{inventory_hostname_short}}.txt
+#   when: not mount.stat.exists
+#   ignore_errors: yes
+
+# - name: symlink /home/mhc/mhc-backend/media/*
+#   file:
+#     src: /mnt/env-efs/{{item}}
+#     dest: /home/mhc/mhc-backend/media/{{item}}
+#     state: link
+#   with_items: "{{ directories }}"
+#   when: not mount.stat.exists
+    
+# - name: chown /mnt/env-efs/*
+#   file:
+#     dest: /mnt/env-efs/{{item}}
+#     owner: mhc
+#     group: mhc
+#     recurse: true
+#   with_items: "{{ directories }}"
+#   when: not mount.stat.exists

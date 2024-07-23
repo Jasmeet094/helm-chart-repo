@@ -1,0 +1,15 @@
+---
+Lpaths:
+  - click
+  - go
+  - unsubscribe
+  - contact
+  - view
+  - oauthCallback
+  - oauth2Callback
+  - SAMLEntry
+  - SSO
+  - reset
+
+nginx_worker_processes: 4
+nginx_worker_connections: 768

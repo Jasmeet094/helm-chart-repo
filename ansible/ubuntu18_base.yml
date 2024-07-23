@@ -1,0 +1,27 @@
+- hosts: all
+  become: yes
+  tasks:
+    - apt:
+        update_cache: yes
+
+    - amazon.aws.ec2_vol_info:
+        filters:
+        "tag:Name": data-postgres
+      register: vol_info
+
+    - debug:
+        msg: "{{ vol_info }}"
+
+- hosts: all
+  become: yes
+  roles:
+    #- ubuntu18_base
+    #- common
+    #- luks
+    #- motd
+    #- patching
+    #- awscli
+    - swap
+    - postgresql
+    - mongo
+    - webserver

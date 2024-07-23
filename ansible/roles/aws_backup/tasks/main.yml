@@ -1,0 +1,24 @@
+---
+- name: Check mandatory backup tag is defined
+  assert:
+    that: tags.Backup is defined
+    fail_msg: Missing EC2 `Backup` instance tag
+
+- name: Check backup tag is not NotBackupedUpOnPurpose
+  assert:
+    that: tags.Backup != "NotBackupedUpOnPurpose"
+    fail_msg: Instance not backed up on purpose
+
+- name: Get the current caller identity information
+  amazon.aws.aws_caller_info:
+  register: caller_info
+
+- name: Start AWS backup job
+  command: >
+    aws backup start-backup-job --backup-vault-name "{{ vault_name[tags.Backup] }}" --resource-arn "arn:aws:ec2:{{ region }}:{{ caller_info.account }}:instance/{{ instance_id }}" --iam-role-arn "arn:aws:iam::{{ caller_info.account }}:role/service-role/{{ backup_service_role }}" --region {{ region }}
+  changed_when: false
+  register: aws_backup_job
+
+- name: Print AWS Backup job id
+  debug:
+    msg: "AWS backup job id : {{ (aws_backup_job.stdout|from_json)['BackupJobId'] }}"

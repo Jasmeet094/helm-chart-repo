@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec su -c 'source /home/mhc/mhc-venv/bin/activate&&cd /home/mhc/mhc-backend&& celery worker -A Backend --loglevel=info -f /home/mhc/logs/celerybglowbandwidth.log -Q bglowbandwidth -E --concurrency={{ bglow_concurrency["large"] if ec2_instance.instances[0].instance_type.split(".")[0] == "c6i" else bglow_concurrency["small"] }} --maxtasksperchild={{ bglow_maxtaskperchild["large"] if ec2_instance.instances[0].instance_type.split(".")[0] == "c6i" else bglow_maxtaskperchild["small"] }} -Ofair -n bglowbandwidth' - mhc

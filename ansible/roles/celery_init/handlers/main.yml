@@ -1,0 +1,13 @@
+---
+- name: restart celery
+  service: name=celery state=restarted
+  become: True
+- name: restart celerybg
+  service: name=celerybg state=restarted
+  become: True
+- name: restart celerybglowbandwidth
+  service: name=celerybglowbandwidth state=restarted
+  become: True
+- name: restart celeryhr
+  service: name=celeryhr state=restarted
+  become: True

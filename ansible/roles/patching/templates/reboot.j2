@@ -1,0 +1,26 @@
+#!/bin/bash
+
+service mhc stop
+{% for service in services %}
+service {{service}} stop
+{% endfor %}
+{% if "w1" in server %}
+bucardo stop
+{% endif %}
+
+{% for shard in shards %}{% if shard.name in inventory_hostname_short %}
+bash -c 'echo -n {{ shard.passphrase }} | cryptsetup luksOpen /dev/xvdf data-mhc -d -'
+{% endif %}{% endfor %}
+mount /dev/mapper/data-mhc /data-mhc
+{% if "w1" in server %}
+mkdir /var/run/bucardo
+chown bucardo:bucardo /var/run/bucardo
+{% endif %}
+
+{% for service in services %}
+service {{service}} start
+{% endfor %}
+service mhc start
+{% if "w1" in server %}
+bucardo start
+{% endif %}

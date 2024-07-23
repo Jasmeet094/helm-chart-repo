@@ -1,0 +1,78 @@
+---
+
+- set_fact:
+    mount_path: "{{ item['crypt'] }}"
+    device_name: "{{ item['name'] }}"
+
+- name: Check for existing LUKS device
+  shell:  "blkid  | grep /dev/{{device_name}} | grep crypto_LUKS"
+  register: crypto_exists
+  ignore_errors: True
+
+- name: Check for existing mount points
+  # This is for restarts/reboots/patching
+  shell:  "mount | grep /dev/mapper | grep {{device_name}}"
+  register: luks_exists
+  ignore_errors: True
+
+- name: Stop database services, in case they're running
+  service: name="{{service_name}}" state=stopped
+  with_items:
+    - mongodb
+    - postgresql
+  become: True
+  ignore_errors: True
+  loop_control:
+    loop_var: service_name
+
+- name: Unmount existing device if present
+  mount:
+    state: unmounted
+    path: "/{{mount_path}}"
+  become: yes
+
+- name: LUKS-close the device if present
+  command: "cryptsetup luksClose /dev/mapper/crypt_{{device_name}}"
+  when: luks_exists.rc == 0
+  become: yes
+
+- name: LUKS-format the device
+  shell: echo -n {{luks_passphrase}} | cryptsetup -y luksFormat /dev/{{device_name}} --batch-mode --key-file -
+  when: crypto_exists.rc != 0
+  become: yes
+
+- name: LUKS-open the device_name
+  shell: echo -n {{luks_passphrase}} | cryptsetup luksOpen /dev/{{device_name}} crypt_{{device_name}} --key-file -
+  become: yes
+
+- name: Format the device
+  filesystem:
+    fstype: ext4
+    dev: "/dev/mapper/crypt_{{device_name}}"
+  become: yes
+  when: crypto_exists.rc != 0
+
+- name: Create the folder for the mounted device
+  file:
+    path: "/{{mount_path}}"
+    state: directory
+    owner: "{{device_owner}}"
+    mode: "{{device_mode}}"
+  become: yes
+  when: luks_exists.rc != 0
+
+- name: Mount the device
+  mount:
+    path: "/{{mount_path}}"
+    src: "/dev/mapper/crypt_{{device_name}}"
+    fstype: ext4
+    state: mounted
+  become: yes
+
+- name: Remove fstab entry (Ansible automatically adds it)
+  # https://github.com/ansible/ansible-modules-core/issues/2571
+  lineinfile:
+    state: absent
+    regexp: "^/dev/mapper/crypt_{{device_name}}.*$"
+    path: /etc/fstab
+  become: yes

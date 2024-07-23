@@ -1,0 +1,9 @@
+---
+backup_service_role: AWSBackupDefaultServiceRole
+region: us-west-2
+
+vault_name:
+  Prod: mhc-prod-Vault
+  NonProd: mhc-nonprod-Vault
+  Anthem2021: anthem-prod-Vault2021
+  Anthem2022: anthem-prod-Vault2022

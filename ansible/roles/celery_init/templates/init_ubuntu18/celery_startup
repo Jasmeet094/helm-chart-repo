@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec su -c 'source /home/mhc/mhc-venv/bin/activate&&cd /home/mhc/mhc-backend/&& celery worker -A Backend --loglevel=info -f /home/mhc/logs/celeryd.log -s /home/mhc/celery-schedules -E --concurrency={{ celery_concurrency }} --maxtasksperchild={{ celery_maxtaskperchild }} -Ofair -n celery {{ celery_extras }}' - mhc

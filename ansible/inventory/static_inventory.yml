@@ -1,0 +1,1324 @@
+Admin:
+  hosts:
+    bscqaw1: {}
+    bscqbw1: {}
+    cctestlogw1: {}
+    cctests01w1: {}
+    dalogw1: {}
+    das01w1: {}
+    das02w1: {}
+    mstlogw1: {}
+    msts01w1: {}
+    ofoglogw1: {}
+    ofogs01w1: {}
+    ofogs02w1: {}
+    ofogs03w1: {}
+    otlogw1: {}
+    ots01w1: {}
+    ots02w1: {}
+    ots03w1: {}
+    ots04w1: {}
+    pclonelogw1: {}
+    pclones01w1: {}
+    pclones02w1: {}
+    pcs01w1: {}
+    pds01w1: {}
+    plogw1: {}
+    ps01w1: {}
+    ps02w1: {}
+    ps03w1: {}
+    ps04w1: {}
+    ps05w1: {}
+    ps06w1: {}
+    ps07w1: {}
+    ps08w1: {}
+    ps09w1: {}
+    ps10w1: {}
+    ps11w1: {}
+    ps12w1: {}
+    ps14w1: {}
+    pts01w1: {}
+    qalogw1: {}
+    qas01w1: {}
+    qas02w1: {}
+    qas03w1: {}
+    qas04w1: {}
+    qatlogw1: {}
+    qats01w1: {}
+    qblogw1: {}
+    qblogw1-old: {}
+    qblogw1-postgres14: {}
+    qbs01w1: {}
+    qbs01w1-old: {}
+    qbs01w1-postgres14: {}
+    qbs02w1: {}
+    qbs02w1-old: {}
+    qbs02w1-postgres14: {}
+    qnlogw1: {}
+    qns01w1: {}
+    qns02w1: {}
+    qns03w1: {}
+    qns04w1: {}
+    snlogw1: {}
+    sns01w1: {}
+    sns02w1: {}
+    stlogw1: {}
+    stlogw1-killsoon: {}
+    sts01w1: {}
+    sts01w1-old: {}
+Database:
+  hosts:
+    Brian - Test instance - ps10db1 8-23-2023 - delete: {}
+    bscqadb1: {}
+    bscqbdb1: {}
+    cctestlogdb: {}
+    cctests01db: {}
+    dalogdb1: {}
+    das01db1: {}
+    das02db1: {}
+    devtest3: {}
+    mstlogdb1: {}
+    msts01db1: {}
+    ofoglogdb1: {}
+    ofogs01db1: {}
+    ofogs02db1: {}
+    ofogs03db1: {}
+    otlogdb1: {}
+    ots01db1: {}
+    ots02db1: {}
+    ots03db1: {}
+    ots04db1: {}
+    pclonelogdb1: {}
+    pclones01db1: {}
+    pclones02db1: {}
+    pcs01db1: {}
+    pds01db1: {}
+    plogdb1: {}
+    ps01db1: {}
+    ps01db1 - LEENA - DELETE: {}
+    ps02db1: {}
+    ps03db1: {}
+    ps04db1: {}
+    ps05db1: {}
+    ps06db1: {}
+    ps07db1: {}
+    ps08db1: {}
+    ps09db1: {}
+    ps09db1 - DELETE - LEENA - KIAN: {}
+    ps09db1 -LEENA KIAN DELETE: {}
+    ps10db1: {}
+    ps10db1 - DELETE - JUSTIN: {}
+    ps10db1 - DELETE - KIAN: {}
+    ps10db1 - LEENA KIAN DELETE: {}
+    ps11db1: {}
+    ps11db1 - Leena - DELETE: {}
+    ps12db1: {}
+    ps14db1: {}
+    pts01db1: {}
+    qalogdb1: {}
+    qas01db1: {}
+    qas02db1: {}
+    qas03db1: {}
+    qas04db1: {}
+    qatlogdb1: {}
+    qats01db1: {}
+    qblogdb1: {}
+    qblogdb1-old: {}
+    qblogdb1-postgres14: {}
+    qbs01db1: {}
+    qbs01db1-old: {}
+    qbs01db1-postgres14: {}
+    qbs02db1: {}
+    qbs02db1-original-postgresupgrade-instnace-whichhasdissapeareddata: {}
+    qbs02db1-postgres14: {}
+    qbs02db1-restored-andstillfailed-debug-instance-launched9-9: {}
+    qnlogdb1: {}
+    qns01db1: {}
+    qns02db1: {}
+    qns03db1: {}
+    qns04db1: {}
+    restore-testing-qbso1db1: {}
+    restore-testing-stlogdb1: {}
+    snlogdb1: {}
+    snlogdb1-failedpostupgrade: {}
+    sns01db1: {}
+    sns01db1-failedpostupgrade: {}
+    sns02db1: {}
+    sns02db1-failedpostupgrade: {}
+    ssrdb01: {}
+    stlogdb1: {}
+    stlogdb1-killsoon: {}
+    stlogdb1-restore: {}
+    sts01db1: {}
+    sts01db1-old: {}
+    sts01db1-restore: {}
+Development:
+  hosts:
+    jenkins: {}
+EndpointProtection:
+  hosts:
+    MHC-Endpoint-Protector: {}
+FTP:
+  hosts:
+    ssftp01: {}
+Jetbrains:
+  hosts:
+    ssjet01: {}
+Monitoring:
+  hosts:
+    ssmon01: {}
+Nessus:
+  hosts:
+    Nessus-scanner: {}
+Nightly:
+  hosts:
+    ps01n1: {}
+    ps03n1: {}
+    ps04n1: {}
+    ps08n1: {}
+    ps09n1: {}
+    ps10n1: {}
+    ps11n1: {}
+    ps12n1: {}
+Operations:
+  hosts:
+    ssops01: {}
+Redmine:
+  hosts:
+    sscfr01: {}
+    ssdev02: {}
+VPN:
+  hosts:
+    OpenVPN: {}
+    OpenVPN-14: {}
+    StrongSwan: {}
+Web:
+  hosts:
+    mstlogw2: {}
+    msts01w2: {}
+    plogw2: {}
+    plogw3: {}
+    plogw4: {}
+    ps01w2: {}
+    ps01w3: {}
+    ps01w4: {}
+    ps02w2: {}
+    ps02w3: {}
+    ps02w4: {}
+    ps03w2: {}
+    ps03w3: {}
+    ps04w2: {}
+    ps04w3: {}
+    ps05w2: {}
+    ps05w3: {}
+    ps06w2: {}
+    ps06w3: {}
+    ps07w2: {}
+    ps07w3: {}
+    ps07w4: {}
+    ps07w5: {}
+    ps08w2: {}
+    ps08w3: {}
+    ps09w2: {}
+    ps09w3: {}
+    ps10w2: {}
+    ps10w3: {}
+    ps11w2: {}
+    ps11w3: {}
+    ps12w2: {}
+    ps12w3: {}
+    ps14w2: {}
+    ps14w3: {}
+    qas01w2: {}
+    qats01w2: {}
+    snlogw2: {}
+    sns01w2: {}
+    sns02w2: {}
+    stlogw2: {}
+    sts01w2: {}
+all:
+  hosts:
+    AMI_update:
+      ansible_host: 172.31.202.95
+    Brian - Test instance - ps10db1 8-23-2023 - delete:
+      ansible_host: 172.31.198.90
+    MHC-Endpoint-Protector:
+      ansible_host: 172.31.13.73
+    Nessus-scanner:
+      ansible_host: 172.31.8.220
+    OpenVPN:
+      ansible_host: 172.31.6.115
+    OpenVPN-14:
+      ansible_host: 172.31.2.133
+    PGDash - SelfHosted - 2023 2 - delete:
+      ansible_host: 172.31.123.245
+    StrongSwan:
+      ansible_host: 172.31.10.118
+    aa3:
+      ansible_host: 172.31.38.35
+    alb-fr-test:
+      ansible_host: 172.31.69.86
+    alc:
+      ansible_host: 172.31.37.155
+    alc3:
+      ansible_host: 172.31.35.163
+    angulardev:
+      ansible_host: 172.31.39.29
+    angulartest:
+      ansible_host: 172.31.33.193
+    angulartest3:
+      ansible_host: 172.31.37.144
+    angulartestnew:
+      ansible_host: 172.31.37.211
+    bscqadb1:
+      ansible_host: 172.31.81.168
+    bscqaw1:
+      ansible_host: 172.31.86.238
+    bscqbdb1:
+      ansible_host: 172.31.87.140
+    bscqbw1:
+      ansible_host: 172.31.83.155
+    buildtest:
+      ansible_host: 172.31.35.18
+    buildtest-branch:
+      ansible_host: 172.31.35.14
+    buildtest-dev:
+      ansible_host: 172.31.36.33
+    buildtest-stable:
+      ansible_host: 172.31.39.197
+    cctestlogdb:
+      ansible_host: 172.31.39.210
+    cctestlogw1:
+      ansible_host: 172.31.37.102
+    cctests01db:
+      ansible_host: 172.31.35.140
+    cctests01w1:
+      ansible_host: 172.31.36.136
+    cw3:
+      ansible_host: 172.31.37.7
+    dalogdb1:
+      ansible_host: 172.31.69.208
+    dalogw1:
+      ansible_host: 172.31.70.210
+    das01db1:
+      ansible_host: 172.31.83.4
+    das01w1:
+      ansible_host: 172.31.82.17
+    das02db1:
+      ansible_host: 172.31.73.200
+    das02w1:
+      ansible_host: 172.31.72.98
+    devtest - OKAY TO DELETE:
+      ansible_host: 172.31.33.168
+    devtest3:
+      ansible_host: 172.31.38.21
+    ek:
+      ansible_host: 172.31.38.134
+    ip-172-31-201-61.us-west-2.compute.internal:
+      ansible_host: 172.31.201.61
+    jenkins:
+      ansible_host: 172.31.9.10
+    justin - delete - updating base image:
+      ansible_host: 172.31.122.240
+    kw-new:
+      ansible_host: 172.31.38.119
+    kw3:
+      ansible_host: 172.31.36.43
+    kw3-restored-ubuntu-upgrade-test-2:
+      ansible_host: 172.31.35.35
+    kw3-ubuntu-upgrade-test-new:
+      ansible_host: 172.31.32.113
+    lf:
+      ansible_host: 172.31.49.93
+    lf3:
+      ansible_host: 172.31.35.3
+    ll3:
+      ansible_host: 172.31.32.149
+    mlv-new:
+      ansible_host: 172.31.36.5
+    mlv3:
+      ansible_host: 172.31.32.52
+    mstlogdb1:
+      ansible_host: 172.31.82.216
+    mstlogw1:
+      ansible_host: 172.31.82.63
+    mstlogw2:
+      ansible_host: 172.31.83.71
+    msts01db1:
+      ansible_host: 172.31.69.99
+    msts01w1:
+      ansible_host: 172.31.65.123
+    msts01w2:
+      ansible_host: 172.31.67.142
+    ofoglogdb1:
+      ansible_host: 172.31.48.134
+    ofoglogdb1-restored-backup-justin-2:
+      ansible_host: 172.31.51.66
+    ofoglogw1:
+      ansible_host: 172.31.50.237
+    ofoglogw1-restored-backup-justin-2:
+      ansible_host: 172.31.52.179
+    ofogs01db1:
+      ansible_host: 172.31.55.62
+    ofogs01db1-restored-backup-justin-2:
+      ansible_host: 172.31.51.112
+    ofogs01w1:
+      ansible_host: 172.31.51.0
+    ofogs01w1-restored-backup-justin-2:
+      ansible_host: 172.31.51.110
+    ofogs02db1:
+      ansible_host: 172.31.55.121
+    ofogs02w1:
+      ansible_host: 172.31.54.88
+    ofogs03db1:
+      ansible_host: 172.31.49.127
+    ofogs03w1:
+      ansible_host: 172.31.48.149
+    otlogdb1:
+      ansible_host: 172.31.54.26
+    otlogw1:
+      ansible_host: 172.31.49.255
+    ots01db1:
+      ansible_host: 172.31.49.67
+    ots01w1:
+      ansible_host: 172.31.55.176
+    ots02db1:
+      ansible_host: 172.31.51.106
+    ots02w1:
+      ansible_host: 172.31.52.214
+    ots03db1:
+      ansible_host: 172.31.55.228
+    ots03w1:
+      ansible_host: 172.31.54.51
+    ots04db1:
+      ansible_host: 172.31.49.199
+    ots04w1:
+      ansible_host: 172.31.50.183
+    pclonelogdb1:
+      ansible_host: 172.31.47.238
+    pclonelogw1:
+      ansible_host: 172.31.45.151
+    pclones01db1:
+      ansible_host: 172.31.46.203
+    pclones01w1:
+      ansible_host: 172.31.47.170
+    pclones02db1:
+      ansible_host: 172.31.42.133
+    pclones02w1:
+      ansible_host: 172.31.41.186
+    pcs01db1:
+      ansible_host: 172.31.85.179
+    pcs01w1:
+      ansible_host: 172.31.80.210
+    pds01db1:
+      ansible_host: 172.31.52.178
+    pds01w1:
+      ansible_host: 172.31.50.19
+    perfdb1:
+      ansible_host: 172.31.38.122
+    perflogdb1:
+      ansible_host: 172.31.38.175
+    perflogw1:
+      ansible_host: 172.31.34.22
+    perfs01db1:
+      ansible_host: 172.31.33.166
+    perfs01w1:
+      ansible_host: 172.31.37.35
+    perfs01w2:
+      ansible_host: 172.31.32.81
+    perfs01w3:
+      ansible_host: 172.31.39.208
+    perfs01w4:
+      ansible_host: 172.31.33.41
+    perfs01w5:
+      ansible_host: 172.31.32.86
+    perfs01w6:
+      ansible_host: 172.31.36.137
+    perfs01w7:
+      ansible_host: 172.31.36.223
+    perfs01w8:
+      ansible_host: 172.31.32.160
+    perfs01w9:
+      ansible_host: 172.31.33.61
+    perfw1:
+      ansible_host: 172.31.33.14
+    pgbadger-2023:
+      ansible_host: 172.31.126.227
+    pgdash-trialkey-DELETE:
+      ansible_host: 172.31.15.196
+    plogdb1:
+      ansible_host: 172.31.210.252
+    plogw1:
+      ansible_host: 172.31.210.247
+    plogw2:
+      ansible_host: 172.31.211.228
+    plogw3:
+      ansible_host: 172.31.201.95
+    plogw4:
+      ansible_host: 172.31.205.30
+    ps01db1:
+      ansible_host: 172.31.194.146
+    ps01db1 - LEENA - DELETE:
+      ansible_host: 172.31.195.194
+    ps01db1 - restore - mongo testing - DELETE:
+      ansible_host: 172.31.196.70
+    ps01n1:
+      ansible_host: 172.31.196.164
+    ps01w1:
+      ansible_host: 172.31.194.185
+    ps01w2:
+      ansible_host: 172.31.193.19
+    ps01w3:
+      ansible_host: 172.31.200.76
+    ps01w4:
+      ansible_host: 172.31.201.123
+    ps02db1:
+      ansible_host: 172.31.202.131
+    ps02w1:
+      ansible_host: 172.31.205.164
+    ps02w2:
+      ansible_host: 172.31.206.226
+    ps02w3:
+      ansible_host: 172.31.200.28
+    ps02w4:
+      ansible_host: 172.31.200.71
+    ps03db1:
+      ansible_host: 172.31.197.81
+    ps03n1:
+      ansible_host: 172.31.193.158
+    ps03w1:
+      ansible_host: 172.31.198.135
+    ps03w2:
+      ansible_host: 172.31.193.140
+    ps03w3:
+      ansible_host: 172.31.192.211
+    ps04db1:
+      ansible_host: 172.31.202.24
+    ps04n1:
+      ansible_host: 172.31.201.52
+    ps04w1:
+      ansible_host: 172.31.204.165
+    ps04w2:
+      ansible_host: 172.31.200.112
+    ps04w3:
+      ansible_host: 172.31.203.175
+    ps05db1:
+      ansible_host: 172.31.193.174
+    ps05w1:
+      ansible_host: 172.31.193.193
+    ps05w2:
+      ansible_host: 172.31.193.155
+    ps05w3:
+      ansible_host: 172.31.192.145
+    ps06db1:
+      ansible_host: 172.31.203.35
+    ps06w1:
+      ansible_host: 172.31.201.183
+    ps06w2:
+      ansible_host: 172.31.207.209
+    ps06w3:
+      ansible_host: 172.31.203.157
+    ps07db1:
+      ansible_host: 172.31.200.73
+    ps07w1:
+      ansible_host: 172.31.203.73
+    ps07w2:
+      ansible_host: 172.31.205.238
+    ps07w3:
+      ansible_host: 172.31.203.89
+    ps07w4:
+      ansible_host: 172.31.200.147
+    ps07w5:
+      ansible_host: 172.31.206.96
+    ps08db1:
+      ansible_host: 172.31.206.120
+    ps08n1:
+      ansible_host: 172.31.207.189
+    ps08w1:
+      ansible_host: 172.31.202.84
+    ps08w2:
+      ansible_host: 172.31.205.73
+    ps08w3:
+      ansible_host: 172.31.204.59
+    ps09db1:
+      ansible_host: 172.31.202.225
+    ps09db1 - DELETE - LEENA - KIAN:
+      ansible_host: 172.31.203.118
+    ps09db1 -LEENA KIAN DELETE:
+      ansible_host: 172.31.204.91
+    ps09n1:
+      ansible_host: 172.31.205.24
+    ps09w1:
+      ansible_host: 172.31.206.235
+    ps09w2:
+      ansible_host: 172.31.202.139
+    ps09w3:
+      ansible_host: 172.31.207.51
+    ps10db1:
+      ansible_host: 172.31.196.59
+    ps10db1 - DELETE - JUSTIN:
+      ansible_host: 172.31.195.103
+    ps10db1 - DELETE - KIAN:
+      ansible_host: 172.31.199.78
+    ps10db1 - LEENA KIAN DELETE:
+      ansible_host: 172.31.199.133
+    ps10n1:
+      ansible_host: 172.31.196.248
+    ps10w1:
+      ansible_host: 172.31.193.73
+    ps10w2:
+      ansible_host: 172.31.193.114
+    ps10w3:
+      ansible_host: 172.31.195.122
+    ps11db1:
+      ansible_host: 172.31.210.130
+    ps11db1 - Leena - DELETE:
+      ansible_host: 172.31.209.227
+    ps11n1:
+      ansible_host: 172.31.210.3
+    ps11w1:
+      ansible_host: 172.31.209.214
+    ps11w2:
+      ansible_host: 172.31.209.167
+    ps11w3:
+      ansible_host: 172.31.209.244
+    ps12db1:
+      ansible_host: 172.31.198.149
+    ps12n1:
+      ansible_host: 172.31.198.218
+    ps12w1:
+      ansible_host: 172.31.195.36
+    ps12w2:
+      ansible_host: 172.31.197.24
+    ps12w3:
+      ansible_host: 172.31.197.80
+    ps14db1:
+      ansible_host: 172.31.195.219
+    ps14w1:
+      ansible_host: 172.31.194.50
+    ps14w2:
+      ansible_host: 172.31.199.68
+    ps14w3:
+      ansible_host: 172.31.198.82
+    pts01db1:
+      ansible_host: 172.31.81.217
+    pts01w1:
+      ansible_host: 172.31.81.220
+    qaclone:
+      ansible_host: 172.31.34.242
+    qaclonedb:
+      ansible_host: 172.31.38.84
+    qalogdb1:
+      ansible_host: 172.31.80.124
+    qalogw1:
+      ansible_host: 172.31.86.173
+    qardb01:
+      ansible_host: 172.31.124.78
+    qas01db1:
+      ansible_host: 172.31.66.94
+    qas01db1-restore-curtis-mongo-DELETE:
+      ansible_host: 172.31.70.7
+    qas01w1:
+      ansible_host: 172.31.71.212
+    qas01w2:
+      ansible_host: 172.31.65.27
+    qas02db1:
+      ansible_host: 172.31.75.118
+    qas02db1-us-west-2b-delete:
+      ansible_host: 172.31.77.243
+    qas02w1:
+      ansible_host: 172.31.74.65
+    qas03db1:
+      ansible_host: 172.31.68.77
+    qas03w1:
+      ansible_host: 172.31.69.27
+    qas04db1:
+      ansible_host: 172.31.75.145
+    qas04w1:
+      ansible_host: 172.31.79.6
+    qatlogdb1:
+      ansible_host: 172.31.81.93
+    qatlogw1:
+      ansible_host: 172.31.83.185
+    qats01db1:
+      ansible_host: 172.31.67.185
+    qats01w1:
+      ansible_host: 172.31.64.96
+    qats01w2:
+      ansible_host: 172.31.71.38
+    qblogdb1:
+      ansible_host: 172.31.85.94
+    qblogdb1-old:
+      ansible_host: 172.31.82.133
+    qblogdb1-postgres14:
+      ansible_host: 172.31.86.108
+    qblogw1:
+      ansible_host: 172.31.80.164
+    qblogw1-old:
+      ansible_host: 172.31.81.229
+    qblogw1-postgres14:
+      ansible_host: 172.31.83.227
+    qbs01db1:
+      ansible_host: 172.31.67.235
+    qbs01db1-old:
+      ansible_host: 172.31.66.59
+    qbs01db1-postgres14:
+      ansible_host: 172.31.70.96
+    qbs01w1:
+      ansible_host: 172.31.68.0
+    qbs01w1-old:
+      ansible_host: 172.31.66.69
+    qbs01w1-postgres14:
+      ansible_host: 172.31.64.15
+    qbs02db1:
+      ansible_host: 172.31.72.154
+    qbs02db1-original-postgresupgrade-instnace-whichhasdissapeareddata:
+      ansible_host: 172.31.72.201
+    qbs02db1-postgres14:
+      ansible_host: 172.31.76.73
+    qbs02db1-restored-andstillfailed-debug-instance-launched9-9:
+      ansible_host: 172.31.75.3
+    qbs02w1:
+      ansible_host: 172.31.77.0
+    qbs02w1-old:
+      ansible_host: 172.31.77.246
+    qbs02w1-postgres14:
+      ansible_host: 172.31.75.117
+    qnlogdb1:
+      ansible_host: 172.31.47.9
+    qnlogw1:
+      ansible_host: 172.31.47.66
+    qns01db1:
+      ansible_host: 172.31.44.153
+    qns01w1:
+      ansible_host: 172.31.45.181
+    qns02db1:
+      ansible_host: 172.31.43.126
+    qns02w1:
+      ansible_host: 172.31.46.162
+    qns03db1:
+      ansible_host: 172.31.40.39
+    qns03w1:
+      ansible_host: 172.31.41.245
+    qns04db1:
+      ansible_host: 172.31.45.112
+    qns04w1:
+      ansible_host: 172.31.47.187
+    restore-testing-qbso1db1:
+      ansible_host: 172.31.70.172
+    restore-testing-stlogdb1:
+      ansible_host: 172.31.85.203
+    robotserver:
+      ansible_host: 172.31.33.208
+    robotserver2:
+      ansible_host: 172.31.33.77
+    sk:
+      ansible_host: 172.31.36.246
+    sk3:
+      ansible_host: 172.31.32.167
+    sm (Sanjay):
+      ansible_host: 172.31.35.223
+    snlogdb1:
+      ansible_host: 172.31.65.59
+    snlogdb1-failedpostupgrade:
+      ansible_host: 172.31.70.221
+    snlogw1:
+      ansible_host: 172.31.67.21
+    snlogw2:
+      ansible_host: 172.31.71.90
+    sns01db1:
+      ansible_host: 172.31.65.199
+    sns01db1-failedpostupgrade:
+      ansible_host: 172.31.64.16
+    sns01w1:
+      ansible_host: 172.31.66.35
+    sns01w2:
+      ansible_host: 172.31.65.18
+    sns02db1:
+      ansible_host: 172.31.67.63
+    sns02db1-failedpostupgrade:
+      ansible_host: 172.31.67.69
+    sns02w1:
+      ansible_host: 172.31.71.192
+    sns02w2:
+      ansible_host: 172.31.64.123
+    sscfr01:
+      ansible_host: 172.31.9.150
+    ssdev02:
+      ansible_host: 172.31.11.106
+    ssftp01:
+      ansible_host: 172.31.11.170
+    ssjet01:
+      ansible_host: 172.31.4.46
+    ssmon01:
+      ansible_host: 172.31.10.210
+    ssops01:
+      ansible_host: 172.31.14.212
+    ssrdb01:
+      ansible_host: 172.31.126.33
+    ssrdb02:
+      ansible_host: 172.31.122.172
+    stlogdb1:
+      ansible_host: 172.31.87.125
+    stlogdb1-killsoon:
+      ansible_host: 172.31.86.85
+    stlogdb1-restore:
+      ansible_host: 172.31.84.203
+    stlogw1:
+      ansible_host: 172.31.84.173
+    stlogw1-killsoon:
+      ansible_host: 172.31.87.248
+    stlogw2:
+      ansible_host: 172.31.83.90
+    sts01db1:
+      ansible_host: 172.31.69.7
+    sts01db1-old:
+      ansible_host: 172.31.64.10
+    sts01db1-restore:
+      ansible_host: 172.31.70.63
+    sts01w1:
+      ansible_host: 172.31.64.179
+    sts01w1-old:
+      ansible_host: 172.31.66.206
+    sts01w2:
+      ansible_host: 172.31.69.199
+    uws01w1:
+      ansible_host: 172.31.33.175
+bscqa:
+  hosts:
+    bscqadb1: {}
+    bscqaw1: {}
+bscqadb1:
+  hosts:
+    bscqadb1: {}
+bscqaw1:
+  hosts:
+    bscqaw1: {}
+bscqb:
+  hosts:
+    bscqbdb1: {}
+    bscqbw1: {}
+bscqbdb1:
+  hosts:
+    bscqbdb1: {}
+bscqbw1:
+  hosts:
+    bscqbw1: {}
+d:
+  hosts:
+    aa3: {}
+    alc: {}
+    alc3: {}
+    angulardev: {}
+    angulartest: {}
+    angulartest3: {}
+    angulartestnew: {}
+    buildtest: {}
+    buildtest-branch: {}
+    buildtest-dev: {}
+    buildtest-stable: {}
+    cctestlogdb: {}
+    cctestlogw1: {}
+    cctests01db: {}
+    cctests01w1: {}
+    cw3: {}
+    devtest - OKAY TO DELETE: {}
+    devtest3: {}
+    ek: {}
+    kw-new: {}
+    kw3: {}
+    lf: {}
+    lf3: {}
+    ll3: {}
+    mlv-new: {}
+    mlv3: {}
+    robotserver: {}
+    robotserver2: {}
+    sk: {}
+    sk3: {}
+    sm (Sanjay): {}
+    uws01w1: {}
+da:
+  hosts:
+    dalogdb1: {}
+    dalogw1: {}
+    das01db1: {}
+    das01w1: {}
+    das02db1: {}
+    das02w1: {}
+log:
+  hosts:
+    cctestlogdb: {}
+    cctestlogw1: {}
+    dalogdb1: {}
+    dalogw1: {}
+    mstlogdb1: {}
+    mstlogw1: {}
+    mstlogw2: {}
+    ofoglogdb1: {}
+    ofoglogw1: {}
+    otlogdb1: {}
+    otlogw1: {}
+    pclonelogdb1: {}
+    pclonelogw1: {}
+    plogdb1: {}
+    plogw1: {}
+    plogw2: {}
+    plogw3: {}
+    plogw4: {}
+    qalogdb1: {}
+    qalogw1: {}
+    qatlogdb1: {}
+    qatlogw1: {}
+    qblogdb1: {}
+    qblogdb1-old: {}
+    qblogdb1-postgres14: {}
+    qblogw1: {}
+    qblogw1-old: {}
+    qblogw1-postgres14: {}
+    qnlogdb1: {}
+    qnlogw1: {}
+    restore-testing-stlogdb1: {}
+    snlogdb1: {}
+    snlogdb1-failedpostupgrade: {}
+    snlogw1: {}
+    snlogw2: {}
+    stlogdb1: {}
+    stlogdb1-killsoon: {}
+    stlogdb1-restore: {}
+    stlogw1: {}
+    stlogw1-killsoon: {}
+    stlogw2: {}
+mst:
+  hosts:
+    mstlogdb1: {}
+    mstlogw1: {}
+    mstlogw2: {}
+    msts01db1: {}
+    msts01w1: {}
+    msts01w2: {}
+nonsharded:
+  hosts:
+    pcs01db1: {}
+    pcs01w1: {}
+    pts01db1: {}
+    pts01w1: {}
+ofog:
+  hosts:
+    ofoglogdb1: {}
+    ofoglogdb1-restored-backup-justin-2: {}
+    ofoglogw1: {}
+    ofogs01db1: {}
+    ofogs01db1-restored-backup-justin-2: {}
+    ofogs01w1: {}
+    ofogs02db1: {}
+    ofogs02w1: {}
+    ofogs03db1: {}
+    ofogs03w1: {}
+ot:
+  hosts:
+    otlogdb1: {}
+    otlogw1: {}
+    ots01db1: {}
+    ots01w1: {}
+    ots02db1: {}
+    ots02w1: {}
+    ots03db1: {}
+    ots03w1: {}
+    ots04db1: {}
+    ots04w1: {}
+p:
+  hosts:
+    Brian - Test instance - ps10db1 8-23-2023 - delete: {}
+    plogdb1: {}
+    plogw1: {}
+    plogw2: {}
+    plogw3: {}
+    plogw4: {}
+    ps01db1: {}
+    ps01db1 - LEENA - DELETE: {}
+    ps01n1: {}
+    ps01w1: {}
+    ps01w2: {}
+    ps01w3: {}
+    ps01w4: {}
+    ps02db1: {}
+    ps02w1: {}
+    ps02w2: {}
+    ps02w3: {}
+    ps02w4: {}
+    ps03db1: {}
+    ps03n1: {}
+    ps03w1: {}
+    ps03w2: {}
+    ps03w3: {}
+    ps04db1: {}
+    ps04n1: {}
+    ps04w1: {}
+    ps04w2: {}
+    ps04w3: {}
+    ps05db1: {}
+    ps05w1: {}
+    ps05w2: {}
+    ps05w3: {}
+    ps06db1: {}
+    ps06w1: {}
+    ps06w2: {}
+    ps06w3: {}
+    ps07db1: {}
+    ps07w1: {}
+    ps07w2: {}
+    ps07w3: {}
+    ps07w4: {}
+    ps07w5: {}
+    ps08db1: {}
+    ps08n1: {}
+    ps08w1: {}
+    ps08w2: {}
+    ps08w3: {}
+    ps09db1: {}
+    ps09db1 - DELETE - LEENA - KIAN: {}
+    ps09db1 -LEENA KIAN DELETE: {}
+    ps09n1: {}
+    ps09w1: {}
+    ps09w2: {}
+    ps09w3: {}
+    ps10db1: {}
+    ps10db1 - DELETE - JUSTIN: {}
+    ps10db1 - DELETE - KIAN: {}
+    ps10db1 - LEENA KIAN DELETE: {}
+    ps10n1: {}
+    ps10w1: {}
+    ps10w2: {}
+    ps10w3: {}
+    ps11db1: {}
+    ps11db1 - Leena - DELETE: {}
+    ps11n1: {}
+    ps11w1: {}
+    ps11w2: {}
+    ps11w3: {}
+    ps12db1: {}
+    ps12n1: {}
+    ps12w1: {}
+    ps12w2: {}
+    ps12w3: {}
+    ps14db1: {}
+    ps14w1: {}
+    ps14w2: {}
+    ps14w3: {}
+pc:
+  hosts:
+    pcs01db1: {}
+    pcs01w1: {}
+pclone:
+  hosts:
+    pclonelogdb1: {}
+    pclonelogw1: {}
+    pclones01db1: {}
+    pclones01w1: {}
+    pclones02db1: {}
+    pclones02w1: {}
+pd:
+  hosts:
+    pds01db1: {}
+    pds01w1: {}
+perf:
+  hosts:
+    perfdb1: {}
+    perflogdb1: {}
+    perflogw1: {}
+    perfs01db1: {}
+    perfs01w1: {}
+    perfs01w2: {}
+    perfs01w3: {}
+    perfs01w4: {}
+    perfs01w5: {}
+    perfs01w6: {}
+    perfs01w7: {}
+    perfs01w8: {}
+    perfs01w9: {}
+    perfw1: {}
+pt:
+  hosts:
+    pts01db1: {}
+    pts01w1: {}
+qa:
+  hosts:
+    qaclone: {}
+    qaclonedb: {}
+    qalogdb1: {}
+    qalogw1: {}
+    qardb01: {}
+    qas01db1: {}
+    qas01w1: {}
+    qas01w2: {}
+    qas02db1: {}
+    qas02w1: {}
+    qas03db1: {}
+    qas03w1: {}
+    qas04db1: {}
+    qas04w1: {}
+qat:
+  hosts:
+    qatlogdb1: {}
+    qatlogw1: {}
+    qats01db1: {}
+    qats01w1: {}
+    qats01w2: {}
+qb:
+  hosts:
+    qblogdb1: {}
+    qblogdb1-old: {}
+    qblogdb1-postgres14: {}
+    qblogw1: {}
+    qblogw1-old: {}
+    qblogw1-postgres14: {}
+    qbs01db1: {}
+    qbs01db1-old: {}
+    qbs01db1-postgres14: {}
+    qbs01w1: {}
+    qbs01w1-old: {}
+    qbs01w1-postgres14: {}
+    qbs02db1: {}
+    qbs02db1-original-postgresupgrade-instnace-whichhasdissapeareddata: {}
+    qbs02db1-postgres14: {}
+    qbs02db1-restored-andstillfailed-debug-instance-launched9-9: {}
+    qbs02w1: {}
+    qbs02w1-old: {}
+    qbs02w1-postgres14: {}
+    restore-testing-qbso1db1: {}
+qn:
+  hosts:
+    qnlogdb1: {}
+    qnlogw1: {}
+    qns01db1: {}
+    qns01w1: {}
+    qns02db1: {}
+    qns02w1: {}
+    qns03db1: {}
+    qns03w1: {}
+    qns04db1: {}
+    qns04w1: {}
+s01:
+  hosts:
+    cctests01db: {}
+    cctests01w1: {}
+    das01db1: {}
+    das01w1: {}
+    msts01db1: {}
+    msts01w1: {}
+    msts01w2: {}
+    ofogs01db1: {}
+    ofogs01w1: {}
+    ots01db1: {}
+    ots01w1: {}
+    pclones01db1: {}
+    pclones01w1: {}
+    pds01db1: {}
+    pds01w1: {}
+    ps01db1: {}
+    ps01db1 - LEENA - DELETE: {}
+    ps01n1: {}
+    ps01w1: {}
+    ps01w2: {}
+    ps01w3: {}
+    ps01w4: {}
+    qas01db1: {}
+    qas01w1: {}
+    qas01w2: {}
+    qats01db1: {}
+    qats01w1: {}
+    qats01w2: {}
+    qbs01db1: {}
+    qbs01db1-old: {}
+    qbs01db1-postgres14: {}
+    qbs01w1: {}
+    qbs01w1-old: {}
+    qbs01w1-postgres14: {}
+    qns01db1: {}
+    qns01w1: {}
+    restore-testing-qbso1db1: {}
+    sns01db1: {}
+    sns01db1-failedpostupgrade: {}
+    sns01w1: {}
+    sns01w2: {}
+    sts01db1: {}
+    sts01db1-old: {}
+    sts01db1-restore: {}
+    sts01w1: {}
+    sts01w1-old: {}
+    sts01w2: {}
+s02:
+  hosts:
+    das02db1: {}
+    das02w1: {}
+    ofogs02db1: {}
+    ofogs02w1: {}
+    ots02db1: {}
+    ots02w1: {}
+    pclones02db1: {}
+    pclones02w1: {}
+    ps02db1: {}
+    ps02w1: {}
+    ps02w2: {}
+    ps02w3: {}
+    ps02w4: {}
+    qas02db1: {}
+    qas02w1: {}
+    qbs02db1: {}
+    qbs02db1-original-postgresupgrade-instnace-whichhasdissapeareddata: {}
+    qbs02db1-postgres14: {}
+    qbs02db1-restored-andstillfailed-debug-instance-launched9-9: {}
+    qbs02w1: {}
+    qbs02w1-old: {}
+    qbs02w1-postgres14: {}
+    qns02db1: {}
+    qns02w1: {}
+    sns02db1: {}
+    sns02db1-failedpostupgrade: {}
+    sns02w1: {}
+    sns02w2: {}
+s03:
+  hosts:
+    ofogs03db1: {}
+    ofogs03w1: {}
+    ots03db1: {}
+    ots03w1: {}
+    ps03db1: {}
+    ps03n1: {}
+    ps03w1: {}
+    ps03w2: {}
+    ps03w3: {}
+    qas03db1: {}
+    qas03w1: {}
+    qns03db1: {}
+    qns03w1: {}
+s04:
+  hosts:
+    ots04db1: {}
+    ots04w1: {}
+    ps04db1: {}
+    ps04n1: {}
+    ps04w1: {}
+    ps04w2: {}
+    ps04w3: {}
+    qas04db1: {}
+    qas04w1: {}
+    qns04db1: {}
+    qns04w1: {}
+s05:
+  hosts:
+    ps05db1: {}
+    ps05w1: {}
+    ps05w2: {}
+    ps05w3: {}
+s06:
+  hosts:
+    ps06db1: {}
+    ps06w1: {}
+    ps06w2: {}
+    ps06w3: {}
+s07:
+  hosts:
+    ps07db1: {}
+    ps07w1: {}
+    ps07w2: {}
+    ps07w3: {}
+    ps07w4: {}
+    ps07w5: {}
+s08:
+  hosts:
+    ps08db1: {}
+    ps08n1: {}
+    ps08w1: {}
+    ps08w2: {}
+    ps08w3: {}
+s09:
+  hosts:
+    ps09db1: {}
+    ps09db1 - DELETE - LEENA - KIAN: {}
+    ps09db1 -LEENA KIAN DELETE: {}
+    ps09n1: {}
+    ps09w1: {}
+    ps09w2: {}
+    ps09w3: {}
+s10:
+  hosts:
+    Brian - Test instance - ps10db1 8-23-2023 - delete: {}
+    ps10db1: {}
+    ps10db1 - DELETE - JUSTIN: {}
+    ps10db1 - DELETE - KIAN: {}
+    ps10db1 - LEENA KIAN DELETE: {}
+    ps10n1: {}
+    ps10w1: {}
+    ps10w2: {}
+    ps10w3: {}
+s11:
+  hosts:
+    ps11db1: {}
+    ps11db1 - Leena - DELETE: {}
+    ps11n1: {}
+    ps11w1: {}
+    ps11w2: {}
+    ps11w3: {}
+s12:
+  hosts:
+    ps12db1: {}
+    ps12n1: {}
+    ps12w1: {}
+    ps12w2: {}
+    ps12w3: {}
+s14:
+  hosts:
+    ps14db1: {}
+    ps14w1: {}
+    ps14w2: {}
+    ps14w3: {}
+sn:
+  hosts:
+    snlogdb1: {}
+    snlogdb1-failedpostupgrade: {}
+    snlogw1: {}
+    snlogw2: {}
+    sns01db1: {}
+    sns01db1-failedpostupgrade: {}
+    sns01w1: {}
+    sns01w2: {}
+    sns02db1: {}
+    sns02db1-failedpostupgrade: {}
+    sns02w1: {}
+    sns02w2: {}
+ss:
+  hosts:
+    AMI_update: {}
+    MHC-Endpoint-Protector: {}
+    Nessus-scanner: {}
+    OpenVPN: {}
+    OpenVPN-14: {}
+    StrongSwan: {}
+    alb-fr-test: {}
+    jenkins: {}
+    sscfr01: {}
+    ssdev02: {}
+    ssftp01: {}
+    ssjet01: {}
+    ssmon01: {}
+    ssops01: {}
+    ssrdb01: {}
+    ssrdb02: {}
+st:
+  hosts:
+    restore-testing-stlogdb1: {}
+    stlogdb1: {}
+    stlogdb1-killsoon: {}
+    stlogdb1-restore: {}
+    stlogw1: {}
+    stlogw1-killsoon: {}
+    stlogw2: {}
+    sts01db1: {}
+    sts01db1-old: {}
+    sts01db1-restore: {}
+    sts01w1: {}
+    sts01w1-old: {}
+    sts01w2: {}
+

@@ -1,0 +1,236 @@
+# This is the default ansible 'hosts' file.
+# all of ps03 configs need ot be validateed
+
+[ps05-db]
+ps05db1-new.mobhealthinternal.com
+
+[ps05-db:vars]
+postgres_password=a1690aef01c815f4
+env=p
+db_server=ps05db1
+postgres_drive=sdp
+mongo_drive=sdm
+shard=s05
+sharded_cluster=True
+
+[ps05-w]
+ps05w1-new.mobhealthinternal.com bg_concurrency=30 bg_maxtaskperchild=10 bglow_concurrency=10 bglow_maxtaskperchild=10 celery_concurrency=8 celery_maxtaskperchild=1 hr_concurrency=11 hr_maxtaskperchild=1 mhc_proccess=15 celery_extras=" -B" nrpe_critical_total_procs=600 nrpe_warning_total_procs=550 nrpe_warning_file_age=6000 nrpe_critical_file_age=12000
+
+[ps05-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=ps05db1
+env=p
+shard=s05
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[ps05:children]
+ps05-db
+ps05-w
+
+####
+[ps03-db]
+ps03db1-new.mobhealthinternal.com
+###
+[ps04-db]
+ps04db1-new.mobhealthinternal.com
+
+[ps04-db:vars]
+postgres_password=a1690aef01c815f4
+env=p
+db_server=ps04db1
+postgres_drive=sdp
+mongo_drive=sdm
+shard=s04
+sharded_cluster=True
+
+[ps04-w]
+ps04w1-new.mobhealthinternal.com bg_concurrency=30 bg_maxtaskperchild=10 bglow_concurrency=10 bglow_maxtaskperchild=10 celery_concurrency=8 celery_maxtaskperchild=1 hr_concurrency=11 hr_maxtaskperchild=1 mhc_proccess=15 celery_extras=" -B" nrpe_critical_total_procs=600 nrpe_warning_total_procs=550 nrpe_warning_file_age=6000 nrpe_critical_file_age=12000
+ps04w2-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+
+[ps04-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=ps04db1
+env=p
+shard=s04
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[ps04:children]
+ps04-db
+ps04-w
+
+####
+[ps03-db]
+ps03db1-new.mobhealthinternal.com
+
+[ps03-db:vars]
+postgres_password=a1690aef01c815f4
+env=p
+db_server=ps03db1
+postgres_drive=sdp
+mongo_drive=sdm
+shard=s03
+sharded_cluster=True
+
+[ps03-w]
+ps03w1-new.mobhealthinternal.com bg_concurrency=30 bg_maxtaskperchild=10 bglow_concurrency=10 bglow_maxtaskperchild=10 celery_concurrency=8 celery_maxtaskperchild=1 hr_concurrency=11 hr_maxtaskperchild=1 mhc_proccess=15 celery_extras=" -B" nrpe_critical_total_procs=600 nrpe_warning_total_procs=550 nrpe_warning_file_age=6000 nrpe_critical_file_age=12000
+ps03w2-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+
+[ps03-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=ps03db1
+env=p
+shard=s03
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[ps03:children]
+ps03-db
+ps03-w
+
+[ps02-db]
+ps02db1-new.mobhealthinternal.com
+
+[ps02-db:vars]
+postgres_password=a1690aef01c815f4
+env=p
+db_server=ps02db1
+postgres_drive=sdp
+mongo_drive=sdm
+shard=s02
+sharded_cluster=True
+
+[ps02-w]
+ps02w1-new.mobhealthinternal.com bg_concurrency=30 bg_maxtaskperchild=10 bglow_concurrency=10 bglow_maxtaskperchild=10 celery_concurrency=8 celery_maxtaskperchild=1 hr_concurrency=11 hr_maxtaskperchild=1 mhc_proccess=15 celery_extras=" -B" nrpe_critical_total_procs=600 nrpe_warning_total_procs=550
+ps02w2-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+
+[ps02-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=ps02db1
+env=p
+shard=s02
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[ps02:children]
+ps02-db
+ps02-w
+
+[ps01-db]
+ps01db1-new.mobhealthinternal.com
+
+[ps01-db:vars]
+postgres_password=a1690aef01c815f4
+env=p
+postgres_drive=sdp
+mongo_drive=sdm
+db_server=ps01db1
+shard=s01
+sharded_cluster=True
+
+[ps01-w]
+ps01w1-new.mobhealthinternal.com bg_concurrency=30 bg_maxtaskperchild=10 bglow_concurrency=10 bglow_maxtaskperchild=10 celery_concurrency=8 celery_maxtaskperchild=1 hr_concurrency=11 hr_maxtaskperchild=1 mhc_proccess=15 celery_extras=" -B" nrpe_critical_total_procs=600 nrpe_warning_total_procs=550 nrpe_warning_file_age=6000 nrpe_critical_file_age=12000
+ps01w2-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+ps01w3-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+ps01w4-new.mobhealthinternal.com bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 mhc_proccess=5 admin_server=false
+
+[ps01-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=ps01db1
+env=p
+shard=s01
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[ps01:children]
+ps01-db
+ps01-w
+
+[plog-db]
+plogdb1-new.mobhealthinternal.com
+
+[plog-db:vars]
+postgres_password=z_qd6M,92,8C\!_WR32Y
+env=p
+shard=log
+postgres_drive=sdp
+mongo_drive=sdm
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+db_server=plogdb1
+sharded_cluster=True
+
+[plog-w]
+plogw1-new.mobhealthinternal.com  mhc_proccess=5 bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1
+plogw2-new.mobhealthinternal.com  mhc_proccess=5 admin_server=false bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1
+plogw3-new.mobhealthinternal.com  mhc_proccess=5 admin_server=false bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1
+plogw4-new.mobhealthinternal.com  mhc_proccess=5 admin_server=false bg_concurrency=2 bg_maxtaskperchild=1 bglow_concurrency=2 bglow_maxtaskperchild=10 celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1
+
+[plog-w:vars]
+postgres_password=a1690aef01c815f4
+db_server=plogdb1
+env=p
+shard=log
+swap_space=2048000000
+sharded_cluster=True
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'lurdirroyRaddOyfterpaisbodcaturAthicjal!'
+
+[plog:children]
+plog-db
+plog-w
+
+
+[db:children]
+ps01-db
+ps02-db
+ps03-db
+ps04-db
+ps05-db
+plog-db
+
+[web:children]
+web_shard
+
+[web:vars]
+mhc_web_drive=sdf
+env=p
+
+[web_shard:children]
+ps01-w
+ps02-w
+ps03-w
+ps04-w
+ps05-w
+
+[db:vars]
+environment_subnet="172.31.192.0/19"
+shared_subnet="172.31.6.29/32"
+
+[prod:children]
+ps01
+ps02
+ps03
+ps04
+ps05
+plog
+
+[prod:vars]
+authentication_sns_topic=arn:aws:sns:us-west-2:913835907225:Production_Auth_Log_Report
+
+[ps-cs]
+ps01cs1.mobhealthinternal.com admin_server=false hr_concurrency=20 hr_maxtaskperchild=1
+ps02cs1.mobhealthinternal.com admin_server=false hr_concurrency=20 hr_maxtaskperchild=1
+
+[ps-cs:vars]
+celery_apps="['celeryhr']"
+env=p
+sharded_cluster=False

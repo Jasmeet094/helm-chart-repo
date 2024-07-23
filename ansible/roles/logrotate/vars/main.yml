@@ -1,0 +1,86 @@
+cwa_agent_ctl: /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+
+cwa_install_path: /opt/aws/amazon-cloudwatch-agent
+cwa_agent_config_file: "{{ cwa_install_path }}/etc/amazon-cloudwatch-agent.json"
+cwa_agent_log_file: "{{ cwa_install_path }}/logs/amazon-cloudwatch-agent.log"
+
+psql_version: "14"
+
+default_cloudwatch_logs:
+  syslog:
+    name: /var/log/syslog
+    timestamp_format: "%b %-d %H:%M:%S"
+  ossec:
+    name: /var/ossec/logs/ossec.log
+    timestamp_format: "%Y/%m/%d %H:%M:%S"
+  ossec_alerts:
+    name: /var/ossec/logs/alerts/alerts.log
+    multi_line_start_pattern: "Alert"
+    timestamp_format: "%Y %b %d %H:%M:%S"
+  ossec_firewall:
+    name: /var/ossec/logs/firewall/firewall.log
+    timestamp_format: "%b %-d %H:%M:%S"
+  auth:
+    name: /var/log/auth.log
+    timestamp_format: "%b %-d %H:%M:%S"
+  apt_history:
+    name: /var/log/apt/history.log
+    multi_line_start_pattern: "Start-Date:"
+    timestamp_format: "%Y-%m-%d  %H:%M:%S"
+  apt_term:
+    name: /var/log/apt/term.log
+    multi_line_start_pattern: "Log started:"
+    timestamp_format: "%Y-%m-%d  %H:%M:%S"
+  clamscan:
+    name: /var/log/clamav/clamscan.log
+    multi_line_start_pattern: "-------------------------------------------------------------------------------"
+    timestamp_format: "%Y:%m:%d %H:%M:%S"
+
+web_cloudwatch_logs:
+  celerybg:
+    name: /home/mhc/logs/celerybg.log
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+  celerybglowbandwidth:
+    name: /home/mhc/logs/celerybglowbandwidth.log
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+  celeryd:
+    name: /home/mhc/logs/celeryd.log
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+  celeryhr:
+    name: /home/mhc/logs/celeryhr.log
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+  uwsgi:
+    name: /home/mhc/logs/mhc_uwsgi.log
+    timestamp_format: "%a %b %d %H:%M:%S %Y"
+  nginx_access:
+    name: /var/log/nginx/access.log
+    timestamp_format: "%d/%b/%Y:%H:%M:%S %z"
+  nginx_error:
+    name: /var/log/nginx/error.log
+    timestamp_format: "%Y/%m/%d %H:%M:%S"
+
+admin_cloudwatch_logs:
+  bucardo_sync:
+    name: /home/mhc/logs/bucardo_sync.log
+    multi_line_start_pattern: "UPDATE"
+    timestamp_format: "%a %b %d %H:%M:%S %Z %Y"
+  bucardo:
+    name: /var/log/bucardo/log.bucardo
+    timestamp_format: "%a %b %d %H:%M:%S %Y"
+  crontab:
+    name: /var/log/bucardo/crontab.log
+    multi_line_start_pattern: "Starting Bucardo"
+    timestamp_format: "%a %b %d %H:%M:%S %Z %Y"
+
+db_cloudwatch_logs:
+  postgresql:
+    name: /var/log/postgresql/postgresql-{{ psql_version }}-main.log
+    timestamp_format: "%Y-%m-%d %H:%M:%S %Z"
+  mongodb:
+    name: /var/log/mongodb/mongodb.log
+    timestamp_format: "%Y-%m-%dT%H:%M:%S"
+
+sftp_cloudwatch_logs:
+  sftp:
+    name: /var/log/sftp.log
+    timestamp_format: "%b %d %H:%M:%S"

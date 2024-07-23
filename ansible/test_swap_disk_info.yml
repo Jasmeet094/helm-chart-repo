@@ -1,0 +1,21 @@
+- hosts: all 
+  vars:
+#    small_swap: 1
+#    med_swap:   2
+#    large_swap: 8
+    disk_space: "{{ ansible_devices.nvme0n1.partitions.nvme0n1p1.size.split('.')[0] |int }}"
+    swap_space: "{% if disk_space >= 50 %}8{% elif disk_space >= 20 %}2{%else %}1{% endif %}"
+    #swap_space: "{% if disk_space >= 50 %}{{ large_swap }}{% elif disk_space >= 20 %}{{ med_swap }}{%else %}{{small_swap}}{% endif %}"
+
+  pre_tasks:
+    - debug:
+        msg: Disk size from host facts is {{ ansible_devices.nvme0n1.partitions.nvme0n1p1.size }}
+
+    - debug: 
+        msg: disk space size is {{ disk_space }} type={{ disk_space | type_debug}}
+   
+    - debug:
+        msg: Swap size conditionally is {{ swap_space }} type={{ swap_space | type_debug}}
+
+#  roles:
+#    - swap

@@ -1,0 +1,4 @@
+---
+# this same var is defined in group_vars and it works by installing specified version then apt upgrade installs the latest
+ossec_version: 3.6.0
+pcre2_version: 10.37

@@ -1,0 +1,20 @@
+---
+
+  - name: check current timezone
+    shell: cat /etc/timezone
+    register: current_zone
+    tags:
+       - timezone
+
+  - debug:
+      msg: current_zone.stdout
+    tags:
+       - timezone
+
+  - name: Set timezone variables
+    file: src=/usr/share/zoneinfo/{{ timezone }} dest=/etc/localtime state=link owner=root group=root mode=0644 force=yes
+    when: current_zone.stdout != timezone
+    notify:
+         - update timezone
+    tags:
+       - timezone

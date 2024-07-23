@@ -1,0 +1,5 @@
+---
+  db_name: djangostack
+  db_user: bitnami
+  mongo_drive: sdm
+  postgres_drive: sdp

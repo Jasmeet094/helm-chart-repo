@@ -1,0 +1,15 @@
+- name: Update psql column data type
+  hosts: all
+  become: true
+  tasks:
+    - name: Alter table column
+      ansible.builtin.command: psql -d djangostack -c "{{ item }}"
+      become: true
+      become_user: postgres
+      with_items:
+        - "ALTER TABLE partners_abstractsecurityconfig ALTER COLUMN id SET DATA TYPE bigint"
+      vars:
+        ansible_ssh_pipelining: true
+      when: "tags.Role in ['Database']"
+  roles:
+    - {role: post_jenkins, when: "tags.Role in ['Admin', 'Web']"}

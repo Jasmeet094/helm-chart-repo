@@ -1,0 +1,16 @@
+[mhcnp-test-servers]
+test-ubuntu18.mhcnp.com 
+
+[mhcnp-test-servers:vars]
+postfix_enable=True
+luks_disable=True
+server=test-ubuntu18.mhcnp.com
+
+[mhcnp-test-mgmt-servers]
+test-mgmt-ubuntu18.mhcnp.com 
+
+[mhcnp-test-mgmt-servers:vars]
+postfix_enable=True
+luks_disable=True
+server=test-mgmt-ubuntu18.mhcnp.com
+ansible_python_interpreter=/usr/bin/python3

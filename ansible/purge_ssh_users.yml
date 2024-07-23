@@ -1,0 +1,27 @@
+---
+# Pass a var called keyfile which contains all of the public keys you wish to
+# purge from the hosts. The playbook will loop through all keys in the file and
+# remove them from the ubuntu user. If running from a container, make sure the
+# key file is accessible from within the container and give the container's path
+# to the keyfile.
+
+- name: Remove ssh keys
+  hosts: all
+  become: yes
+  tasks:
+    - name: Remove authorized keys to ubuntu user
+      authorized_key:
+        user: ubuntu
+        key: "{{item}}"
+        state: absent
+      loop: "{{ lookup('file', keyfile).splitlines() }}"
+    - name: Remove authorized keys to mhc user
+      authorized_key:
+        user: mhc
+        key: "{{item}}"
+        state: absent
+      loop: "{{ lookup('file', keyfile).splitlines() }}"
+      ignore_errors: yes
+
+
+

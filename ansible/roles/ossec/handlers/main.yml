@@ -1,0 +1,5 @@
+---
+- name: restart ossec
+  command: /var/ossec/bin/ossec-control restart
+  become: true
+  when: is_vagrant

@@ -1,0 +1,212 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    # - name: 'Backup EC2 Instance'
+    #   include_role:
+    #     name: aws_backup
+
+    # Upgrade Mongo 4.0
+    - name: 'Stop Mongo 3.6 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'stopped'
+
+    - name: 'Remove old Mongo 3.6 packages'
+      shell: 'apt-get purge mongodb-org* -y'
+      become: true
+
+    - name: 'Add Mongo 4.0 apt key'
+      ansible.builtin.apt_key:
+        url: 'https://www.mongodb.org/static/pgp/server-4.0.asc'
+        state: 'present'
+
+    - name: 'Add Mongo 4.0 apt repo'
+      ansible.builtin.apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse'
+        filename: 'mongodb-org-4.0'
+        state: 'present'
+
+    - name: 'Apt-get update'
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: 'Install Mongo 4.0'
+      ansible.builtin.apt:
+        name: 'mongodb-org'
+      become: true
+
+    - name: 'Restart Mongo 4.0 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'restarted'
+        enabled: 'yes'
+
+    - name: 'Set compatability setting to 4.0'
+      shell: 'mongo --eval "db.adminCommand( { setFeatureCompatibilityVersion: \"4.0\" } )"'
+      become: true
+
+    # Upgrade Mongo 4.2
+    - name: 'Stop Mongo 4.0 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'stopped'
+
+    - name: 'Remove old Mongo 4.0 packages'
+      shell: 'apt-get purge mongodb-org* -y'
+      become: true
+
+    - name: 'Add Mongo 4.2 apt key'
+      ansible.builtin.apt_key:
+        url: 'https://www.mongodb.org/static/pgp/server-4.2.asc'
+        state: 'present'
+
+    - name: 'Add Mongo 4.2 apt repo'
+      ansible.builtin.apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse'
+        filename: 'mongodb-org-4.2'
+        state: 'present'
+
+    - name: 'Apt-get update'
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: 'Install Mongo 4.2'
+      ansible.builtin.apt:
+        name: 'mongodb-org'
+      become: true
+
+    - name: 'Restart Mongo 4.2 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'restarted'
+        enabled: 'yes'
+
+    - name: 'Set compatability setting to 4.2'
+      shell: 'mongo --eval "db.adminCommand( { setFeatureCompatibilityVersion: \"4.2\" } )"'
+      become: true
+
+    # Upgrade Mongo 4.4
+    - name: 'Stop Mongo 4.2 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'stopped'
+
+    - name: 'Remove old Mongo 4.2 packages'
+      shell: 'apt-get purge mongodb-org* -y'
+      become: true
+
+    - name: 'Add Mongo 4.4 apt key'
+      ansible.builtin.apt_key:
+        url: 'https://www.mongodb.org/static/pgp/server-4.4.asc'
+        state: 'present'
+
+    - name: 'Add Mongo 4.4 apt repo'
+      ansible.builtin.apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse'
+        filename: 'mongodb-org-4.4'
+        state: 'present'
+
+    - name: 'Apt-get update'
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: 'Install Mongo 4.4'
+      ansible.builtin.apt:
+        name: 'mongodb-org'
+      become: true
+
+    - name: 'Restart Mongo 4.4 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'restarted'
+        enabled: 'yes'
+
+    - name: 'Set compatability setting to 4.4'
+      shell: 'mongo --eval "db.adminCommand( { setFeatureCompatibilityVersion: \"4.4\" } )"'
+      become: true
+
+    # Upgrade Mongo 5.0
+    - name: 'Stop Mongo 4.4 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'stopped'
+
+    - name: 'Remove old Mongo 4.4 packages'
+      shell: 'apt-get purge mongodb-org* -y'
+      become: true
+
+    - name: 'Add Mongo 5.0 apt key'
+      ansible.builtin.apt_key:
+        url: 'https://www.mongodb.org/static/pgp/server-5.0.asc'
+        state: 'present'
+
+    - name: 'Add Mongo 5.0 apt repo'
+      ansible.builtin.apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/5.0 multiverse'
+        filename: 'mongodb-org-5.0'
+        state: 'present'
+
+    - name: 'Apt-get update'
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: 'Install Mongo 5.0'
+      ansible.builtin.apt:
+        name: 'mongodb-org'
+      become: true
+
+    - name: 'Restart Mongo 5.0 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'restarted'
+        enabled: 'yes'
+
+    - name: 'Pause for 5 seconds to restart service'
+      ansible.builtin.pause:
+        seconds: 5
+
+    - name: 'Set compatability setting to 5.0'
+      shell: 'mongo --eval "db.adminCommand( { setFeatureCompatibilityVersion: \"5.0\" } )"'
+      become: true
+
+    # Upgrade Mongo 6.0
+    - name: 'Stop Mongo 5.0 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'stopped'
+
+    - name: 'Remove old Mongo 5.0 packages'
+      shell: 'apt-get purge mongodb-org* -y'
+      become: true
+
+    - name: 'Add Mongo 6.0 apt key'
+      ansible.builtin.apt_key:
+        url: 'https://www.mongodb.org/static/pgp/server-6.0.asc'
+        state: 'present'
+
+    - name: 'Add Mongo 6.0 apt repo'
+      ansible.builtin.apt_repository:
+        repo: 'deb https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/6.0 multiverse'
+        filename: 'mongodb-org-6.0'
+        state: 'present'
+
+    - name: 'Apt-get update'
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: 'Install Mongo 6.0'
+      ansible.builtin.apt:
+        name: 'mongodb-org'
+      become: true
+
+    - name: 'Restart Mongo 6.0 service'
+      ansible.builtin.service:
+        name: 'mongod'
+        state: 'restarted'
+        enabled: 'yes'
+
+    - name: 'Set compatability setting to 6.0'
+      shell: 'mongosh --eval "db.adminCommand( { setFeatureCompatibilityVersion: \"6.0\" } )"'
+      become: true

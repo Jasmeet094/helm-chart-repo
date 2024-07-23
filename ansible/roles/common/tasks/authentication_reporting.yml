@@ -1,0 +1,50 @@
+---
+
+ - name: Creates root bin dir
+   file:
+        path: /root/bin
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+   become: yes
+   tags: authentication
+
+ - stat: path=/var/log/remote-connection.log
+   register: log
+   tags: authentication
+
+ - name: Creates log file
+   file:
+        path: /var/log/remote-connection.log
+        state: touch
+        owner: root
+        group: root
+        mode: 0755
+   become: yes
+   when: log.stat.exists == False
+   tags: authentication
+
+ - name: put authentication reporting scripts
+   template:
+     remote_src: False
+     owner: root
+     group: root
+     mode: 0755
+     dest: /root/bin/{{ item }}
+     src: authentication/{{ item }}
+   become: True
+   with_items:
+     - remote-connection-log.py
+     - remote-connection-log.sh
+   tags: authentication
+
+ - name: Install authentication reporting to cron
+   cron:
+     name: authentication_report
+     user: root
+     hour: "6"
+     minute: "20"
+     job: /root/bin/remote-connection-log.sh >> /var/log/remote-connection.log
+   tags: authentication
+   become: True

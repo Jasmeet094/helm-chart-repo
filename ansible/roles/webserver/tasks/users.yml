@@ -1,0 +1,174 @@
+---
+- name: create mhc user
+  user:
+    name: mhc
+    shell: /bin/bash
+    append: yes
+    comment: mhc_service_account
+  become: True
+
+- name: append keys to authoried_keys for mhc user
+  authorized_key:
+      user: mhc
+      key: "{{ operations_management_publickey }}"
+      state: present
+      exclusive: no
+  tags: 
+    - mhcssh
+
+- name: Fix permissions on mhc home directory
+  # https://github.com/ansible/ansible/issues/24862
+  file:
+    path: /home/mhc/
+    state: directory
+    mode: 0755
+    owner: mhc
+    group: mhc
+  become: True
+
+- name: Install acl package so that becoming a non-privileged user works
+  # https://github.com/ansible/ansible/issues/16048#issuecomment-296342956
+  # https://github.com/ansible/ansible/issues/16691
+  apt:
+    name: acl
+  become: True
+
+- name: Check for existing virtualenv
+  stat:
+    path: /home/mhc/mhc-venv3
+  register: venv_exists
+
+- name: Create virtualenv for mhc
+  command: virtualenv -p /usr/bin/python3.6 /home/mhc/mhc-venv3
+  become_user: mhc
+  # https://github.com/ansible/ansible/issues/16048#issuecomment-229012509
+  vars:
+    ansible_ssh_pipelining: true
+  become: True
+  when: venv_exists.stat.islnk is not defined
+
+- name: check if mhc-venv exists
+  stat:
+    path: /home/mhc/mhc-venv
+  register: mhc_venv_path
+
+- name: create link from new virtual env to old
+  shell:
+    cmd: ln -s mhc-venv3 mhc-venv
+    chdir: /home/mhc
+  become_user: mhc
+  become: True
+  when: mhc_venv_path.stat.exists == False
+
+- name: Activate virtualenv in mhc user's bashrc
+  lineinfile:
+    insertafter: EOF
+    path: /home/mhc/.bashrc
+    line: source /home/mhc/mhc-venv/bin/activate
+    create: yes
+  when: mhc_venv_path.stat.exists == False
+  become_user: mhc
+  become: True
+
+- name: pip install setuptools into mhc virtualenv
+  pip:
+    name: setuptools==57.5.0
+    virtualenv: /home/mhc/mhc-venv
+    virtualenv_python: python3.6
+    state: latest
+
+- name: pip install wheel into mhc virtualenv
+  pip:
+    name: wheel
+    virtualenv: /home/mhc/mhc-venv3
+  when: mhc_venv_path.stat.exists == False
+
+- name: install development packages so pip can install required modules
+  apt:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - libssl-dev
+    - libncurses5-dev
+    - libncursesw5-dev
+  become: True
+  when: mhc_venv_path.stat.exists == False
+
+- name: copy requirements.txt for python modules for ubuntu18
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /tmp/pip_requirements.txt
+    src: pip_requirements_test_1804.txt
+  become: True
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == '18' and mhc_venv_path.stat.exists == False
+
+- name: install python modules via pip requirements
+  pip:
+    requirements: /tmp/pip_requirements.txt
+    virtualenv: /home/mhc/mhc-venv
+  become_user: mhc
+  become: True
+  when: mhc_venv_path.stat.exists == False
+
+#add apns.py file copy to update to working version that wont cause jenkins build to fail
+#see: https://github.com/djacobs/PyAPNs/commit/fce9e33c62a0cef8eebcd8b1a293d66be0b45480
+- name: copy correct apns.py version for python3
+  copy:
+    src: ../files/apns.py
+    dest: /home/mhc/mhc-venv3/lib/python3.6/site-packages
+    owner: mhc
+    group: mhc
+    mode: '0644'
+  when: mhc_venv_path.stat.exists == False
+
+- name: Creates bin dir
+  file:
+    path: /home/mhc/bin
+    state: directory
+    mode: 0755
+    owner: mhc
+    group: mhc
+  become: True
+
+- name: Creates logs dir
+  file:
+    path: /home/mhc/logs
+    state: directory
+    mode: 0755
+    owner: mhc
+    group: mhc
+  become: True
+
+- name: Creates run dir
+  file:
+    path: /home/mhc/run
+    state: directory
+    mode: 0755
+    owner: mhc
+    group: mhc
+  become: True
+
+- name: Install a pgpass file
+  template:
+    src: pgpass.j2
+    dest: /home/mhc/.pgpass
+    mode: 0600
+    owner: mhc
+    group: mhc
+  become: True
+
+# - name: install uwsgi-mhc.ini file
+#   template:
+#     src: uwsgi-mhc.j2
+#     dest: /home/mhc/uwsgi-mhc.ini
+#     mode: 0644
+#     owner: mhc
+#     group: mhc
+#   become: True
+#   tags: 
+#     - uwsgi
+#   notify:
+#     - restart mhc

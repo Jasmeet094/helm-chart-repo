@@ -1,0 +1,21 @@
+---
+  mhc_proccess: 2
+  admin_server: true
+  mhc_web_drive: sdf
+  saml_keyfile: prodkey-new.pem
+  saml_certfile: prodcert-new.pem
+  nrpe_critical_usgi_procs: 2560
+  nrpe_warning_usgi_procs: 1920
+  nrpe_critical_file_age: 1200
+  nrpe_warning_file_age: 600
+  plog_processes: 2
+  prod_processes: 2
+  postgres_password: "c487cf499b"
+  login_server_secret: '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+  secret_key: 'WharpeushyelEfUnJaikpoogloocdicHyavmekgi^'
+  sharded_cluster: True
+  psql_version: "14"
+  postgres_apt_key: "https://www.postgresql.org/media/keys/ACCC4CF8.asc"
+  postgres_apt_repo: "http://apt.postgresql.org/pub/repos/apt/"
+  burcaro_user_id: '999999999999999'
+  mhc_cert: "mhc-cert-2022-2023.pem"

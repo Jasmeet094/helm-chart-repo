@@ -1,0 +1,59 @@
+
+- name: restart server
+  shell: sleep 2 && /sbin/shutdown -r now "System reboot"
+  async: 1
+  poll: 0
+
+- name: Wait for machine to come back
+  wait_for_connection:
+    delay: 30
+    timeout: 600
+
+- name: Identify services for given server
+  set_fact:
+    these_services: "{% if 'w' in server %}{{services['w']}}{% elif 'db' in server %}{{services['db']}}{% endif %}"
+
+- name: mount crypted volumes
+  include_role:
+    name: luks
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version <= '16'
+
+- name: Mount luks mapped volumes
+  mount:
+    path: "/{{mount_path}}"
+    src: "/dev/mapper/crypt_{{device_name}}"
+    fstype: ext4
+    state: mounted
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version <= '16'
+
+- name: Remove fstab entry since Ansible doesn't support not adding it in the first place
+   # https://github.com/ansible/ansible-modules-core/issues/2571
+  lineinfile:
+    state: absent
+    regexp: "^/dev/mapper/crypt_{{device_name}}.*$"
+    path: /etc/fstab
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version <= '16'
+
+- name: Create bucardo run directory
+  file:
+    path: /var/run/bucardo
+    owner: bucardo
+    group: bucardo
+    state: directory
+  when: 'sharded_cluster == True and ("db" in server or server == "w1")'
+
+- name: start postgresql
+  service: name=postgresql state=started
+  when: '"db" in server'
+  
+- name: Start bucardo on DB instances
+  command: bucardo start
+  become: True
+  become_user: bucardo
+  vars: 
+    ansible_ssh_pipelining: true
+  when: 'sharded_cluster == True and ("db" in server or server == "w1")'
+
+- name: starting services
+  service: name={{ item }} state=started
+  with_items: "{{these_services}}"

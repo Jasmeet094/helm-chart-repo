@@ -1,0 +1,19 @@
+"/var/log/bucardo/log.bucardo" /var/log/bucardo/*.log {
+        daily
+        missingok
+        rotate 366
+        compress
+        delaycompress
+        notifempty
+        create 664 bucardo bucardo
+        sharedscripts
+	prerotate
+		echo `date` >> /var/log/bucardo/crontab.log 2>&1
+		su -c "bucardo stop" bucardo >> /var/log/bucardo/crontab.log 2>&1
+		sleep 5 # this sleep is done because bucardo takes a few seconds to shutdown properly
+	endscript
+        postrotate
+		echo `date` >> /var/log/bucardo/crontab.log 2>&1
+		su -c "bucardo start" bucardo >> /var/log/bucardo/crontab.log 2>&1
+        endscript
+}

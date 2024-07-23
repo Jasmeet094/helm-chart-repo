@@ -1,0 +1,19 @@
+# {{ ansible_managed }}
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery.py --queues celery highresource background bglowbandwidth
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery.py --queues celery highresource background bglowbandwidth
+
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_encryption.sh /dev/xvdb
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_encryption.sh /dev/xvdc
+
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_bucardo.py --warning 2700 --critical 3600 --sync_name login_sync
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_bucardo.py --warning 2700 --critical 3600 --sync_name client_sync
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_bucardo.py --warning 2700 --critical 3600 --sync_name shard_sync
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_bucardo.py --warning 129600 --critical 216000 --sync_name hrs_sync
+
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery_queue.py --queue celeryd --warning 10000 --critical 10000
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery_queue.py --queue highresource --warning 10000 --critical 10000
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery_queue.py --queue background --warning 10000 --critical 10000
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_celery_queue.py --queue bglowbandwidth --warning 10000 --critical 10000
+
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_encryption.sh /dev/{{ mhc_web_drive }}
+nagios ALL=(ALL)NOPASSWD:/usr/sbin/rabbitmqctl list_queues

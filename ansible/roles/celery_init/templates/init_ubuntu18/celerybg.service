@@ -1,0 +1,17 @@
+# Location: /etc/systemd/system/celerybg.service
+# systemctl enable celerybg
+# systemctl start celerybg
+# systemctl | grep celerybg
+# https://www.freedesktop.org/software/systemd/man/systemd.unit.html
+
+[Unit]
+Description=MHC Celerybg
+After=mhc.service
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=/etc/systemd/system/celerybg_startup
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

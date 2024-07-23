@@ -1,0 +1,22 @@
+---
+- name: Check for existing OSSEC install
+  stat:
+    path: /var/ossec
+  register: ossec_path
+  tags: ossec
+
+
+- name: install required packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  tags: ossec
+  with_items: 
+  - libpcre2-dev
+  - libevent-dev
+  - zlib1g-dev
+  - libssl-dev 
+
+- include: ossec_install.yml
+  become: true
+  tags: ossec

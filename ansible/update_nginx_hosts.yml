@@ -1,0 +1,5 @@
+- hosts: all
+  become: yes
+  roles:
+    - role: nginx
+      when: '"db" not in inventory_hostname_short'

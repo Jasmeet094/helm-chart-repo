@@ -1,0 +1,42 @@
+- hosts: all 
+  become: yes
+
+  tasks:
+  - name: Update postfix settings
+    replace:
+      path: /etc/postfix/sasl_passwd
+      regexp: '(^email-smtp.us-east-1.amazonaws.com:587\s)(.*)$'
+      replace: '\1{{email_aws_user}}:{{email_aws_password}}'
+      backup: yes
+  
+  - name:
+    shell: postmap /etc/postfix/sasl_passwd
+
+  - name: ensure postfix is running
+    service: name=postfix state=restarted enabled=yes 
+
+- hosts: ssdev02:sscfr01
+  become: yes
+
+  tasks:
+  - name: Update redmine config stmp username
+    replace:
+      path: /opt/redmine-4.0.5/config/configuration.yml
+      after: '\s+authentication: :login'
+      before: '\s+# ==== Simple SMTP'
+      regexp: '(\s+user_name: ")(.*)$'
+      replace: '\1{{email_aws_user}}"'
+      backup: yes
+  
+  - name: Update redmine config smtp password
+    replace:
+      path: /opt/redmine-4.0.5/config/configuration.yml
+      after: 'user_name: "{{email_aws_user}}"'
+      before: '\s+# ==== Simple SMTP'
+      regexp: '(\s+password: ")(.*)$'
+      replace: '\1{{email_aws_password}}"'
+      backup: yes
+  
+  - name: restart apache2 to reloaded redmine
+    service: name=apache2 state=reloaded enabled=yes 
+

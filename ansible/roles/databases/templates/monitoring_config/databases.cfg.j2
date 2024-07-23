@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+command[check_postgres_connection]=export PGCLUSTER={{ psql_version }}/main && /usr/bin/check_postgres_connection -H localhost -u bitnami -p 6432 -t 60 -db djangostack
+command[check_postgres_query_time]=export PGCLUSTER={{ psql_version }}/main && /usr/bin/check_postgres_query_time -H localhost -u bitnami -p 6432 -w "45 minutes" -c "60 minutes" -t 60 -db djangostack
+command[check_postgres_dbstats]=export PGCLUSTER={{ psql_version }}/main && /usr/bin/check_postgres_dbstats -H localhost -u bitnami -p 6432 -t 60 -db djangostack
+command[check_postgres_bloat]=export PGCLUSTER={{ psql_version }}/main && /usr/bin/check_postgres_bloat -H localhost -u bitnami -p 6432 -w "70%" -c "99%" -db djangostack
+command[check_mhc_user_count]=/usr/lib/nagios/plugins/check_mhc_user_count.sh -c 100000000 -w 90000000
+command[check_postgres_connection_count]=/usr/lib/nagios/plugins/check_postgres_db_connections.sh -c 900 -w 500
+command[check_encrpytion_mongo]=/usr/bin/sudo /usr/lib/nagios/plugins/check_encryption.sh /dev/{{ mongo_drive }}
+command[check_encrpytion_postgres]=/usr/bin/sudo /usr/lib/nagios/plugins/check_encryption.sh /dev/{{ postgres_drive }}

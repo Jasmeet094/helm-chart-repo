@@ -1,0 +1,14 @@
+---
+ - name: put sudoers.d file
+   copy:
+     remote_src: False
+     owner: root
+     group: root
+     mode: 0640
+     dest: /etc/sudoers.d/{{ item }}
+     src: sudoers.d/{{ item }}
+   become: True
+   with_items:
+     - 50-mhc
+   tags:
+     - mhc_application

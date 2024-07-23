@@ -1,0 +1,37 @@
+---
+
+#env_og: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\1') }}"
+#shard_og: "{{ inventory_hostname_short |regex_replace('(^.*)(s[0-9]{2}|log).*$', '\\2') }}"
+shard: "{% if tags.Environment == 'p'%}www{% else %}{{tags.Shard}}{% endif %}"
+env: "{% if tags.Environment == 'p'%}www{% else %}{{tags.Environment}}{% endif %}"
+envshard: "{{env}}{{shard}}"
+subdomain: "{% if tags.Environment == 'p'%}www{% else %}{{tags.Environment}}{% endif %}"
+
+#"{% if 'ps' in inventory_hostname_short %}30{% elif 'plog' in inventory_hostname_short %}15{% else %}2{% endif %}"_
+alightwell_shards: ['ps07', "ops01"]
+epoint_shards: ['ps05', "ops01"]
+nonsharded_envs: ['pc','pt','bscqa','bscqb']
+mhcint_shards: ['qas04']
+
+prod_login_custom_servers:
+  alightwell.com:
+    login_url_path: "/web/pages/AlightWellSponsorSelector.html"
+    register_url_path: "/web/pages/AlightWellSponsorSelector.html"
+    partners_test_url: "https://ps07w1.mobilehealthconsumer.com"
+    partners_click_url: "https://ps07.alightwell.com"
+    ssl_cert_path: "/etc/ssl/wildcard.alightwell.com.crt"
+    ssl_key_path: "/etc/ssl/wildcard.alightwell.com.key"
+    root_rewrite_path: "/web/pages/AlightWellSponsorSelector.html"
+    #site_path only used on engagementpoint.com
+    site_path: ''
+  engagementpoint.com:
+    login_url_path: "/web/pages/epointLogin.html"
+    register_url_path: "/web/register/epointRegister.html"
+    partners_test_url: "https://ps05w1.mobilehealthconsumer.com"
+    partners_click_url: "https://ps05.engagementpoint.com"
+    ssl_cert_path: "/etc/ssl/wildcardcert.crt"
+    ssl_key_path: "/etc/ssl/wildcardcert.key"
+    site_path: "/home/mhc/mhc-backend/publicsite-ep.com/"
+    #root_rewrite_path only used on alightwell.com
+    root_rewrite_path: ''
+    

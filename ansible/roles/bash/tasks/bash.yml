@@ -1,0 +1,12 @@
+---
+  - name: Put bashrc
+    template:
+      remote_src: False
+      owner: root
+      group: root
+      mode: 0644
+      dest: /etc/bash.bashrc
+      src: bash.bashrc
+    become: True
+    tags:
+      - bashrc

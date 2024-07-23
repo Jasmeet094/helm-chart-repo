@@ -1,0 +1,7 @@
+---
+# - import_tasks: restart_os_and_services.yml
+#   become: yes
+#   when: no_reboot == "False"
+
+
+- import_tasks: patching.yml

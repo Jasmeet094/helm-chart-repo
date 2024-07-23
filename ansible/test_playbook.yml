@@ -1,0 +1,10 @@
+---
+- name: Print Server Metadata
+  hosts: all
+  tasks:
+    - name: Gather Server Facts
+      setup:
+
+    - name: Display Server Metadata
+      debug:
+        var: ansible_facts

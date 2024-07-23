@@ -1,0 +1,72 @@
+---
+- name: Put Mongo Config in place
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+     - mongod.conf
+  tags:
+     - mongodb
+
+- name: Stop Mongodb service
+  service: name=mongod state=stopped
+  become: True
+
+- include: mount_mongo.yml
+  become: True
+
+- include: move_mongo.yml
+  become: True
+
+- name: create the mongod service link
+  file:
+    src: /lib/systemd/system/mongod.service
+    dest: /etc/systemd/system/mongodb.service
+    owner: root
+    group: root
+    state: link
+
+- name: Start Mongodb service
+  service: name=mongod state=started enabled=yes
+  become: True
+
+- name: sleep for 20 seconds to give mongo db time to accept connections
+  pause:
+   seconds: 20
+
+- name: Copy the indices script
+  copy:
+    dest: /tmp/mongo_indices.js
+    src: mongo_indices.js
+
+- name: Run the indices script
+  shell: mongo < /tmp/mongo_indices.js
+  ignore_errors: True
+
+- name: install pip into base OS
+  pip:
+    name: "{{ item }}"
+  become: True
+  with_items:
+    - pymongo
+
+- name: m_event user
+  community.mongodb.mongodb_index:
+    indexes:
+      - database: mhc
+        collection: m_event
+        state: present
+        options:
+          name: user_1
+        keys:
+          name: 1
+
+- name: Remove indices script
+  file:
+    path: /tmp/mongo_indices.js
+    state: absent

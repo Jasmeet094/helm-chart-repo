@@ -1,0 +1,3 @@
+# {{ ansible_managed }}
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_encryption.sh /dev/{{ postgres_drive }}
+nagios ALL=(ALL)NOPASSWD:/usr/lib/nagios/plugins/check_encryption.sh /dev/{{ mongo_drive }}

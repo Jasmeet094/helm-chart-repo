@@ -1,0 +1,21 @@
+---
+ - name: put rabbitmq-server /etc/init.d file
+   copy:
+     remote_src: False
+     owner: root
+     group: root
+     mode: 0755
+     dest: /etc/init.d/rabbitmq-server
+     src: files/rabbitmq-server
+   tags: 
+     - nessus-rabbitmq
+   become: True
+
+ - name: Restart Rabbitmq service
+   service: 
+     name: rabbitmq-server 
+     state: restarted
+   tags: 
+     - rabbitmq
+     - nessus-rabbitmq
+   become: yes

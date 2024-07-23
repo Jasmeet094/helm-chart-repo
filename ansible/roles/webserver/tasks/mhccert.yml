@@ -1,0 +1,48 @@
+---
+  - name: mkdir for samldir
+    file:
+      path: "/home/mhc/crypt/samldir/"
+      state: directory
+      owner: mhc
+      group: mhc
+      mode: '0775'
+    tags:
+      - mhccert
+
+  - name: Retrieve mhc_certs assets from S3
+    aws_s3:
+      bucket: "{{s3_bucket}}"
+      object: "secrets/mhc-certs/{{mhc_cert}}"
+      dest: "/home/mhc/crypt/samldir/samlcert.pem"
+      mode: get
+    tags:
+      - mhccert
+
+  - name: Setting prems 
+    file:
+      path: "/home/mhc/crypt/samldir/samlcert.pem"
+      owner: mhc
+      group: mhc
+      mode: '0775'
+    tags:
+      - mhccert
+    notify: restart mhc
+
+  - name: Retrieve mhc_certs assets from S3
+    aws_s3:
+      bucket: "{{s3_bucket}}"
+      object: "secrets/mhc-certs/{{mhc_cert}}"
+      dest: "/home/mhc/crypt/samlcert.pem"
+      mode: get
+    tags:
+      - mhccert
+
+  - name: Setting prems 
+    file:
+      path: "/home/mhc/crypt/samlcert.pem"
+      owner: mhc
+      group: mhc
+      mode: '0775'
+    tags:
+      - mhccert
+    notify: restart mhc

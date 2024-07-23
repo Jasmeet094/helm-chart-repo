@@ -1,0 +1,18 @@
+---
+- include: pip.yml
+- include: users.yml
+- include: application.yml
+- include: mhccert.yml
+- include: apn.yml
+- include: monitoring.yml
+- include: logrotate.yml
+- include: init.yml
+- include: db_clients.yml
+- include: rabbitmq.yml
+- include: sudoers.yml
+- include: fonts-roboto.yml
+- include: sendmail.yml
+- include: clamav.yml
+- include: cron_admin.yml
+- include: portforwarding.yml
+- include: update_server_max_settings.yml

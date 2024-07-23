@@ -1,0 +1,12 @@
+- hosts: all
+  become: yes
+  vars:
+    psql_version: "14"
+
+  tasks:
+    - name: Replace max connection line in config file
+      lineinfile:
+        path: /etc/postgresql/{{ psql_version }}/main/postgresql.conf
+        search_string: "max_connections"
+        line: "max_connections = {% if tags.Environment == 'p' %}'1000'{% else %}'250'{% endif %}               # (change requires restart)"
+      when: "tags.Role in ['Database']"

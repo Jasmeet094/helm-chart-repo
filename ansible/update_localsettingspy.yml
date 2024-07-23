@@ -1,0 +1,36 @@
+- hosts: all
+  become: yes
+
+  vars:
+    client_id: "{{ anthem_client_id }}"
+    client_secret: "{{ anthem_client_secret }}"
+    api_key: "{{ anthem_api_key }}"
+
+  tasks:
+    - name: Add line to end of localsettings.py file
+      blockinfile:
+        path: /home/mhc/mhc-backend/localsettings.py
+        backup: yes
+        block: |
+          MHC_ANTHEM_IDCARDS_CONFIGURATION = { # used for ID card API
+            'host': 'api.anthem.com',
+            'accessURI': '/v1/oauth/accesstoken',
+            'idcardsURI': '/v1/members/idcards/images',
+            'clientID': '{{ anthem_client_id }}', 
+            'clientSecret': '{{ anthem_client_secret }}',
+            'apikey': '{{ anthem_api_key }}',
+            'verify': True
+          }
+          MAPPING_OF_CELERY_TASK_KEYS_TO_QUEUES_OVERRIDES = {
+            'process_rule_items_for_user_async': 'highresource',
+            'user_custom_field_deferred_calculation_processor': 'celery'
+          }
+      when: tags.Role in ['Admin', 'Web', 'Nightly']
+
+# unsure if we're going to restart every service here
+    - name: ensure mhc is restart
+      service: 
+        name: mhc 
+        state: restarted 
+        enabled: yes 
+      when: tags.Role in ['Admin', 'Web', 'Nightly']

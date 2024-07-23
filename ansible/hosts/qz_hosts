@@ -1,0 +1,115 @@
+# This is the default ansible 'hosts' file.
+
+[qzs01-db]
+qzs01db1pvt.mobilehealthconsumer.com
+
+[qzs01-db:vars]
+postgres_password=c487cf499b
+postgres_drive=sdp
+mongo_drive=sdm
+env=qz
+shard=s01
+sharded_cluster=True
+
+[qzs01-w]
+qzs01w1pvt.mobilehealthconsumer.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=214751 mhc_web_drive=sdf env=qz shard=s01
+
+[qzs01-w:vars]
+postgres_password=c487cf499b
+db_server=qzs01db1
+env=qz
+shard=s01
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'WharpeushyelEfUnJaikpoogloocdicHyavmekgi^'
+sharded_cluster=True
+
+[qzs01:children]
+qzs01-db
+qzs01-w
+
+[qzs02-db]
+qzs02db1pvt.mobilehealthconsumer.com
+
+[qzs02-w]
+qzs02w1pvt.mobilehealthconsumer.com celery_concurrency=2 celery_maxtaskperchild=1 hr_concurrency=2 hr_maxtaskperchild=1 bg_concurrency=2 bg_maxtaskperchild=10 bglow_concurrency=2 bglow_maxtaskperchild=2 mhc_proccess=3 celery_extras=" -B" burcaro_user_id=10000001055
+
+[qzs02-w:vars]
+postgres_password=c487cf499b
+db_server=qzs02db1
+env=qz
+shard=s02
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'sewAteckudnudd:wrotNayttEmadwalityirgAqu%'	
+sharded_cluster=True
+
+[qzs02-db:vars]
+postgres_password=c487cf499b
+env=qz
+shard=s02
+postgres_drive=sdp
+mongo_drive=sdm
+sharded_cluster=True
+
+[qzs02:children]
+qzs02-db
+qzs02-w
+
+[qzlog-w]
+qzlogw1pvt.mobilehealthconsumer.com mhc_proccess=3
+
+[qzlog-w:vars]
+postgres_password=c487cf499b
+db_server=qzlogdb1
+env=qz
+shard=log
+login_server_secret = '+3/Pslf2dUs2RxN+3/5i2dKCNt8V8vn+HecGQEj4mkY='
+secret_key = 'KrafvomejyifCecOcWityuHydNafInyenJihuims$'
+sharded_cluster=True
+
+[qzlog-db]
+qzlogdb1pvt.mobilehealthconsumer.com
+
+[qzlog-db:vars]
+postgres_password=c487cf499b
+env=qz
+shard=log
+postgres_drive=sdp
+mongo_drive=sdm
+sharded_cluster=True
+
+[qzlog:children]
+qzlog-db
+qzlog-w
+
+[db:vars]
+cluster_version="14"
+environment_subnet="172.31.64.0/19"
+shared_subnet="172.31.0.0/19"
+effective_cache_size="128MB"
+random_page_cost="4.0"
+shared_buffers="128MB"
+log_min_duration_statement="40000"
+postgres_drive=sdp
+mongo_drive=sdm
+
+[db:children]
+qzs01-db
+qzs02-db
+qzlog-db
+
+[web:vars]
+swap_space=2048000000
+mhc_web_drive=sdf
+
+[web:children]
+web_shard
+qzlog-w
+
+[web_shard:children]
+qzs01-w
+qzs02-w
+
+[qz:children]
+qzs01
+qzs02
+qzlog

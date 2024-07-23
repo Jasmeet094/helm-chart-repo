@@ -1,0 +1,39 @@
+---
+  - name: mkdir for apns
+    file:
+      path: /home/mhc/crypt/apns
+      state: directory
+      owner: mhc
+      group: mhc
+      mode: '0755'
+    tags:
+      - apns
+
+  - name: Retrieve apns assets from S3
+    aws_s3:
+      bucket: "{{s3_bucket}}"
+      object: "secrets/apns/{{item}}"
+      dest: "/home/mhc/crypt/apns/{{item}}"
+      mode: get
+    with_items:
+      - "AlightWellbeingProductionAPNS.pem"
+      - "EngagementPointProductionAPNS.pem"
+      - "MHCUniversalProductionAPNS.pem"
+      - "StudentHealthProductionAPNS.pem"
+      - "CarePlusProductionAPNS.pem"
+      - "MHCSponsorSelectorProductionAPNS.pem"
+      - "MobileHealthProductionAPNS.pem"
+    tags:
+      - apns
+
+  - name: Recursively setting file prems
+    file:
+      path: /home/mhc/crypt/apns
+      state: directory
+      recurse: yes
+      owner: mhc
+      group: mhc
+      mode: '0755'
+    tags:
+      - apns
+    

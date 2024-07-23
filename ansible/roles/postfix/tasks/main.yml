@@ -1,0 +1,16 @@
+---
+- name: Install Postfix
+  ansible.builtin.apt:
+    name: postfix
+    state: present
+  tags:
+    - postfix
+    - postfix-install
+  become: true
+
+- name: Configure postfix
+  ansible.builtin.import_tasks: configure.yml
+  become: true
+  tags:
+    - postfix
+    - postfix-install

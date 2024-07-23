@@ -1,0 +1,523 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "MHC Security Groups v1.0.1",
+  "Parameters" : {
+    "Environment": {
+      "Description" : "What is the Environment you are building?",
+      "Default" : "ProdTest",
+      "Type" : "String"
+    },
+    "DatabasePlatform": {
+      "Description" : "Database Platform",
+      "Default" : "PostGreSQL",
+      "Type" : "String",
+      "AllowedValues" : ["MySQL", "PostGreSQL","MS SQL","Oracle","MongoDB"]
+    },
+
+    "DatabasePlatform2": {
+      "Description" : "Secondary Database Platform",
+      "Default" : "MongoDB",
+      "Type" : "String",
+      "AllowedValues" : ["MySQL", "PostGreSQL","MS SQL","Oracle","MongoDB", "None"]
+    }
+  },
+
+  "Conditions" : {
+    "condMySQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MySQL"]},
+    "condPostGreSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "PostGreSQL"]},
+    "condMSSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MS SQL"]},
+    "condOracle": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "Oracle"]},
+    "condMongoDB": {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MongoDB"]},
+
+    "condMySQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "MySQL"]},
+    "condPostGreSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "PostGreSQL"]},
+    "condMSSQL": {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "MS SQL"]},
+    "condOracle": {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "Oracle"]},
+    "condMongoDB": {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "MongoDB"]},
+
+
+    "condAllMySQL":  {"Fn::Or" : [
+      {"Fn::Equals" : [{"Ref" : "DatabasePlatform"}, "MySQL"]},
+      {"Fn::Equals" : [{"Ref" : "DatabasePlatform2"}, "MySQL"]}]},
+    "condAllPostGreSQL": {"Fn::Or" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "PostGreSQL"]}, {"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform2"}, "PostGreSQL"]}]},
+    "condAllOracle": {"Fn::Or" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "Oracle"]}, {"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform2"}, "Oracle"]}]},
+    "condAllMSSQL": {"Fn::Or" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MS SQL"]}, {"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform2"}, "MS SQL"]}]},
+    "condAllMongoDB": {"Fn::Or" : [{"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform"}, "MongoDB"]}, {"Fn::Equals" : [
+      {"Ref" : "DatabasePlatform2"}, "MongoDB"]}]}
+  },
+
+  "Resources" : {
+    "sgApp": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": {"Fn::Join": ["", ["App-", { "Ref": "Environment"} ]] },
+        "VpcId": {
+          "Fn::ImportValue" : "VPCID"
+        },
+        "Tags": [{
+          "Key": "Name",
+          "Value": {"Fn::Join": ["", ["App-", { "Ref": "Environment"} ]] },
+        }, {
+          "Key": "Environment",
+          "Value" : { "Ref": "Environment"}
+        }]
+      }
+    },
+
+    "igApp80fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igApp443fromELB": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+
+
+    "igApp22fromDeployment": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "SourceSecurityGroupId": {
+          "Fn::ImportValue" : "MHCSSDeployment"
+        }
+      }
+    },
+
+    "igAppAllfromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "egAppAllfromApp": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "egApp80toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egApp443toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egApp123toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "123",
+        "ToPort": "123",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egApp3306toDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condAllMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egApp1521toDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condAllOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egApp27027toDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condAllMongoDB",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27027",
+        "ToPort": "27027",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egApp1433toDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condAllMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egApp6432toDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Condition": "condAllPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgApp"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "6432",
+        "ToPort": "6432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "sgELB": {
+      "Type": "AWS::EC2::SecurityGroup",
+            "Properties": {
+              "GroupDescription": {"Fn::Join": ["", ["ELB-", { "Ref": "Environment"} ]] },
+        "VpcId": {
+          "Fn::ImportValue" : "VPCID"
+        },
+        "Tags": [{
+          "Key": "Name",
+          "Value": {"Fn::Join": ["", ["ELB-", { "Ref": "Environment"} ]] }
+        }, {
+          "Key": "Environment",
+          "Value" : { "Ref": "Environment"}
+        }]
+      }
+    },
+
+    "igELB80fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgELB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "igELB443fromAll": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgELB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egELB80toApp": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgELB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "egELB443toApp": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgELB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "sgDB": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": {"Fn::Join": ["", ["DB-", { "Ref": "Environment"} ]] },
+        "VpcId": {
+          "Fn::ImportValue" : "VPCID"
+        },
+        "Tags": [{
+          "Key": "Name",
+          "Value": {"Fn::Join": ["", ["DB-", { "Ref": "Environment"} ]] },
+        }, {
+          "Key": "Environment",
+          "Value" : { "Ref": "Environment"}
+        }]
+      }
+    },
+
+    "igDB3306fromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condAllMySQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "igDB1521fromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condAllOracle",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1521",
+        "ToPort": "1521",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "igDB1433fromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condAllMSSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "1433",
+        "ToPort": "1433",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "igDB6432fromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condAllPostGreSQL",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "6432",
+        "ToPort": "6432",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+    "igDB27027fromApp": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Condition": "condAllMongoDB",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "27027",
+        "ToPort": "27027",
+        "SourceSecurityGroupId": {
+          "Ref": "sgApp"
+        }
+      }
+    },
+
+
+    "igDBAllfromDB": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+            "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egDBAllfromDB": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgDB"
+        }
+      }
+    },
+
+    "egDB80toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egDB443toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+
+    "egDB123toAny": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgDB"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "123",
+        "ToPort": "123",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+
+    "Outputs": {
+        "sgApp": {
+            "Description" : "SG for App",
+            "Value" :    {"Ref": "sgApp"},
+            "Export" : {
+                "Name" : "sgApp"
+            }
+        },
+    "Outputs": {
+        "sgDB": {
+            "Description" : "SG for DB",
+            "Value" :    {"Ref": "sgDB"},
+            "Export" : {
+                "Name" : "sgDB"
+            }
+        },
+    "Outputs": {
+        "sgELB": {
+            "Description" : "SG for LB",
+            "Value" :    {"Ref": "sgELB"},
+            "Export" : {
+                "Name" : "sgELB"
+            }
+        }
+}

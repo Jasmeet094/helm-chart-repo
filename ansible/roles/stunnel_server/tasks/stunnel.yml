@@ -1,0 +1,53 @@
+---
+- name: Put stunnel server config in place
+  template:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/stunnel/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+    - mhc.conf
+  tags:
+    - stunnel
+
+- name: Put stunnel server default in place
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0644
+    dest: /etc/default/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+    - stunnel4
+  tags:
+    - stunnel
+
+- name: Put stunnel cert in place
+  copy:
+    remote_src: False
+    owner: root
+    group: root
+    mode: 0600
+    dest: /etc/stunnel/{{ item }}
+    src: "{{ item }}"
+  become: True
+  with_items:
+    - cert.pem
+  notify: restart stunnel4
+  tags:
+    - stunnel
+
+- name: restart stunnel4
+  service: name=stunnel4 state=restarted
+  become: True
+  when: is_vagrant == False
+
+- name: stop stunnel4
+  service: name=stunnel4 state=restarted
+  become: True
+  when: is_vagrant

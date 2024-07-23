@@ -1,0 +1,48 @@
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "ansible/roles",
+    "ansible/files",
+    "terraform",
+    "mhc-lambda-redmine",
+    "server_config",
+    "sshkey",
+    "Operations_Tag_Script",
+    "CopyToDRRegion"
+]
+
+line-length = 120
+target-version = "py311"
+preview = true
+fix = true
+
+[tool.ruff.lint]
+select = ["F","E", "W","C90","I","N","D","UP","YTT","ANN","ASYNC","TRIO","S","BLE","FBT","B","A","COM","CPY","C4","DTZ","T10","DJ","EM","EXE","FA","ISC","ICN","G","INP","PIE","T20","PYI","PT","Q","RSE","RET","SLF","SLOT","SIM","TID","TCH","INT","ARG","PTH","TD","FIX","ERA","PD","PGH","PL","TRY","FLY","NPY","AIR","PERF","FURB","LOG","RUF"]
+ignore = ["COM812", "ISC001", "E731", "D211", "D213", "INP001", "CPY001", "T201", "DTZ001", "DTZ005", "TRY003", "EM101", "ANN101", "PLR6104", "RUF027", "PLW1514", "PGH004", "PLC0206"]
+
+[tool.ruff.per-file-ignores]
+"test_*.py" = ["D100", "S403", "S101", "ANN001", "ANN201"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"

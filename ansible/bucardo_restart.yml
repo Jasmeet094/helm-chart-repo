@@ -1,0 +1,14 @@
+- name: Stop bucardo service
+  hosts: all
+  become: yes
+  vars:
+    restart_hosts: False
+
+  tasks:
+    - name: Disble bucardo on DB servers
+      ansible.builtin.systemd:
+        state: stopped
+        name: bucardo
+        enabled: no
+        force: yes
+      when: "tags.Role in ['Database']"

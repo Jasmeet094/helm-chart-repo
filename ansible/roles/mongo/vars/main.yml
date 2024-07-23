@@ -1,0 +1,8 @@
+---
+mongo_apt_key: "https://www.mongodb.org/static/pgp/server-3.6.asc"
+mongo_apt_repo: "https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.6"
+mongo_repo_filename: "mongodb-org"
+specific_mongo_vers_minor: "3.6.23"
+specific_mongo_vers_major: "3.6"
+compatability_vers: "3.6"
+mongo_drive: "sdm"
