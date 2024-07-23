@@ -1,4 +1,5 @@
-name: Lint-MHC_TEST_DEMO
+---
+name: Lint_mhc_test
 
 on:
   push:
@@ -10,7 +11,7 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      changed_files: ${{ steps.set_changed_files.outputs.changed_files }}
+      changed_files: ${{ steps.get_changed_files.outputs.changed_files }}
 
     steps:
       - name: Checkout Code
@@ -20,16 +21,12 @@ jobs:
 
       - name: Get Changed Files
         id: get_changed_files
-        run: |
-          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' '|')
-          echo "changed_files=$changed_files" >> $GITHUB_ENV
-          echo "changed_files=$changed_files" # Debugging line
-
-      - name: Set Changed Files Output
-        id: set_changed_files
-        run: echo "changed_files=${{ env.changed_files }}"
-        env:
-          changed_files: ${{ env.changed_files }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { execSync } = require('child_process');
+            const changedFiles = execSync('git diff --name-only ${{ github.event.before }} ${{ github.sha }}').toString().trim().split('\n').filter(file => file);
+            return JSON.stringify(changedFiles);
 
   super-linter:
     name: Super Linter
@@ -47,11 +44,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Debug Changed Files
-        run: echo "CHANGED_FILES=${{ needs.get_changed_files.outputs.changed_files }}" # Debugging line
-
       - name: Set Environment Variables for Changed Files
-        run: echo "CHANGED_FILES=${{ needs.get_changed_files.outputs.changed_files }}" >> $GITHUB_ENV
+        run: |
+          echo "CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')" >> $GITHUB_ENV
 
       - name: Lint Changed Files
         uses: github/super-linter@v6
@@ -60,16 +55,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_INCLUDE: ${{ env.CHANGED_FILES }}
           VALIDATE_ANSIBLE: false
+          # disable all python linters
+          # ruff is taking care of this
           VALIDATE_PYTHON: false
           VALIDATE_PYTHON_BLACK: false
           VALIDATE_PYTHON_FLAKE8: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
+          # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
+          # specify one on the command line". Since there is no environment variable to set one on
+          # the command line, that means you need a configuration file (pyproject.toml by default)
+          # just to be able to use it.
           VALIDATE_SQLFLUFF: false
-          VALIDATE_JSCPD: false
+          VALIDATE_JSCPD: false 
           VALIDATE_CHECKOV: false
-          VALIDATE_GO: false
+          VALIDATE_GO: false 
 
   ansible-lint:
     name: Ansible Lint
@@ -91,7 +92,7 @@ jobs:
 
       - name: Run ansible-lint on changed files
         run: |
-          CHANGED_FILES="${{ needs.get_changed_files.outputs.changed_files }}"
+          CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')
           for file in $CHANGED_FILES; do
             if [[ $file == *.yml || $file == *.yaml ]]; then
               ansible-lint $file
@@ -108,19 +109,5 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.x
-
-      - name: Install Ruff
-        run: pip install ruff
-
       - name: Ruff check
-        run: |
-          CHANGED_FILES="${{ needs.get_changed_files.outputs.changed_files }}"
-          for file in $CHANGED_FILES; do
-            if [[ $file == *.py ]]; then
-              ruff check $file
-            fi
-          done
+        uses: chartboost/ruff-action@v1
