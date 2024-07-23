@@ -90,7 +90,7 @@ jobs:
 
       - name: Run ansible-lint on changed files
         run: |
-          CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.all_changed_files }}' | jq -r '.[]')
+          CHANGED_FILES="${{ needs.get_changed_files.outputs.all_changed_files }}"
           for file in $CHANGED_FILES; do
             if [[ $file == *.yml || $file == *.yaml ]]; then
               ansible-lint $file
