@@ -1,4 +1,4 @@
-name: Lint-MHC_TEST
+name: Lint_TEST
 
 on:
   push:
