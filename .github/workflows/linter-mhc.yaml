@@ -41,12 +41,10 @@ jobs:
           fetch-depth: 0
 
       - name: Display Changed Files
-        run: |
-          echo "Changed files: $(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')"
+        run: echo "Changed files: ${{ needs.get_changed_files.outputs.changed_files }}"
 
       - name: Set Environment Variables for Changed Files
-        run: |
-          echo "CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')" >> $GITHUB_ENV
+        run: echo "CHANGED_FILES=${{ needs.get_changed_files.outputs.changed_files }}" >> $GITHUB_ENV
 
       - name: Lint Changed Files
         uses: github/super-linter@v6
@@ -86,7 +84,7 @@ jobs:
 
       - name: Run ansible-lint on changed files
         run: |
-          CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')
+          CHANGED_FILES="${{ needs.get_changed_files.outputs.changed_files }}"
           for file in $CHANGED_FILES; do
             if [[ $file == *.yml || $file == *.yaml ]]; then
               ansible-lint $file
@@ -104,10 +102,9 @@ jobs:
           fetch-depth: 1
 
       - name: Display Changed Files
-        run: |
-          echo "Changed files: $(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')"
+        run: echo "Changed files: ${{ needs.get_changed_files.outputs.changed_files }}"
 
       - name: Ruff check
         uses: chartboost/ruff-action@v1
         with:
-          args: $(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')
+          args: ${{ needs.get_changed_files.outputs.changed_files }}
