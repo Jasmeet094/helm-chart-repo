@@ -1,5 +1,4 @@
----
-name: Lint-Code-Base -MHC-TEST
+name: Lint Code Base
 
 on:
   push:
@@ -21,12 +20,8 @@ jobs:
 
       - name: Get Changed Files
         id: get_changed_files
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { execSync } = require('child_process');
-            const changedFiles = execSync('git diff --name-only ${{ github.event.before }} ${{ github.sha }}').toString().trim().split('\n').filter(file => file);
-            return JSON.stringify(changedFiles);
+        run: |
+          echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')"
 
   super-linter:
     name: Super Linter
@@ -45,8 +40,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set Environment Variables for Changed Files
-        run: |
-          echo "CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')" >> $GITHUB_ENV
+        run: echo "CHANGED_FILES=${{ needs.get_changed_files.outputs.changed_files }}" >> $GITHUB_ENV
 
       - name: Lint Changed Files
         uses: github/super-linter@v6
@@ -54,20 +48,13 @@ jobs:
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_INCLUDE: ${{ env.CHANGED_FILES }}
-          #VALIDATE_BASH_EXEC: true
           VALIDATE_ANSIBLE: false
-          # disable all python linters
-          # ruff is taking care of this
           VALIDATE_PYTHON: false
           VALIDATE_PYTHON_BLACK: false
           VALIDATE_PYTHON_FLAKE8: false
           VALIDATE_PYTHON_ISORT: false
           VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
-          # sql fluff is a sql smeller written in Python, and "You must configure a dialect or
-          # specify one on the command line". Since there is no environment variable to set one on
-          # the command line, that means you need a configuration file (pyproject.toml by default)
-          # just to be able to use it.
           VALIDATE_SQLFLUFF: false
           VALIDATE_JSCPD: false 
           VALIDATE_CHECKOV: false 
@@ -93,7 +80,7 @@ jobs:
 
       - name: Run ansible-lint on changed files
         run: |
-          CHANGED_FILES=$(echo '${{ needs.get_changed_files.outputs.changed_files }}' | jq -r '.[]')
+          CHANGED_FILES="${{ needs.get_changed_files.outputs.changed_files }}"
           for file in $CHANGED_FILES; do
             if [[ $file == *.yml || $file == *.yaml ]]; then
               ansible-lint $file
@@ -112,3 +99,5 @@ jobs:
 
       - name: Ruff check
         uses: chartboost/ruff-action@v1
+        with:
+          args: ${{ needs.get_changed_files.outputs.changed_files }}
