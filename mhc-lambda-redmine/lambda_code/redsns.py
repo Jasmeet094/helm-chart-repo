@@ -10,20 +10,6 @@ url = 'https://dev2.mobilehealthconsumer.com/redmine'
 name = 'hitrust-evidence'
 assigned_id = '39' # George's ID
 
-def get_file_path(issue, extention):
-    if platform.system() == "Darwin":
-        file_path = '%s/scratch/%s.%s' % (expanduser("~"), issue, extention)
-        return file_path
-
-    elif platform.system() == "Linux":
-        file_path = '/tmp/%s.%s' % (issue, extention)
-        return file_path
-
-    else:
-        sys.exit(1)
-
-
-
 # ToDo: Figure out why CA cert is not working
 redmine = Redmine(url, key=key, requests={'verify': False})
 project = redmine.project.get(name)

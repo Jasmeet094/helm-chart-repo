@@ -15,15 +15,3 @@ SELECT "partners_clientformula"."updated",
     "partners_clientformula"."text_description",
     "partners_clientformula"."recalculation_mode",
     COALESCE("partners_clientformula"."formula_tokens", NULL) AS "tokens2"
-FROM "partners_clientformula"
-WHERE (
-    "partners_clientformula"."client_id" = :client_id
-    AND "partners_clientformula"."recalculation_mode" IN ('depsave')
-    AND (
-        COALESCE("partners_clientformula"."formula_tokens", NULL) @> '[{"ruleType": "CF", "customFieldDefId": 80000634231, "attributeName": "Attributes"}]'
-        OR COALESCE("partners_clientformula"."formula_tokens", NULL) @> '[{"ruleType": "CF", "customFieldDefId": 80000634231}]'
-        OR COALESCE("partners_clientformula"."formula_tokens", NULL) @> '[{"ruleType": "CF", "customFieldDefId": 80000634231}]'
-        OR COALESCE("partners_clientformula"."formula_tokens", NULL) @> '[{"ruleType": "CFDD", "customFieldDefId": 80000634231}]'
-        OR COALESCE("partners_clientformula"."formula_tokens", NULL) @> '[{"ruleType": "CFD", "customFieldDefId": 80000634231}]'
-    )
-)
