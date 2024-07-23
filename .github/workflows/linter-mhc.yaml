@@ -10,7 +10,7 @@ jobs:
     name: Get Changed Files
     runs-on: ubuntu-latest
     outputs:
-      changed_files: ${{ steps.get_changed_files.outputs.changed_files }}
+      changed_files: ${{ steps.set_changed_files.outputs.changed_files }}
 
     steps:
       - name: Checkout Code
@@ -21,7 +21,14 @@ jobs:
       - name: Get Changed Files
         id: get_changed_files
         run: |
-          echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')"
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+      - name: Set Changed Files Output
+        id: set_changed_files
+        run: echo "changed_files=${{ env.changed_files }}"
+        env:
+          changed_files: ${{ env.changed_files }}
 
   super-linter:
     name: Super Linter
