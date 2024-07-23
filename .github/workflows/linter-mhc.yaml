@@ -1,8 +1,9 @@
-name: Lint-MHC_TEST_DEMO
+name: Lint Code Base
+
 on:
   push:
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   get_changed_files:
@@ -20,7 +21,8 @@ jobs:
       - name: Get Changed Files
         id: get_changed_files
         run: |
-          echo "::set-output name=changed_files::$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')"
+          changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | tr '\n' ' ')
+          echo "::set-output name=changed_files::$changed_files"
 
   super-linter:
     name: Super Linter
@@ -47,7 +49,7 @@ jobs:
       - name: Lint Changed Files
         uses: github/super-linter@v6
         env:
-          DEFAULT_BRANCH: main
+          DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FILTER_REGEX_INCLUDE: ${{ env.CHANGED_FILES }}
           VALIDATE_ANSIBLE: false
