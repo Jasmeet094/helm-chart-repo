@@ -1,0 +1,48 @@
+name: Hotfix-Dev Deployment
+
+on:
+  workflow_dispatch:
+    inputs:
+      feature_branch_name:
+        description: 'The feature branch to deploy'
+        required: true
+        default: ''
+
+jobs:
+  backup-hotfix-dev:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Fetch all branches
+      run: |
+        git fetch --all
+
+    - name: Create backup branch
+      id: backup
+      run: |
+        TIMESTAMP=$(date +"%Y%m%d%H%M")
+        BACKUP_BRANCH="backup-hotfix-dev-${TIMESTAMP}"
+        git checkout hotfix-dev
+        git checkout -b ${BACKUP_BRANCH}
+        git push origin ${BACKUP_BRANCH}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  push-feature-branch:
+    runs-on: ubuntu-latest
+    needs: backup-hotfix-dev
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Force push feature branch to hotfix-dev
+      run: |
+        FEATURE_BRANCH=${{ github.event.inputs.feature_branch_name }}
+        git checkout ${FEATURE_BRANCH}
+        git push origin ${FEATURE_BRANCH}:hotfix-dev --force
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
