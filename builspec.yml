@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "🔧 Installing dependencies (none needed for this test)"
+  pre_build:
+    commands:
+      - echo "🚀 Pre-build started"
+      - echo "Git branch: $CODEBUILD_WEBHOOK_HEAD_REF"
+      - echo "Git commit: $CODEBUILD_RESOLVED_SOURCE_VERSION"
+  build:
+    commands:
+      - echo "🏗️ Build phase running"
+      - echo "This is a test build triggered by a GitHub push"
+  post_build:
+    commands:
+      - echo "✅ Build complete"
+artifacts:
+  files:
+    - '**/*'
